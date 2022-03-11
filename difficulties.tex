@@ -1,0 +1,37 @@
+\section{Practical Considerations}
+\label{sec:difficulties}
+
+This section focuses on other things we had to do beyond
+the core WPI algorithm presented in the previous section
+in order to get a working tool. Its subsections should
+be massaged to make them sound like theoretical problems---the idea
+is that the reader should think of this section as the list of
+problems we had to solve along the way, and the solutions to
+the problems.
+
+\subsection{Infinite Descending Chains}
+\label{sec:infinite-descending-chains}
+
+The usual lattice definition in an abstract interpretation
+(or equivalently, a type system, cite Cousot 1997) forbids
+infinite ascending chains but permits infinite descending chains.
+The WPI fixpoint algorithm has a problem with them, though, and
+needs widening operators. Talk about the early problems
+with WPI on the Value Checker, where WPI would run for hundreds of
+iterations: @IntRange(1, 10) -> @IntRange(1, 11) -> \ldots.
+
+\subsection{Pre- and Post-conditions}
+\label{sec:pre-post-conditions}
+
+Discuss some of the troubles that Mike encountered when
+he implemented pre- and post-condition support in WPI. Frame
+this as a theoretical problem.
+
+\subsection{Output Format}
+\label{sec:output}
+
+Find a way to frame the various WPI modes (i.e., JAIF mode,
+stub mode, ajava mode) as a solution to a theoretical problem.
+
+\todo{Think more about this and remember what other big problems
+  we had to solve, and then add corresponding subsections.}

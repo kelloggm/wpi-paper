@@ -20,11 +20,17 @@
 # *.ps
 # *.eps
 # *.pdf
+resource-leak.pdf
+resource-leak-notodos.pdf
+onefile.tex
+onefile.pdf
+onefile.zip
 
 ## Generated if empty string is given at "Please type another file name for output:"
 .pdf
 
 ## Bibliography auxiliary files (bibtex/biblatex/biber):
+bib
 *.bbl
 *.bcf
 *.blg
@@ -40,14 +46,11 @@
 *.synctex.gz(busy)
 *.pdfsync
 
-## Build tool directories for auxiliary files
-# latexrun
-latex.out/
-
 ## Auxiliary and intermediate files from other packages:
 # algorithms
 *.alg
 *.loa
+comment.cut
 
 # achemso
 acs-*.bib
@@ -63,9 +66,6 @@ acs-*.bib
 
 # changes
 *.soc
-
-# comment
-*.cut
 
 # cprotect
 *.cpt
@@ -109,11 +109,6 @@ acs-*.bib
 *.glo
 *.gls
 *.glsdefs
-*.lzo
-*.lzs
-
-# uncomment this for glossaries-extra (will ignore makeindex's style files!)
-# *.ist
 
 # gnuplottex
 *-gnuplottex-*
@@ -142,13 +137,11 @@ acs-*.bib
 # listings
 *.lol
 
-# luatexja-ruby
-*.ltjruby
-
 # makeidx
 *.idx
 *.ilg
 *.ind
+*.ist
 
 # minitoc
 *.maf
@@ -198,9 +191,6 @@ sympy-plots-for-*.tex/
 *.pytxcode
 pythontex-files-*/
 
-# tcolorbox
-*.listing
-
 # thmtools
 *.loe
 
@@ -212,15 +202,8 @@ pythontex-files-*/
 # todonotes
 *.tdo
 
-# vhistory
-*.hst
-*.ver
-
 # easy-todo
 *.lod
-
-# xcolor
-*.xcp
 
 # xmpincl
 *.xmpi
@@ -228,9 +211,8 @@ pythontex-files-*/
 # xindy
 *.xdy
 
-# xypic precompiled matrices and outlines
+# xypic precompiled matrices
 *.xyc
-*.xyd
 
 # endfloat
 *.ttt
@@ -247,20 +229,11 @@ TSWLatexianTemp*
 # Texpad
 .texpadtmp
 
-# LyX
-*.lyx~
-
 # Kile
 *.backup
 
-# gummi
-.*.swp
-
 # KBibTeX
 *~[0-9]*
-
-# TeXnicCenter
-*.tps
 
 # auto folder when using emacs and auctex
 ./auto/*
@@ -272,5 +245,10 @@ TSWLatexianTemp*
 # standalone packages
 *.sta
 
-# Makeindex log files
-*.lpz
+# generated if using elsarticle.cls
+*.spl
+
+# emacs temporary files
+*~
+
+wpi.pdf

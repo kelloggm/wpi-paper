@@ -1,0 +1,22 @@
+%% This is the primary table.
+
+\begin{table*}
+  \caption{
+    WPI performance on human-annotated benchmarks. ``Annotated for'' is
+    the names of the typecheckers for which human annotations were written
+    (see \cref{tab:checkers} to understand the codes).
+    ``NCNB LoC'' is the number of lines of non-comment, non-blank code.
+    ``Annos.'' is the number of human-written annotations, across all typecheckers.
+    ``WPI \% Inferred'' is the percentage of the human-written annotations that WPI
+    inferred.
+  }
+  \label{tab:case-studies}
+  \posttablecaption
+
+  \begin{tabular}{@{}ll|rrr@{}}
+    \textbf{\smaller{Benchmark}} & Annoted for & NCNB LoC & Annos. & WPI \% Inferred \\
+    \textbf{\smaller{JFreeChart}} & In & 95,000 & 2,500 & X\% \\
+    \textbf{\smaller{PlumeUtil}} & All & 10,000 & ? & X\% \\
+    \ldots & \ldots & \ldots & \ldots & \ldots \\
+  \end{tabular}
+\end{table*}

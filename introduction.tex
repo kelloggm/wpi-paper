@@ -1,0 +1,62 @@
+\section{Introduction}
+\label{sec:intro}
+
+\todo{Turn this into actual text with references rather than bullets.}
+
+Pluggable types are a great way to verify programs. People in industry
+use them and lots of papers have been published about them.
+
+A problem with pluggable types (and other type systems, too!) is that
+users need to write type annotations. There is a benefit to writing
+type annotations: documentation. There is a burden, too, though: it
+is time-consuming and can be intimidating for new users.
+
+Type inference is a classic plan to save the day when writing types gets
+too painful. Cite some classic work, like Hindley-Milner. Cite some recent
+work on type inference, like for TypeScript or Python. Describe the general
+approaches to type inference, with an emphasis on the need to build and then
+solve systems of constraints.
+
+Oh no, a problem! There are many pluggable type systems that we might want
+to do inference for, and it is impractical to build custom solvers or
+constraint systems for each. Whatever will we do?
+
+We propose a \emph{generic} type inference algorithm for pluggable type
+systems that is applicable to any flow-sensitive pluggable type system.
+Our key insight is that we can use \emph{local} type inference (i.e.,
+the flow-sensitivity that modern pluggable type systems already have!)
+to derive global facts. We do this in a fixpoint algorithm, and, as a bonus,
+we can run the typechecker itself when we're done to check that we haven't
+made any mistakes.
+
+We implemented this idea for a popular open-source pluggable type system
+framework. There were some difficulties along the way---we're going to
+impress you with how much engineering we did. We used our tools to run
+on some massive number of lines of code---look at our big experiments!
+We found that our inference approach infers some large \% of human-written
+annotations. We also show that our approach is general, by running it
+on \todo{some number bigger than 10} different typecheckers.
+
+We also compared our approach to bespoke inference systems that build
+systems of constraints for particular type systems, like nullness or
+maybe CFI (if Werner is an author of this paper). We show that our approach
+produces similarly-good results, but didn't require a ton of extra
+implementation effort for each new type system.
+
+Our contributions are:
+\begin{itemize}
+\item a novel type inference algorithm for flow-sensitive pluggable
+  typecheckers (\cref{sec:core-algorithm});
+\item a collection of enhancements to the algorithm that are necessary to
+  make it practical (\cref{sec:difficulties});
+\item an implementation of our new type inference algorithm for a framework
+  for building pluggable typecheckers (\cref{sec:implementation});
+\item an evaluation of our implementation, that shows that it can infer
+  \todo{X}\% of human-written annotations in \todo{Y} projects totalling
+  \todo{Z} lines of non-comment, non-blank Java code, across \todo{W} different
+  pluggable typecheckers (\cref{sec:evaluation}); and,
+\item a comparison of our generic algorithm to specialized inference
+  techniques for specific typecheckers, which demonstrates that our generic
+  approach is about as good at inferring annotations but requires less
+  custom code (\cref{sec:comparison}).
+\end{itemize}

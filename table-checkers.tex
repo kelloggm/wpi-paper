@@ -1,0 +1,21 @@
+%% This is the table per-checker.
+
+\begin{table*}
+  \caption{
+    The results of \cref{tab:case-studies} indexed by typechecker
+    rather than by benchmark. ``Code'' is the two-character code
+    used in the ``Annotated for'' column of \cref{tab:case-studies}.
+    A code in \cref{tab:case-studies} of ``All'' means that every
+    checker in this table was run on that project.\todo{Do we need the
+      ``All'' code?}
+  }
+  \label{tab:checkers}
+  \posttablecaption
+
+  \begin{tabular}{@{}ll|rrrr@{}}
+    \textbf{\smaller{Checker}} & Code & \# projects & NCNB LoC & Annos. & WPI \% Inferred \\
+    \textbf{\smaller{Index}} & In & 2 & 120,000 & 3,200 & X\% \\
+    \textbf{\smaller{Nullness}} & Nu & 5 & 100,000 & ? & X\% \\
+    \ldots & \ldots & \ldots & \ldots & \ldots \\
+  \end{tabular}
+\end{table*}
