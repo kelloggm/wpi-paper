@@ -187,14 +187,15 @@
 %% The abstract is a short summary of the work to be presented in the
 %% article.
 \begin{abstract}
-  Type inference is useful: it makes it easier for programmers to use
-  a type system by inferring type annotations, which programmers would
-  otherwise need to write by hand.
-  Traditional approaches to type inference are type system specific:
+  A pluggable type system extends a host type system with type qualifiers;
+  it enables detection and prevention of errors beyond the abilities of the
+  host type system.\todo{give some examples?}
+  The biggest obstacle to use of pluggable types is the need for
+  programmers to write type qualifiers.
+  Type inference can solve this problem.
+  Traditional approaches to type inference are type-system-specific:
   typically, a type inference algorithm builds and then solves a system
   of constraints corresponding to the rules of the underlying type system.
-  Pluggable type systems extend a host type system with type qualifiers related
-  to some property of interest.
   Unfortunately, traditional type inference
   techniques for some host language do not scale well to pluggable type
   systems: for each new pluggable type system, the type inference algorithm
@@ -205,7 +206,8 @@
   that is generic over the pluggable type system to which it is applied.
   That is, our system can conduct type inference for \emph{any} pluggable
   type system with no new type-system-specific code. The key insight behind
-  our new technique is that pluggable type systems are \emph{flow-sensitive}
+  our new technique is that pluggable type systems are
+  \emph{flow-sensitive}\todo{Ours are; not all have to be.}
   and therefore include \emph{local} type inference components. Our algorithm
   uses the results of local type inference to produce candidate summaries
   for procedures. These new summaries enable new local inference results
@@ -213,8 +215,8 @@
   summaries is reached.
 
   We have implemented our algorithm for the open-source Checker Framework
-  project, which includes a variety of specialized pluggable typecheckers
-  for Java. We used our inference algorithm with \todo{some number of} distinct
+  project, which is widely used in industry and on which dozens of specialized pluggable typecheckers
+  have been built. We used our inference algorithm with \todo{some number of} distinct
   pluggable typecheckers to annotate \todo{some number of} projects that had
   previously been annotated by humans, and found that our algorithm could
   infer \todo{X}\% of the human-written annotations. We also compared our
