@@ -8,7 +8,7 @@ use them and lots of papers have been published about them.
 
 A problem with pluggable types (and other type systems, too!) is that
 users need to write type annotations. There is a benefit to writing
-type annotations: documentation. There is a burden, too, though: it
+type annotations: correctness and documentation. There is a burden, too, though: it
 is time-consuming and can be intimidating for new users.
 
 Type inference is a classic plan to save the day when writing types gets
@@ -31,7 +31,8 @@ made any mistakes.
 
 We implemented this idea for a popular open-source pluggable type system
 framework. There were some difficulties along the way---we're going to
-impress you with how much engineering we did. We used our tools to run
+impress you with our clever solution to tricky problems, and also how much
+engineering we did. We used our tools to run
 on some massive number of lines of code---look at our big experiments!
 We found that our inference approach infers some large \% of human-written
 annotations. We also show that our approach is general, by running it
