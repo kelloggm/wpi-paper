@@ -17,10 +17,10 @@ split by checker ("original annotations")
 The procedure:
 
 1. Fork and then clone the project, and checkout the commit in the
-projects/ directory. In the file `projects.in`, record the URL and
+projects/ directory. In the file `projects.in`, record the URL (of your fork) and
 commit ID. Then, add a row to the "summary" sheet in the spreadsheet
 (https://docs.google.com/spreadsheets/d/1r_NhumolEp5CiOL7CmsvZaa4-FDUxCJXfswyJoKg8uM/edit?usp=sharing)
-without any data.
+with both the original and forked url as well as the commit ID.
 
 2. Create a new branch called "baseline" at that commit:
 `git checkout -b baseline ; git push origin baseline`
@@ -76,6 +76,9 @@ without any data.
     c. modify the variables at the beginning of the script as appropriate for the target project
     d. run the script
     e. transcribe the output after "====== COMBINED RESULTS =======" is printed to the spreadsheet, combining rows that mention the same annotation (this happens when e.g., different @RequiresQualifier annotations are inferred by different checkers)
+    f. commit and push the script: `git add compute-annos-inferred.sh ; git commit -m "inference output summarization script" ; git push origin wpi-annotations`
 
 11. Measure the percentage of hand-written annotations that WPI inferred
     a. TODO: write a script to do this
+
+12. Copy summary numbers from the project-specific spreadsheet page to the "summary" tab, and color code the project row green once it is finished.
