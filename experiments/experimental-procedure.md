@@ -71,9 +71,11 @@ without any data.
    d. commit the results: `git add wpi-annotations/** ; git commit -am "WPI annotations" ; git push origin wpi-annotations`
 
 10. Measure the number of annotations that WPI inferred, by checker:
-   a. create a list of the checkers used by WPI. You can collect this information from the produced ajava files.
-   b. write a script that, for each checker in the above list (TODO: write this script and add it to this repo):
-      i. copies the ajava files associated with that checker over top
-      of the original files from which they were produced
-      ii. runs AnnotationStatistics on the resulting program
-      iii. resets the state of the repository
+    a. switch to the `wpi-annotations` branch: `git checkout wpi-annotations`
+    b. create a copy of the script `compute-annos-inferred.sh` in the target project directory
+    c. modify the variables at the beginning of the script as appropriate for the target project
+    d. run the script
+    e. transcribe the output after "====== COMBINED RESULTS =======" is printed to the spreadsheet, combining rows that mention the same annotation (this happens when e.g., different @RequiresQualifier annotations are inferred by different checkers)
+
+11. Measure the percentage of hand-written annotations that WPI inferred
+    a. TODO: write a script to do this
