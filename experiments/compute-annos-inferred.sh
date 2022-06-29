@@ -24,6 +24,15 @@ RUN_ANNO_STATS="./gradlew compileJava"
 AJAVA_FILE_LIST=$(cd ${WPI_RESULTS_DIR} && find . -name "*-*.ajava")
 CHECKER_LIST=""
 
+if [ -f compute-annos-inferred-out ]; then
+    # from https://betterprogramming.pub/24-bashism-to-avoid-for-posix-compliant-shell-scripts-8e7c09e0f49a, in response to a shellcheck error noting that $RANDOM is not POSIX-compliant
+    var1=$(date +%s)
+    var2=$$
+    random="$var1$var2"
+    echo "making a backup of compute-annos-inferred-out in compute-annos-inferred-out-${random}"
+    mv compute-annos-inferred-out compute-annos-inferred-out-"${random}"
+fi
+
 for ajava_filename in ${AJAVA_FILE_LIST};
 do
     tmp=${ajava_filename##*-};
@@ -45,8 +54,12 @@ for checker in ${CHECKER_LIST}; do
 	    cp "${ajava_file}" "${JAVA_SRC_DIR}/${java_file}"
 	fi
     done
-    # run AnnotationStatistics
-    eval "${RUN_ANNO_STATS}"
+    # run AnnotationStatistics and append the results to the output file
+    eval "${RUN_ANNO_STATS}" >> compute-annos-inferred-out 2>&1
     # reset to the state before doing the copying
-    git reset --hard wpi-annotations --
+    git reset --hard wpi-annotations -- > /dev/null 2>&1
 done
+
+# find the lines from AnnotationStatistics listing annotations
+echo "====== COMBINED RESULTS ======="
+grep "^org.checkerframework" < compute-annos-inferred-out | sort | uniq
