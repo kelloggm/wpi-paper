@@ -19,6 +19,7 @@ The procedure:
 1. Fork and then clone the project, and checkout the commit in the
 projects/ directory. In the file `projects.in`, record the URL and
 commit ID. Then, add a row to the "summary" sheet in the spreadsheet
+(https://docs.google.com/spreadsheets/d/1r_NhumolEp5CiOL7CmsvZaa4-FDUxCJXfswyJoKg8uM/edit?usp=sharing)
 without any data.
 
 2. Create a new branch called "baseline" at that commit:
@@ -38,7 +39,7 @@ without any data.
    b. modify the project's build file so that it runs the
    `org.checkerframework.common.util.count.AnnotationStatistics` processor
    instead of the typecheckers it was running before
-   c. add the `-Aannotations` and `-Anolocations` options
+   c. add the `-Aannotations` and `-Anolocations` options, and make sure that you remove any `-Werror` argument to javac.
    d. compile the program and record the output in the spreadsheet. (You should
    create a new "sheet" in the spreadsheet for each project. Copy one that's
    already there and delete the data in it.)
@@ -64,7 +65,7 @@ without any data.
    typechecker issued the error) after the script is finished
 
 9. Create a branch for the code with inferred annotations
-   a. Create a branch: `git checkout -b wpi-annotations wpi-enabled`
+   a. Create a branch: `git checkout -b wpi-annotations annotation-statistics`
    b. Create a new directory for the inferred ajava files: `mkdir wpi-annotations`
    c. copy all the ajava files: `rsync -r ${WPITEMPDIR}/ wpi-annotations`
    d. commit the results: `git add wpi-annotations/** ; git commit -am "WPI annotations" ; git push origin wpi-annotations`
