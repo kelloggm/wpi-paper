@@ -79,6 +79,6 @@ with both the original and forked url as well as the commit ID.
     f. commit and push the script: `git add compute-annos-inferred.sh ; git commit -m "inference output summarization script" ; git push origin wpi-annotations`
 
 11. Measure the percentage of hand-written annotations that WPI inferred
-    a. TODO: write a script to do this
+    a. create a 
 
 12. Copy summary numbers from the project-specific spreadsheet page to the "summary" tab, and color code the project row green once it is finished.
