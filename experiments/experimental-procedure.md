@@ -14,6 +14,14 @@ split by checker ("original annotations")
 * the number of remaining errors after running WPI
 * the percentage of the original annotations that WPI inferred
 
+Prerequisites:
+* TODO: list required software. Incomplete list of software you must have installed:
+git, a JDK, the Checker Framework (see next item)
+* follow the "Building from Source" instructions in the Checker Framework manual
+(https://checkerframework.org/manual/#build-source), especially making sure
+that your $CHECKERFRAMEWORK environment variable is set, because that is used
+in some of the steps of the experimental procedure below.
+
 The procedure:
 
 1. Fork and then clone the project, and checkout the commit in the
