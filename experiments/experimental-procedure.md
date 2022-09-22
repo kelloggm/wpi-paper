@@ -44,9 +44,9 @@ with both the original and forked url as well as the commit ID.
 
 6. Collect the number of original annotations in the code:
    a. run `git checkout -b annotation-statistics origin/baseline`
-   b. modify the project's build file so that it runs the
-   `org.checkerframework.common.util.count.AnnotationStatistics` processor
-   instead of the typecheckers it was running before
+   b. modify the project's build file so that it
+        i. does not run the typecheckers that it was running before, and
+        ii. does runs the `org.checkerframework.common.util.count.AnnotationStatistics` processor
    c. add the `-Aannotations` and `-Anolocations` options, and make sure that you remove any `-Werror` argument to javac.
    d. compile the program and record the output in the spreadsheet. (You should
    create a new "sheet" in the spreadsheet for each project. Copy one that's
