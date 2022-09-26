@@ -64,7 +64,8 @@ with both the original and forked url as well as the commit ID.
 8. Run WPI:
    a. run `git checkout -b wpi-enabled origin/unannotated`
    b. choose any temporary directory for $WPITEMPDIR
-   c. modify the build file to run with `-Ainfer=ajava`, `-Awarns`, '-AinferOutputOriginal', and `-Aajava=$WPITEMPDIR` (modifying the latter as appropriate for project structure, Ex: '-Aajava=/path/to/temp/dir/'). Make sure that you remove any `-Werror` argument to javac, because otherwise WPI will fail.
+   c. modify the build file to run with `-Ainfer=ajava`, `-Awarns`, '-AinferOutputOriginal', and `-Aajava=$WPITEMPDIR` (modifying the latter as appropriate for project structure, 
+   Ex: '-Aajava=/path/to/temp/dir/').Make sure that you remove any `-Werror` argument to javac, because otherwise WPI will fail.
    d. write a short script based on the template in `wpi-template.sh`. The script should:
       i. copy the content of `build/whole-program-inference` into $WPITEMPDIR
       ii. compile the code 
