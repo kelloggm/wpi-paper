@@ -22,10 +22,9 @@ git, a JDK, the Checker Framework (see next item)
 that your $CHECKERFRAMEWORK environment variable is set, because that is used
 in some of the steps of the experimental procedure below.
 
-
-Example outputs of this experimental procedure can be found in 
-(/main/experiments/inferred-annos-counter/inputExamples). These may be used as inputs for some other tools but should be used for smaller projects only. 
-
+Example outputs of this experimental procedure (which may become inputs for downstream tools) 
+can be found in (/main/experiments/inferred-annos-counter/inputExamples). 
+These example inputs should only be used for smaller projects.
 
 The procedure:
 
