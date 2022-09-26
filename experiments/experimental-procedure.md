@@ -22,6 +22,10 @@ git, a JDK, the Checker Framework (see next item)
 that your $CHECKERFRAMEWORK environment variable is set, because that is used
 in some of the steps of the experimental procedure below.
 
+Use for small projects only, a good example project is (https://github.com/plume-lib/require-javadoc).
+Example input for tools can be found in (/main/experiments/inferred-annos-counter/inputExamples)
+
+
 The procedure:
 
 1. Fork and then clone the project, and checkout the commit in the
@@ -56,15 +60,15 @@ with both the original and forked url as well as the commit ID.
 
 7. Collect the number of lines of code:
    a. run `git checkout baseline`
-   b. run `scc .` and record the results in the spreadsheet, on the summary page
+   b. run `scc .` and record the results in the spreadsheet, on the summary page. You may need to install scc on your system.
 
 8. Run WPI:
    a. run `git checkout -b wpi-enabled origin/unannotated`
    b. choose any temporary directory for $WPITEMPDIR
-   c. modify the build file to run with `-Ainfer=ajava`, `-Awarns`, '-AinferOutputOriginal', and `-Aajava=$WPITEMPDIR` (modifying the latter as appropriate for project structure). Make sure that you remove any `-Werror` argument to javac, because otherwise WPI will fail.
+   c. modify the build file to run with `-Ainfer=ajava`, `-Awarns`, '-AinferOutputOriginal', and `-Aajava=$WPITEMPDIR` (modifying the latter as appropriate for project structure, Ex: '-Aajava=/path/to/temp/dir/'). Make sure that you remove any `-Werror` argument to javac, because otherwise WPI will fail.
    d. write a short script based on the template in `wpi-template.sh`. The script should:
       i. copy the content of `build/whole-program-inference` into $WPITEMPDIR
-      ii. compile the code
+      ii. compile the code 
       iii. compare `build/whole-program-inference` and $WPITEMPDIR. If they're the same, exit. Otherwise, go to step i.
    e. add this script: `chmod +x wpi.sh ; git add wpi.sh`
    f. commit the script and build changes: `git commit -am "enable WPI" ; git push origin wpi-enabled`
