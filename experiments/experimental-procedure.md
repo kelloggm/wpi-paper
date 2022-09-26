@@ -22,8 +22,9 @@ git, a JDK, the Checker Framework (see next item)
 that your $CHECKERFRAMEWORK environment variable is set, because that is used
 in some of the steps of the experimental procedure below.
 
-Use for small projects only, a good example project is (https://github.com/plume-lib/require-javadoc).
-Example input for tools can be found in (/main/experiments/inferred-annos-counter/inputExamples)
+
+Example outputs of this experimental procedure can be found in 
+(/main/experiments/inferred-annos-counter/inputExamples). These may be used as inputs for some other tools but should be used for smaller projects only. 
 
 
 The procedure:
