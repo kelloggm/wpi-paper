@@ -22,9 +22,9 @@ git, a JDK, the Checker Framework (see next item)
 that your $CHECKERFRAMEWORK environment variable is set, because that is used
 in some of the steps of the experimental procedure below.
 
-Use for small projects only, a good example project is (https://github.com/plume-lib/require-javadoc).
-Example input for tools can be found in (/main/experiments/inferred-annos-counter/inputExamples)
-
+Example outputs of this experimental procedure (which may become inputs for downstream tools) 
+can be found in (/main/experiments/inferred-annos-counter/inputExamples). 
+These example inputs should only be created for smaller projects.
 
 The procedure:
 
@@ -64,7 +64,8 @@ with both the original and forked url as well as the commit ID.
 8. Run WPI:
    a. run `git checkout -b wpi-enabled origin/unannotated`
    b. choose any temporary directory for $WPITEMPDIR
-   c. modify the build file to run with `-Ainfer=ajava`, `-Awarns`, '-AinferOutputOriginal', and `-Aajava=$WPITEMPDIR` (modifying the latter as appropriate for project structure, Ex: '-Aajava=/path/to/temp/dir/'). Make sure that you remove any `-Werror` argument to javac, because otherwise WPI will fail.
+   c. modify the build file to run with `-Ainfer=ajava`, `-Awarns`, '-AinferOutputOriginal', and `-Aajava=$WPITEMPDIR` (modifying the latter as appropriate for project structure, 
+   Ex: '-Aajava=/path/to/temp/dir/'). Make sure that you remove any `-Werror` argument to javac, because otherwise WPI will fail.
    d. write a short script based on the template in `wpi-template.sh`. The script should:
       i. copy the content of `build/whole-program-inference` into $WPITEMPDIR
       ii. compile the code 
@@ -88,6 +89,9 @@ with both the original and forked url as well as the commit ID.
     d. run the script
     e. transcribe the output after "====== COMBINED RESULTS =======" is printed to the spreadsheet, combining rows that mention the same annotation (this happens when e.g., different @RequiresQualifier annotations are inferred by different checkers)
     f. commit and push the script: `git add compute-annos-inferred.sh ; git commit -m "inference output summarization script" ; git push origin wpi-annotations`
+    g. copy outputs of this experimental procedure into (`/main/experiments/inferred-annos-counter/inputExamples`). This can be done by creating a directory in (`/inferred-annos-counter/inputExamples`) with the name of your project and two sub folders, `generated` and `human-written`. (This and following steps are optional. Use as input for downstream tools on small projects only).
+    h. copy all of the contents in your `$WPITEMPDIR` directory used in the previous steps into the `generated` subfolder. 
+    i. copy all of the human-written code (the human-annotated, i.e. original, code, but with a formatter run over it) from your project's source folder (e.g., ./src/main/java/ in a Gradle project) into the `human-written` directory that was created.
 
 11. Measure the percentage of hand-written annotations that WPI inferred
     a. create a 
