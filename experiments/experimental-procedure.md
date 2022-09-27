@@ -89,7 +89,9 @@ with both the original and forked url as well as the commit ID.
     d. run the script
     e. transcribe the output after "====== COMBINED RESULTS =======" is printed to the spreadsheet, combining rows that mention the same annotation (this happens when e.g., different @RequiresQualifier annotations are inferred by different checkers)
     f. commit and push the script: `git add compute-annos-inferred.sh ; git commit -m "inference output summarization script" ; git push origin wpi-annotations`
-    g. copy outputs of this experimental procedure into (`/main/experiments/inferred-annos-counter/inputExamples`). This can be done by creating a directory in (`/inferred-annos-counter/inputExamples`) with the name of your project and two sub folders, `generated` and `human-written`. Copy all of the contents in your $WPITEMPDIR directory used in the previous steps into the `generated` subfolder. Copy all of the contents from your projects `./src/main/java/` directory into the `human-written` directory that was created.
+    g. copy outputs of this experimental procedure into (`/main/experiments/inferred-annos-counter/inputExamples`). This can be done by creating a directory in (`/inferred-annos-counter/inputExamples`) with the name of your project and two sub folders, `generated` and `human-written`. (This and following steps are optional. Use as input for downstream tools on small projects only).
+    h. copy all of the contents in your `$WPITEMPDIR` directory used in the previous steps into the `generated` subfolder. 
+    i. copy all of the human-written code (the human-annotated, i.e. original, code, but with a formatter run over it) from your project's source folder (e.g., ./src/main/java/ in a Gradle project) into the `human-written` directory that was created.
 
 11. Measure the percentage of hand-written annotations that WPI inferred
     a. create a 
