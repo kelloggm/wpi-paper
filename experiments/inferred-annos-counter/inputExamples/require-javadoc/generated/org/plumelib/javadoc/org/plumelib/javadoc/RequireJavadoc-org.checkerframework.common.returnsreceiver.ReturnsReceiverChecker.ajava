@@ -52,10 +52,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Pattern;
-import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
-import org.checkerframework.checker.nullness.qual.NonNull;
-import org.checkerframework.checker.nullness.qual.Nullable;
-import org.plumelib.options.Option;
 import org.plumelib.options.Options;
 
 /**
@@ -64,11 +60,12 @@ import org.plumelib.options.Options;
  * at <a
  * href="https://github.com/plume-lib/require-javadoc#readme">https://github.com/plume-lib/require-javadoc#readme</a>.
  */
+@org.checkerframework.framework.qual.AnnotatedFor(
+    "org.checkerframework.common.returnsreceiver.ReturnsReceiverChecker")
 public class RequireJavadoc {
 
   /** Matches name of file or directory where no problems should be reported. */
-  @Option("Don't check files or directories whose pathname matches the regex")
-  public @MonotonicNonNull Pattern exclude = null;
+  public Pattern exclude = null;
 
   // TODO: It would be nice to support matching fully-qualified class names, but matching
   // packages will have to do for now.
@@ -76,11 +73,9 @@ public class RequireJavadoc {
    * Matches simple name of class/constructor/method/field, or full package name, where no problems
    * should be reported.
    */
-  @Option("Don't report problems in Java elements whose name matches the regex")
-  public @MonotonicNonNull Pattern dont_require = null;
+  public Pattern dont_require = null;
 
   /** If true, don't check elements with private access. */
-  @Option("Don't report problems in elements with private access")
   public boolean dont_require_private;
 
   /**
@@ -88,7 +83,6 @@ public class RequireJavadoc {
    * "default constructors", though that term means a no-argument constructor that the compiler
    * synthesized when the programmer didn't write one.
    */
-  @Option("Don't report problems in constructors with zero formal parameters")
   public boolean dont_require_noarg_constructor;
 
   /**
@@ -118,34 +112,27 @@ public class RequireJavadoc {
    * }
    * }</pre>
    */
-  @Option("Don't report problems in trivial getters and setters")
   public boolean dont_require_trivial_properties;
 
   /** If true, don't check type declarations: classes, interfaces, enums, annotations. */
-  @Option("Don't report problems in type declarations")
   public boolean dont_require_type;
 
   /** If true, don't check fields. */
-  @Option("Don't report problems in fields")
   public boolean dont_require_field;
 
   /** If true, don't check methods, constructors, and annotation members. */
-  @Option("Don't report problems in methods and constructors")
   public boolean dont_require_method;
 
   /** If true, warn if any package lacks a package-info.java file. */
-  @Option("Require package-info.java file to exist")
   public boolean require_package_info;
 
   /**
    * If true, print filenames relative to working directory. Setting this only has an effect if the
    * command-line arguments were absolute pathnames, or no command-line arguments were supplied.
    */
-  @Option("Report relative rather than absolute filenames")
   public boolean relative = false;
 
   /** If true, output debug information. */
-  @Option("Print diagnostic information")
   public boolean verbose = false;
 
   /** All the errors this program will report. */
@@ -172,9 +159,7 @@ public class RequireJavadoc {
         new Options(
             "java org.plumelib.javadoc.RequireJavadoc [options] [directory-or-file ...]", rj);
     String[] remainingArgs = options.parse(true, args);
-
     rj.setJavaFiles(remainingArgs);
-
     for (Path javaFile : rj.javaFiles) {
       if (rj.verbose) {
         System.out.println("Checking " + javaFile);
@@ -198,6 +183,7 @@ public class RequireJavadoc {
   }
 
   /** Creates a new RequireJavadoc instance. */
+  @org.checkerframework.dataflow.qual.SideEffectFree
   private RequireJavadoc() {}
 
   /**
@@ -205,14 +191,11 @@ public class RequireJavadoc {
    *
    * @param args the directories and files listed on the command line
    */
-  @SuppressWarnings("lock:methodref.receiver") // no locking here
   private void setJavaFiles(String[] args) {
     if (args.length == 0) {
       args = new String[] {workingDirAbsolute.toString()};
     }
-
     FileVisitor<Path> walker = new JavaFilesVisitor();
-
     for (String arg : args) {
       if (shouldExclude(arg)) {
         continue;
@@ -234,14 +217,10 @@ public class RequireJavadoc {
         javaFiles.add(Paths.get(arg));
       }
     }
-
     javaFiles.sort(Comparator.comparing(Object::toString));
-
     Set<Path> missingPackageInfoFiles = new LinkedHashSet<>();
     if (require_package_info) {
       for (Path javaFile : javaFiles) {
-        @SuppressWarnings("nullness:assignment") // the file is not "/", so getParent() is non-null
-        @NonNull
         Path javaFileParent = javaFile.getParent();
         // Java 11 has Path.of() instead of creating a new File.
         Path packageInfo = javaFileParent.resolve(new File("package-info.java").toPath());
@@ -261,8 +240,7 @@ public class RequireJavadoc {
     /** Create a new JavaFilesVisitor. */
     JavaFilesVisitor() {}
 
-    @Override
-    public FileVisitResult visitFile(Path file, BasicFileAttributes attr) {
+    public FileVisitResult visitFile(JavaFilesVisitor this, Path file, BasicFileAttributes attr) {
       if (attr.isRegularFile() && file.toString().endsWith(".java")) {
         if (!shouldExclude(file)) {
           javaFiles.add(file);
@@ -271,16 +249,15 @@ public class RequireJavadoc {
       return FileVisitResult.CONTINUE;
     }
 
-    @Override
-    public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attr) {
+    public FileVisitResult preVisitDirectory(
+        JavaFilesVisitor this, Path dir, BasicFileAttributes attr) {
       if (shouldExclude(dir)) {
         return FileVisitResult.SKIP_SUBTREE;
       }
       return FileVisitResult.CONTINUE;
     }
 
-    @Override
-    public FileVisitResult postVisitDirectory(Path dir, IOException exc) {
+    public FileVisitResult postVisitDirectory(JavaFilesVisitor this, Path dir, IOException exc) {
       if (exc != null) {
         System.out.println("Problem visiting " + dir + ": " + exc.getMessage());
         System.exit(2);
@@ -288,8 +265,7 @@ public class RequireJavadoc {
       return FileVisitResult.CONTINUE;
     }
 
-    @Override
-    public FileVisitResult visitFileFailed(Path file, IOException exc) {
+    public FileVisitResult visitFileFailed(JavaFilesVisitor this, Path file, IOException exc) {
       if (exc != null) {
         System.out.println("Problem visiting " + file + ": " + exc.getMessage());
         System.exit(2);
@@ -347,6 +323,7 @@ public class RequireJavadoc {
 
   /** The type of property method: a getter or setter. */
   enum PropertyType {
+
     /** A method of the form {@code int getFoo()}. */
     GETTER("get", 0, false),
     /** A method of the form {@code boolean hasFoo()}. */
@@ -505,12 +482,11 @@ public class RequireJavadoc {
    * @param propertyType the type of property method
    * @return the lower-cased name of the property, or null
    */
-  @Nullable String propertyName(MethodDeclaration md, PropertyType propertyType) {
+  String propertyName(MethodDeclaration md, PropertyType propertyType) {
     String methodName = md.getNameAsString();
     if (!methodName.startsWith(propertyType.prefix)) {
       return null;
     }
-    @SuppressWarnings("index") // https://github.com/typetools/checker-framework/issues/5201
     String upperCamelCaseProperty = methodName.substring(propertyType.prefix.length());
     if (upperCamelCaseProperty.length() == 0) {
       return null;
@@ -548,7 +524,7 @@ public class RequireJavadoc {
    * @param md a method declaration
    * @return its sole statement, or null
    */
-  @Nullable Statement getOnlyStatement(MethodDeclaration md) {
+  Statement getOnlyStatement(MethodDeclaration md) {
     Optional<BlockStmt> body = md.getBody();
     if (!body.isPresent()) {
       return null;
@@ -598,8 +574,7 @@ public class RequireJavadoc {
       }
     }
 
-    @Override
-    public void visit(CompilationUnit cu, Void ignore) {
+    public void visit(RequireJavadocVisitor this, CompilationUnit cu, Void ignore) {
       Optional<PackageDeclaration> opd = cu.getPackageDeclaration();
       if (opd.isPresent()) {
         String packageName = opd.get().getName().asString();
@@ -620,8 +595,7 @@ public class RequireJavadoc {
       super.visit(cu, ignore);
     }
 
-    @Override
-    public void visit(ClassOrInterfaceDeclaration cd, Void ignore) {
+    public void visit(RequireJavadocVisitor this, ClassOrInterfaceDeclaration cd, Void ignore) {
       if (dont_require_private && cd.isPrivate()) {
         return;
       }
@@ -638,8 +612,7 @@ public class RequireJavadoc {
       super.visit(cd, ignore);
     }
 
-    @Override
-    public void visit(ConstructorDeclaration cd, Void ignore) {
+    public void visit(RequireJavadocVisitor this, ConstructorDeclaration cd, Void ignore) {
       if (dont_require_private && cd.isPrivate()) {
         return;
       }
@@ -659,8 +632,7 @@ public class RequireJavadoc {
       super.visit(cd, ignore);
     }
 
-    @Override
-    public void visit(MethodDeclaration md, Void ignore) {
+    public void visit(RequireJavadocVisitor this, MethodDeclaration md, Void ignore) {
       if (dont_require_private && md.isPrivate()) {
         return;
       }
@@ -683,8 +655,7 @@ public class RequireJavadoc {
       super.visit(md, ignore);
     }
 
-    @Override
-    public void visit(FieldDeclaration fd, Void ignore) {
+    public void visit(RequireJavadocVisitor this, FieldDeclaration fd, Void ignore) {
       if (dont_require_private && fd.isPrivate()) {
         return;
       }
@@ -713,8 +684,7 @@ public class RequireJavadoc {
       }
     }
 
-    @Override
-    public void visit(EnumDeclaration ed, Void ignore) {
+    public void visit(RequireJavadocVisitor this, EnumDeclaration ed, Void ignore) {
       if (dont_require_private && ed.isPrivate()) {
         return;
       }
@@ -731,8 +701,7 @@ public class RequireJavadoc {
       super.visit(ed, ignore);
     }
 
-    @Override
-    public void visit(EnumConstantDeclaration ecd, Void ignore) {
+    public void visit(RequireJavadocVisitor this, EnumConstantDeclaration ecd, Void ignore) {
       String name = ecd.getNameAsString();
       if (shouldNotRequire(name)) {
         return;
@@ -746,8 +715,7 @@ public class RequireJavadoc {
       super.visit(ecd, ignore);
     }
 
-    @Override
-    public void visit(AnnotationDeclaration ad, Void ignore) {
+    public void visit(RequireJavadocVisitor this, AnnotationDeclaration ad, Void ignore) {
       if (dont_require_private && ad.isPrivate()) {
         return;
       }
@@ -764,8 +732,7 @@ public class RequireJavadoc {
       super.visit(ad, ignore);
     }
 
-    @Override
-    public void visit(AnnotationMemberDeclaration amd, Void ignore) {
+    public void visit(RequireJavadocVisitor this, AnnotationMemberDeclaration amd, Void ignore) {
       String name = amd.getNameAsString();
       if (shouldNotRequire(name)) {
         return;
@@ -838,19 +805,11 @@ public class RequireJavadoc {
    * @param result the list to add orphan comments to. Is side-effected by this method. The
    *     implementation uses this to minimize the diffs against upstream.
    */
-  @SuppressWarnings({
-    "JdkObsolete", // for LinkedList
-    "interning:not.interned", // element of a list
-    "ReferenceEquality",
-  })
-  // This implementation is from Randoop's `Minimize.java` file, and before that from JavaParser's
-  // PrettyPrintVisitor.printOrphanCommentsBeforeThisChildNode.  The JavaParser maintainers refuse
-  // to provide such functionality in JavaParser proper.
-  private static void getOrphanCommentsBeforeThisChildNode(final Node node, List<Comment> result) {
+  private static // to provide such functionality in JavaParser proper.
+  void getOrphanCommentsBeforeThisChildNode(final Node node, List<Comment> result) {
     if (node instanceof Comment) {
       return;
     }
-
     Node parent = node.getParentNode().orElse(null);
     if (parent == null) {
       return;

@@ -53,8 +53,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Pattern;
 import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
-import org.checkerframework.checker.nullness.qual.NonNull;
-import org.checkerframework.checker.nullness.qual.Nullable;
 import org.plumelib.options.Option;
 import org.plumelib.options.Options;
 
@@ -68,7 +66,8 @@ public class RequireJavadoc {
 
   /** Matches name of file or directory where no problems should be reported. */
   @Option("Don't check files or directories whose pathname matches the regex")
-  public @MonotonicNonNull Pattern exclude = null;
+  @MonotonicNonNull
+  public Pattern exclude = null;
 
   // TODO: It would be nice to support matching fully-qualified class names, but matching
   // packages will have to do for now.
@@ -77,7 +76,8 @@ public class RequireJavadoc {
    * should be reported.
    */
   @Option("Don't report problems in Java elements whose name matches the regex")
-  public @MonotonicNonNull Pattern dont_require = null;
+  @MonotonicNonNull
+  public Pattern dont_require = null;
 
   /** If true, don't check elements with private access. */
   @Option("Don't report problems in elements with private access")
@@ -172,9 +172,7 @@ public class RequireJavadoc {
         new Options(
             "java org.plumelib.javadoc.RequireJavadoc [options] [directory-or-file ...]", rj);
     String[] remainingArgs = options.parse(true, args);
-
     rj.setJavaFiles(remainingArgs);
-
     for (Path javaFile : rj.javaFiles) {
       if (rj.verbose) {
         System.out.println("Checking " + javaFile);
@@ -205,14 +203,13 @@ public class RequireJavadoc {
    *
    * @param args the directories and files listed on the command line
    */
-  @SuppressWarnings("lock:methodref.receiver") // no locking here
+  // no locking here
+  @SuppressWarnings("lock:methodref.receiver")
   private void setJavaFiles(String[] args) {
     if (args.length == 0) {
       args = new String[] {workingDirAbsolute.toString()};
     }
-
     FileVisitor<Path> walker = new JavaFilesVisitor();
-
     for (String arg : args) {
       if (shouldExclude(arg)) {
         continue;
@@ -234,14 +231,12 @@ public class RequireJavadoc {
         javaFiles.add(Paths.get(arg));
       }
     }
-
     javaFiles.sort(Comparator.comparing(Object::toString));
-
     Set<Path> missingPackageInfoFiles = new LinkedHashSet<>();
     if (require_package_info) {
       for (Path javaFile : javaFiles) {
-        @SuppressWarnings("nullness:assignment") // the file is not "/", so getParent() is non-null
-        @NonNull
+        // the file is not "/", so getParent() is non-null
+        @SuppressWarnings("nullness:assignment")
         Path javaFileParent = javaFile.getParent();
         // Java 11 has Path.of() instead of creating a new File.
         Path packageInfo = javaFileParent.resolve(new File("package-info.java").toPath());
@@ -347,6 +342,7 @@ public class RequireJavadoc {
 
   /** The type of property method: a getter or setter. */
   enum PropertyType {
+
     /** A method of the form {@code int getFoo()}. */
     GETTER("get", 0, false),
     /** A method of the form {@code boolean hasFoo()}. */
@@ -505,12 +501,13 @@ public class RequireJavadoc {
    * @param propertyType the type of property method
    * @return the lower-cased name of the property, or null
    */
-  @Nullable String propertyName(MethodDeclaration md, PropertyType propertyType) {
+  String propertyName(MethodDeclaration md, PropertyType propertyType) {
     String methodName = md.getNameAsString();
     if (!methodName.startsWith(propertyType.prefix)) {
       return null;
     }
-    @SuppressWarnings("index") // https://github.com/typetools/checker-framework/issues/5201
+    // https://github.com/typetools/checker-framework/issues/5201
+    @SuppressWarnings("index")
     String upperCamelCaseProperty = methodName.substring(propertyType.prefix.length());
     if (upperCamelCaseProperty.length() == 0) {
       return null;
@@ -548,7 +545,7 @@ public class RequireJavadoc {
    * @param md a method declaration
    * @return its sole statement, or null
    */
-  @Nullable Statement getOnlyStatement(MethodDeclaration md) {
+  Statement getOnlyStatement(MethodDeclaration md) {
     Optional<BlockStmt> body = md.getBody();
     if (!body.isPresent()) {
       return null;
@@ -838,19 +835,16 @@ public class RequireJavadoc {
    * @param result the list to add orphan comments to. Is side-effected by this method. The
    *     implementation uses this to minimize the diffs against upstream.
    */
-  @SuppressWarnings({
-    "JdkObsolete", // for LinkedList
-    "interning:not.interned", // element of a list
-    "ReferenceEquality",
+  @SuppressWarnings({ // for LinkedList
+    "JdkObsolete", // element of a list
+    "interning:not.interned",
+    "ReferenceEquality"
   })
-  // This implementation is from Randoop's `Minimize.java` file, and before that from JavaParser's
-  // PrettyPrintVisitor.printOrphanCommentsBeforeThisChildNode.  The JavaParser maintainers refuse
-  // to provide such functionality in JavaParser proper.
-  private static void getOrphanCommentsBeforeThisChildNode(final Node node, List<Comment> result) {
+  private static // to provide such functionality in JavaParser proper.
+  void getOrphanCommentsBeforeThisChildNode(final Node node, List<Comment> result) {
     if (node instanceof Comment) {
       return;
     }
-
     Node parent = node.getParentNode().orElse(null);
     if (parent == null) {
       return;
