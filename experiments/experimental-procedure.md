@@ -89,11 +89,15 @@ with both the original and forked url as well as the commit ID.
     d. run the script
     e. transcribe the output after "====== COMBINED RESULTS =======" is printed to the spreadsheet, combining rows that mention the same annotation (this happens when e.g., different @RequiresQualifier annotations are inferred by different checkers)
     f. commit and push the script: `git add compute-annos-inferred.sh ; git commit -m "inference output summarization script" ; git push origin wpi-annotations`
-    g. copy outputs of this experimental procedure into (`/main/experiments/inferred-annos-counter/inputExamples`). This can be done by creating a directory in (`/inferred-annos-counter/inputExamples`) with the name of your project and two sub folders, `generated` and `human-written`. (This and following steps are optional. Use as input for downstream tools on small projects only).
-    h. copy all of the contents in your `$WPITEMPDIR` directory used in the previous steps into the `generated` subfolder. 
-    i. copy all of the human-written code (the human-annotated, i.e. original, code, but with a formatter run over it) from your project's source folder (e.g., ./src/main/java/ in a Gradle project) into the `human-written` directory that was created.
 
 11. Measure the percentage of hand-written annotations that WPI inferred
-    a. create a 
+    a. copy the formatter script, `format.sh` found in the experiments directory into your projects top level directory. 
+    b. download the `google-java-format.jar`. Link can be found in the script. Confirm the variable path in the script aligns with the location of your download.
+    c. change the variable, `WPI_RESULTS_DIR` to the path of your projects WPI annotations `wpi-annotations`.
+    d. confirm that the `JAVA_SRC_DIR` is appropriate to your projects file tree, modify if needed.
+    e. run the script `./format-mycopy.sh`.
+    f. copy outputs of this experimental procedure into (`/main/experiments/inferred-annos-counter/inputExamples`). This can be done by creating a directory in (`/inferred-annos-counter/inputExamples`) with the name of your project and two sub folders, `generated` and `human-written`. (This and following steps are optional. Use as input for downstream tools on small projects only).
+    g. copy all of the contents in your `$WPITEMPDIR` directory used in the previous steps into the `generated` subfolder. 
+    h. copy all of the human-written code (the human-annotated, i.e. original, code, but with a formatter run over it) from your project's source folder (e.g., ./src/main/java/ in a Gradle project) into the `human-written` directory that was created.
 
 12. Copy summary numbers from the project-specific spreadsheet page to the "summary" tab, and color code the project row green once it is finished.
