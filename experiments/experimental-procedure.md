@@ -91,10 +91,10 @@ with both the original and forked url as well as the commit ID.
     f. commit and push the script: `git add compute-annos-inferred.sh ; git commit -m "inference output summarization script" ; git push origin wpi-annotations`
 
 11. Measure the percentage of hand-written annotations that WPI inferred
-    a. copy the formatter script, `format.sh` found in the experiments directory into your projects top level directory. 
-    b. download the `google-java-format.jar`. Link can be found in the script. Confirm the variable path in the script aligns with the location of your download.
-    c. change the variable, `WPI_RESULTS_DIR` to the path of your projects WPI annotations `wpi-annotations`.
-    d. confirm that the `JAVA_SRC_DIR` is appropriate to your projects file tree, modify if needed.
+    a. copy the formatter script as `format-mycopy.sh` found in the experiments directory into your project's top level directory. 
+    b. download the `google-java-format.jar`. The link for it is in the script's documentation. Confirm the variable path in the script aligns with the location of your download.
+    c. change the variable, `WPI_RESULTS_DIR` to the path of your project's WPI annotations `wpi-annotations`.
+    d. confirm that the `JAVA_SRC_DIR` is appropriate to your project's file tree which may look something like `./src/main/java/` and should contain `your-project.java` in the lowest directory, modify if needed.
     e. run the script `./format-mycopy.sh`.
     f. copy outputs of this experimental procedure into (`/main/experiments/inferred-annos-counter/inputExamples`). This can be done by creating a directory in (`/inferred-annos-counter/inputExamples`) with the name of your project and two sub folders, `generated` and `human-written`. (This and following steps are optional. Use as input for downstream tools on small projects only).
     g. copy all of the contents in your `$WPITEMPDIR` directory used in the previous steps into the `generated` subfolder. 
