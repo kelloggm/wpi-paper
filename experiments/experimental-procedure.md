@@ -40,7 +40,7 @@ with both the original and forked url as well as the commit ID.
 3. Create a new branch called "unannotated" starting at the same commit:
 `git checkout -b unannotated`
 
-4. Run the `RemoveAnnotationsForInference` program on the source:
+4. Run the `RemoveAnnotationsForInference` program on the source, no ouput means it ran successfully:
 `java -cp "$CHECKERFRAMEWORK/checker/dist/checker.jar" org.checkerframework.framework.stub.RemoveAnnotationsForInference .`
 
 5. Push the unannotated code:
