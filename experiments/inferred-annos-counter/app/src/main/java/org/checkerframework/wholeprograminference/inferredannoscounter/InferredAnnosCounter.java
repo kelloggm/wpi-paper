@@ -73,7 +73,7 @@ public class InferredAnnosCounter {
     List<String> originalFile = new ArrayList<String>();
     List<String> ImportantAnno = new ArrayList<String>();
     int count = 0;
-    // specific annotations and the number of computer-written files missing them
+    // specific annotations and the number of computer-generated files missing them
     Map<String, Integer> AnnoLocate = new HashMap<String, Integer>();
     // the name of the types of annotation and their numbers in the human-written file
     Map<String, Integer> AnnoCount = new HashMap<String, Integer>();
@@ -222,8 +222,8 @@ public class InferredAnnosCounter {
     // update the data of AnnoSimilar
     for (Map.Entry<String, Integer> me : AnnoLocate.entrySet()) {
       String k = me.getKey();
-      /*if the number of computer-written code missing that element is less than the total number of codes written
-      by computer, the at least one of those computer-written code must have gotten the annotation correct*/
+      /*if the number of computer-written code missing that element is less than the total number of files generated
+      by computer, the at least one of those computer-generated files must have gotten the annotation correct*/
       if (me.getValue() < args.length - 1) {
         // for example, if we have @Option_345, we will only need "@Option" since we want the
         // general type here
