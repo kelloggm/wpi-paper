@@ -3,13 +3,40 @@
 
 \todo{Turn this into actual text with references rather than bullets.}
 
-Pluggable types are a great way to verify programs. People in industry
-use them and lots of papers have been published about them.
+A pluggable type system extends a host type system with an orthogonal
+lattice of type qualifiers~\cite{FosterFFA99}.
+The pluggable type system inherits both the soundness guarantees
+and much of the typechecking machinery of the host language:
+the type qualifiers intuitively ``ride along'' with the host
+language's existing typechecking, augmented with new rules
+unique to the pluggable typechecker.
+Pluggable typecheckers are a popular tool for partial program
+verification---that is, for enforcing that a program is free
+of a particular class of bugs, such as null pointer dereferences---and
+have been deployed at companies including Amazon~\cite{KelloggRSSE2020},
+Uber~\todo{citation}, Google~\todo{citation}, and others.
 
-A problem with pluggable types (and other type systems, too!) is that
-users need to write type annotations. There is a benefit to writing
-type annotations: correctness and documentation. There is a burden, too, though: it
-is time-consuming and can be intimidating for new users.
+A problem with pluggable types %(and other type systems, too!)
+is that developers need to write type annotations when using a pluggable type
+system\footnote{Note that this is a problem for many ``traditional'' type systems,
+too---consider the number of type annotations in \eg a typical Java program.}.
+There is a benefit to a programmer who writes type annotations: they serve as machine-checkable
+documentation.
+There is a burden, too, though: to typecheck an entire program, all its type annotations
+must be correct, so a programmer who wishes to use a pluggable type system
+on a legacy system must annotate their entire program, which can be time-consuming.
+\todo{It would be great here to have some evidence that users believe this is a problem.
+  I think we know that's the case, but maybe we could interview e.g., Martin Schaef about
+  why Amazon didn't adopt the CF as much as we'd have liked and include a quote about
+  annotations here?}
+
+% I considered text like this at this point, but I think its orthogonal to my main point.
+%% Further, most pluggable
+%% typecheckers are not perfectly precise: that is, the typechecker may reject
+%% programs that are correct at runtime\footnote{Note again that this is also
+%% a problem for ``traditional'' type systems!}. When annotating a legacy program,
+%% a programmer may discover code that, while correct, cannot be proven so
+%% by the typechecker.
 
 Type inference is a classic plan to save the day when writing types gets
 too painful. Cite some classic work, like Hindley-Milner. Cite some recent
