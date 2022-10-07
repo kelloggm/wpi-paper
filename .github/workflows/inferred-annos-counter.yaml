@@ -2,6 +2,10 @@ name: Java CI
 
 on: [push]
 
+defaults:
+  run:
+    working-directory: experiments/inferred-annos-counter
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -13,10 +17,8 @@ jobs:
         with:
           java-version: '11'
           distribution: 'adopt'
-      - run: cd experiments/inferred-annos-counter
       - name: Validate Gradle wrapper
         uses: gradle/wrapper-validation-action@e6e38bacfdf1a337459f332974bb2327a31aaf4b
-      - run: cd experiments/inferred-annos-counter	
       - name: Build with Gradle
         uses: gradle/gradle-build-action@67421db6bd0bf253fb4bd25b31ebb98943c375e1
         with:
