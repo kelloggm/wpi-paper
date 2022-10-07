@@ -9,7 +9,7 @@
 plugins {
     // Apply the application plugin to add support for building a CLI application in Java.
     id 'application'
-    id 'org.checkerframework' version '0.6.16'
+    id 'org.checkerframework' version '0.6.14'
     id "com.diffplug.spotless" version "6.11.0"
 }
 
@@ -34,24 +34,24 @@ checkerFramework {
     ]
 }
 
-spotless {
+  spotless {
 
-  // If you add any formatters to this block that require dependencies here, then you must also
-  // add them to spotlessPredeclare block.
-  format 'misc', {
-    // define the files to apply `misc` to
-    target '*.gradle', '*.md', '.gitignore'
+    // If you add any formatters to this block that require dependencies here, then you must also
+    // add them to spotlessPredeclare block.
+    format 'misc', {
+      // define the files to apply `misc` to
+      target '*.gradle', '*.md', '.gitignore'
 
-    // define the steps to apply to those files
-    trimTrailingWhitespace()
-    indentWithSpaces(2)
-    endWithNewline()
+      // define the steps to apply to those files
+      trimTrailingWhitespace()
+      indentWithSpaces(2)
+      endWithNewline()
+    }
+    java {
+      googleJavaFormat()
+      formatAnnotations()
+    }
   }
-  java {
-    googleJavaFormat()
-    formatAnnotations()
-  }
-}
 
 application {
     // Define the main class for the application.
