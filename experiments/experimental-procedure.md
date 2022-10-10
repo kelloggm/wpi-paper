@@ -60,7 +60,8 @@ with both the original and forked url as well as the commit ID.
 
 7. Collect the number of lines of code:
    a. run `git checkout baseline`
-   b. run `scc .` and record the results in the spreadsheet, on the summary page (if you don't have scc installed, https://github.com/boyter/scc)
+   b. run `scc .` and record the results in the spreadsheet (in the "LoC" column), on the summary page (if you don't have scc installed, https://github.com/boyter/scc)
+   
 8. Run WPI:
    a. run `git checkout -b wpi-enabled origin/unannotated`
    b. choose any temporary directory for $WPITEMPDIR
