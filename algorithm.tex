@@ -1,8 +1,50 @@
-\section{Our Generic Type Inference Algorithm}
+\section{Type Inference Algorithm}
+\label{sec:algorithm}
+
+This section presents our type inference algorithm. This algorithm is
+polymorphic with respect to the underlying pluggable typechecker: that is,
+it applies equally well to any pluggable typechecker that performs flow-sensitive
+local inference. The algorithm is described in two parts: first, the fixpoint
+algorithm used to infer types for a particular program (\cref{sec:core-algorithm});
+and second, the modifications we make to the pluggable typechecker to enable
+that algorithm (\ie the \textsc{Instrument} function of \cref{alg:wpi-fixpoint},
+in \cref{sec:instrument}).
+
+\subsection{Fixpoint Algorithm}
 \label{sec:core-algorithm}
 
-This section presents the core WPI fixpoint algorithm. It almost
-certainly contains an ``algorithm 1'' figure. It might also contain
-some background on pluggable types. This section also discusses why
-this approach is sound---the verifier does eventually run at the end
-with the final set of annotations.
+\input{alg-wpi-fixpoint}
+
+This section presents the core fixpoint algorithm, which appears
+in \cref{alg:wpi-fixpoint}.
+
+\todo{Describe it.}
+
+\subsubsection{Soundness}
+\label{sec:soundness}
+
+\Cref{alg:wpi-fixpoint} is sound, assuming the underlying typechecker $T$
+is sound. The key reason is that \cref{alg:wpi-fixpoint} always runs $T$
+on each set of proposed annotations. If any of the annotations are incorrect,
+$T$ will report an error---in the same manner as if a human had written an
+incorrect annotation. In particular, this means that the instrumentation
+(\cref{sec:instrument}) has no obligation to produce annotations that are sound,
+so long as the underlying typechecking algorithm itself is not modified.
+\todo{Maybe formalize this a bit more?}
+
+\subsection{Modification to the Typechecker}
+\label{sec:instrument}
+
+The algorithm presented in \cref{sec:core-algorithm} works for
+any pluggable typechecker that supports flow-sensitive inference:
+that is, it does not require a type system implementer to write
+any special rules to support type inference. Instead, this section
+describes our approach to \emph{automatically} modify a given
+pluggable typechecker to support inference, corresponding to the
+\textsc{Instrument} helper function in \cref{alg:wpi-fixpoint}.
+
+\todo{Describe how this works. Include the changes to the
+  general type rules for qualified types so that candidate
+  specifications are also an output. Basically, there should be
+  something in this section for every public method in
+  \<WholeProgramInference>.}
