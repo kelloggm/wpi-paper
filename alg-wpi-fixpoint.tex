@@ -1,0 +1,24 @@
+% the core WPI fixpoint algorithm; that is, the outer WPI loop
+
+\begin{algorithm}[htbp]
+  \DontPrintSemicolon
+  \SetKwInOut{Input}{input}
+  \SetKwInOut{Output}{output}
+  \Input{program $P$ and pluggable typechecker $T$}
+  \Output{Set of errors $E$ and set of specifications $A^{\prime}$}
+  \BlankLine
+%  \tcc{In each iteration, $A$ is the specification set before running $T$, and $A^{\prime}$ is the set after.}
+  $A \gets \emptyset, A^{\prime} \gets \emptyset$ \;
+%  \tcc{\textsc{Instrument} modifies $T$ to both check the program and collect a candidate specification set.}
+  $T^{\prime} \gets \textsc{Instrument}(T)$ \;
+  $E, A^{\prime} \gets T^{\prime}(P, A)$ \;
+  \While{$E \neq \emptyset \wedge A \neq A^{\prime}$}{
+    $A \gets A^{\prime}$ \;
+    $E, A^{\prime} \gets T^{\prime}(P, A)$ \;
+  }
+  \Return $E, A^{\prime}$ \;
+
+  \caption{The core fixpoint algorithm for our type inference system.
+    The helper function \textsc{Instrument} is defined and explained in \cref{sec:instrument}.}
+  \label{alg:wpi-fixpoint}
+\end{algorithm}
