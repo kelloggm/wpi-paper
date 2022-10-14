@@ -16,18 +16,29 @@ in \cref{sec:instrument}).
 \input{alg-wpi-fixpoint}
 
 This section presents the core fixpoint algorithm, which appears
-in \cref{alg:wpi-fixpoint}.
+in \cref{alg:wpi-fixpoint}. The key idea is to iteratively analyze
+the target program ($P$) with an instrumented version of the
+pluggable typechecker, recording intermediate results at each
+step (the sets of specifications $A$ and $A^{\prime}$) until
+either the program can be typechecked (\ie $E \neq \emptyset$,
+meaning there are no remaining typechecking errors) or the
+specifications reach fixpoint (\ie $A = A^{\prime}$) and
+no further refinement is possible.
 
-\todo{Describe it.}
+This fixpoint loop is quite general: its success for our
+purposes depends heavily on the \textsc{Instrument} procedure
+that outputs locally-inferred specifications. \Cref{sec:instrument}
+describes how we implement \textsc{Instrument} in a way that is
+applicable to any pluggable typechecker.
 
 \subsubsection{Soundness}
 \label{sec:soundness}
 
-\Cref{alg:wpi-fixpoint} is sound, assuming the underlying typechecker $T$
-is sound. The key reason is that \cref{alg:wpi-fixpoint} always runs $T$
-on each set of proposed annotations. If any of the annotations are incorrect,
+Nevertheless, \cref{alg:wpi-fixpoint} is sound, assuming the underlying typechecker $T$
+is sound. The key intuition is that \cref{alg:wpi-fixpoint} always runs $T$
+on each set of proposed specifications. If any specification is incorrect,
 $T$ will report an error---in the same manner as if a human had written an
-incorrect annotation. In particular, this means that the instrumentation
+incorrect specification. In particular, this means that the instrumentation
 (\cref{sec:instrument}) has no obligation to produce annotations that are sound,
 so long as the underlying typechecking algorithm itself is not modified.
 \todo{Maybe formalize this a bit more?}
@@ -43,8 +54,21 @@ describes our approach to \emph{automatically} modify a given
 pluggable typechecker to support inference, corresponding to the
 \textsc{Instrument} helper function in \cref{alg:wpi-fixpoint}.
 
-\todo{Describe how this works. Include the changes to the
-  general type rules for qualified types so that candidate
-  specifications are also an output. Basically, there should be
-  something in this section for every public method in
-  \<WholeProgramInference>.}
+The key idea behind our approach to instrumenting the typechecker
+is to do the instrumentation at the \emph{framework} level: that is
+we modify the underlying infrastructure that typecheckers rely on
+once, and the modifications can then be applied generically to any
+typechecker compatible with the original framework. Our modifications
+can be conceptualized at the type-qualifier-theory level: that is,
+we modify the rules for typechecking \emph{any} pluggable type system
+so that inference is supported,
+regardless of the particular qualifiers it happens to support.
+
+\todo{Create a figure with modified type rules for handling
+  inference, with one rule for each part of \<WholeProgramInference>.
+  We want to present this as a theoretical contribution: \ie, as
+  a new way of building a pluggable type system. Maybe take the original
+  rules from~\cite{FosterFFA99}?}
+
+\todo{Then, this section should describe the interesting parts of the
+  modified type rules in detail.}
