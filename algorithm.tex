@@ -64,6 +64,14 @@ we modify the rules for typechecking \emph{any} pluggable type system
 so that inference is supported,
 regardless of the particular qualifiers it happens to support.
 
+Our modifications rely on the fact that modern pluggable type systems
+do \emph{local}, intra-procedural flow-sensitive type inference. This assumption is
+reasonable in practice: programmers are generally not willing to
+write type qualifiers within method bodies, and so 
+the pluggable type frameworks that exist in practice \todo{all?}
+support this feature~\cite{PapiACPE2008}~\todo{cite any other practical pluggable
+  type frameworks that exist, if there are any}.
+
 \todo{Create a figure with modified type rules for handling
   inference, with one rule for each part of \<WholeProgramInference>.
   We want to present this as a theoretical contribution: \ie, as
