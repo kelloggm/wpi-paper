@@ -1,8 +1,84 @@
-\section{Our Generic Type Inference Algorithm}
+\section{Type Inference Algorithm}
+\label{sec:algorithm}
+
+This section presents our type inference algorithm. This algorithm is
+polymorphic with respect to the underlying pluggable typechecker: that is,
+it applies equally well to any pluggable typechecker that performs flow-sensitive
+local inference. The algorithm is described in two parts: first, the fixpoint
+algorithm used to infer types for a particular program (\cref{sec:core-algorithm});
+and second, the modifications we make to the pluggable typechecker to enable
+that algorithm (\ie the \textsc{Instrument} function of \cref{alg:wpi-fixpoint},
+in \cref{sec:instrument}).
+
+\subsection{Fixpoint Algorithm}
 \label{sec:core-algorithm}
 
-This section presents the core WPI fixpoint algorithm. It almost
-certainly contains an ``algorithm 1'' figure. It might also contain
-some background on pluggable types. This section also discusses why
-this approach is sound---the verifier does eventually run at the end
-with the final set of annotations.
+\input{alg-wpi-fixpoint}
+
+This section presents the core fixpoint algorithm, which appears
+in \cref{alg:wpi-fixpoint}. The key idea is to iteratively analyze
+the target program ($P$) with an instrumented version of the
+pluggable typechecker, recording intermediate results at each
+step (the sets of specifications $A$ and $A^{\prime}$) until
+either the program can be typechecked (\ie $E \neq \emptyset$,
+meaning there are no remaining typechecking errors) or the
+specifications reach fixpoint (\ie $A = A^{\prime}$) and
+no further refinement is possible.
+
+This fixpoint loop is quite general: its success for our
+purposes depends heavily on the \textsc{Instrument} procedure
+that outputs locally-inferred specifications. \Cref{sec:instrument}
+describes how we implement \textsc{Instrument} in a way that is
+applicable to any pluggable typechecker.
+
+\subsubsection{Soundness}
+\label{sec:soundness}
+
+Nevertheless, \cref{alg:wpi-fixpoint} is sound, assuming the underlying typechecker $T$
+is sound. The key intuition is that \cref{alg:wpi-fixpoint} always runs $T$
+on each set of proposed specifications. If any specification is incorrect,
+$T$ will report an error---in the same manner as if a human had written an
+incorrect specification. In particular, this means that the instrumentation
+(\cref{sec:instrument}) has no obligation to produce annotations that are sound,
+so long as the underlying typechecking algorithm itself is not modified.
+\todo{Maybe formalize this a bit more?}
+
+\subsection{Modifications to the Typechecker}
+\label{sec:instrument}
+
+The algorithm presented in \cref{sec:core-algorithm} works for
+any pluggable typechecker that supports flow-sensitive inference:
+that is, it does not require a type system implementer to write
+any special rules to support type inference. Instead, this section
+describes our approach to \emph{automatically} modify a given
+pluggable typechecker to support inference, corresponding to the
+\textsc{Instrument} helper function in \cref{alg:wpi-fixpoint}.
+
+The key idea behind our approach to instrumenting the typechecker
+is to do the instrumentation at the \emph{framework} level: that is
+we modify the underlying infrastructure that typecheckers rely on
+once, and the modifications can then be applied generically to any
+typechecker compatible with the original framework. Our modifications
+can be conceptualized at the type-qualifier-theory level: that is,
+we modify the rules for typechecking \emph{any} pluggable type system
+so that inference is supported,
+regardless of the particular qualifiers it happens to support.
+
+Our modifications rely on the fact that modern pluggable type systems
+do \emph{local}, intra-procedural flow-sensitive type inference. This assumption is
+reasonable in practice: programmers are generally not willing to
+write type qualifiers within method bodies, and so 
+the pluggable type frameworks that exist in practice \todo{all?}
+support this feature~\cite{PapiACPE2008}~\todo{cite any other practical pluggable
+  type frameworks that exist, if there are any}. \todo{Also mention that
+  Java itself supports this now for the base type system?} \todo{Also mention
+  that this seems to be a general trend in language design, citing maybe Kotlin?}
+
+\todo{Create a figure with modified type rules for handling
+  inference, with one rule for each part of \<WholeProgramInference>.
+  We want to present this as a theoretical contribution: \ie, as
+  a new way of building a pluggable type system. Maybe take the original
+  rules from~\cite{FosterFFA99}?}
+
+\todo{Then, this section should describe the interesting parts of the
+  modified type rules in detail.}

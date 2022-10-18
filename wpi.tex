@@ -77,24 +77,14 @@
 \usepackage{tabularx}
 \usepackage{multirow}
 \usepackage{booktabs}
-\usepackage{algorithm}
-\usepackage[noend]{algpseudocode}
+
+\usepackage[ruled,vlined]{algorithm2e}
 
 % margin notes
 \usepackage{marginnote}
 
 % xspace command
 \usepackage{xspace}
-
-% From https://tex.stackexchange.com/questions/177025/
-\makeatletter
-\newcounter{algorithmicH}% New algorithmic-like hyperref counter
-\let\oldalgorithmic\algorithmic
-\renewcommand{\algorithmic}{%
-  \stepcounter{algorithmicH}% Step counter
-  \oldalgorithmic}% Do what was always done with algorithmic environment
-\renewcommand{\theHALG@line}{ALG@line.\thealgorithmicH.\arabic{ALG@line}}
-\makeatother
 
 % lstlisting command
 \usepackage{listings}
@@ -206,8 +196,8 @@
   that is generic over the pluggable type system to which it is applied.
   That is, our system can conduct type inference for \emph{any} pluggable
   type system with no new type-system-specific code. The key insight behind
-  our new technique is that pluggable type systems are
-  \emph{flow-sensitive}\todo{Ours are; not all have to be.}
+  our new technique is that extant, practical pluggable type systems are
+  \emph{flow-sensitive}
   and therefore include \emph{local} type inference components. Our algorithm
   uses the results of local type inference to produce candidate summaries
   for procedures. These new summaries enable new local inference results
@@ -266,6 +256,8 @@
 
 \input{introduction}
 
+\input{motivating-example}
+
 \input{algorithm}
 
 \input{difficulties}
@@ -275,6 +267,8 @@
 \input{evaluation}
 
 \input{comparison}
+
+\input{limits}
 
 \input{relatedwork}
 

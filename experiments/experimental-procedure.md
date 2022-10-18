@@ -40,7 +40,7 @@ with both the original and forked url as well as the commit ID.
 3. Create a new branch called "unannotated" starting at the same commit:
 `git checkout -b unannotated`
 
-4. Run the `RemoveAnnotationsForInference` program on the source:
+4. Run the `RemoveAnnotationsForInference` program on the source, no ouput means it ran successfully:
 `java -cp "$CHECKERFRAMEWORK/checker/dist/checker.jar" org.checkerframework.framework.stub.RemoveAnnotationsForInference .`
 
 5. Push the unannotated code:
@@ -60,7 +60,8 @@ with both the original and forked url as well as the commit ID.
 
 7. Collect the number of lines of code:
    a. run `git checkout baseline`
-   b. run `scc .` and record the results in the spreadsheet, on the summary page (if you don't have scc installed, https://github.com/boyter/scc)
+   b. run `scc .` and record the number of non-comment, non-blanks lines of Java code (the "Code" column of the "Java" row) in the spreadsheet (in the "LoC" column), on the summary page (if you don't have scc installed, https://github.com/boyter/scc)
+   
 8. Run WPI:
    a. run `git checkout -b wpi-enabled origin/unannotated`
    b. choose any temporary directory for $WPITEMPDIR
@@ -89,11 +90,15 @@ with both the original and forked url as well as the commit ID.
     d. run the script
     e. transcribe the output after "====== COMBINED RESULTS =======" is printed to the spreadsheet, combining rows that mention the same annotation (this happens when e.g., different @RequiresQualifier annotations are inferred by different checkers)
     f. commit and push the script: `git add compute-annos-inferred.sh ; git commit -m "inference output summarization script" ; git push origin wpi-annotations`
-    g. copy outputs of this experimental procedure into (`/main/experiments/inferred-annos-counter/inputExamples`). This can be done by creating a directory in (`/inferred-annos-counter/inputExamples`) with the name of your project and two sub folders, `generated` and `human-written`. (This and following steps are optional. Use as input for downstream tools on small projects only).
-    h. copy all of the contents in your `$WPITEMPDIR` directory used in the previous steps into the `generated` subfolder. 
-    i. copy all of the human-written code (the human-annotated, i.e. original, code, but with a formatter run over it) from your project's source folder (e.g., ./src/main/java/ in a Gradle project) into the `human-written` directory that was created.
 
 11. Measure the percentage of hand-written annotations that WPI inferred
-    a. create a 
+    a. copy the formatter script as `format-mycopy.sh` found in the experiments directory into your project's top level directory. 
+    b. download the `google-java-format.jar`. The link for it is in the script's documentation. Confirm the variable path in the script aligns with the location of your download.
+    c. change the variable, `WPI_RESULTS_DIR` to the path of your project's WPI annotations `wpi-annotations`.
+    d. confirm that the `JAVA_SRC_DIR` is appropriate to your project's file tree which may look something like `./src/main/java/` and should contain `your-project.java` in the lowest directory, modify if needed.
+    e. run the script `./format-mycopy.sh`.
+    f. copy outputs of this experimental procedure into (`/main/experiments/inferred-annos-counter/inputExamples`). This can be done by creating a directory in (`/inferred-annos-counter/inputExamples`) with the name of your project and two sub folders, `generated` and `human-written`. (This and following steps are optional. Use as input for downstream tools on small projects only).
+    g. copy all of the contents in your `$WPITEMPDIR` directory used in the previous steps into the `generated` subfolder. 
+    h. copy all of the human-written code (the human-annotated, i.e. original, code, but with a formatter run over it) from your project's source folder (e.g., ./src/main/java/ in a Gradle project) into the `human-written` directory that was created.
 
 12. Copy summary numbers from the project-specific spreadsheet page to the "summary" tab, and color code the project row green once it is finished.
