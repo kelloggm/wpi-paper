@@ -1,18 +1,19 @@
 package org.checkerframework.wholeprograminference.inferredannoscounter;
 
-import org.checkerframework.common.value.qual.MinLen;
 import com.github.difflib.DiffUtils;
 import com.github.difflib.patch.AbstractDelta;
 import com.github.difflib.patch.Patch;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.checkerframework.checker.index.qual.LTEqLengthOf;
+import org.checkerframework.checker.index.qual.NonNegative;
+import org.checkerframework.common.value.qual.MinLen;
 
 /**
  * The entry point for the inferred annos counter. Pass it a list of files, as detailed in README.md
@@ -21,54 +22,61 @@ import java.util.Map;
 public class InferredAnnosCounter {
 
   /**
-   * For example, if we have @Annotation] coming from the diff algorithm, we will extract the @Annotation part.
+   * For example, if we have @Annotation] coming from the diff algorithm, we will extract
+   * the @Annotation part.
    */
-  static String ExtractHumanAnno( @MinLen(2) String Anno) {
-    /// this is for cases such as ArrayList<@Anno(abcd)...., we only want the "@Anno(abcd)" part.
-    int index1 = Anno.indexOf("@");
-    // this is for cases such as @Option(abc), we only want the "@Option" part.
-    int indexOfLastElement = 1;
-    boolean CheckJustAlphabet=true;
-    for (int county = index1 + 1; county < Anno.length(); county++) {
-      if (!Character.isLetter(Anno.charAt(county))) {
-        CheckJustAlphabet=false;
-        indexOfLastElement = county;
+  static String ExtractHumanAnno(@MinLen(2) String Anno) {
+    @SuppressWarnings(
+        "index:assignment") // This method should only be called on strings that contain an "@"
+    @NonNegative int index1 = Anno.indexOf('@');
+    String result = "";
+    @SuppressWarnings(
+        "index:assignment") // since indexOfLastElement can not be larger than the length of Anno
+    @LTEqLengthOf("Anno") int indexOfLastElement = 0;
+    /* if apart from the '@' symbol, the Anno contains only alphabetical elements (for example: @NulLable), we will take
+    the whole string. Otherwise, for cases such as @Nullable], we will ignore the last element of the Anno.
+    */
+    boolean CheckJustAlphabet = true;
+    for (int i = index1 + 1; i < Anno.length(); i++) {
+      if (Anno.charAt(i) == ']') {
+        CheckJustAlphabet = false;
+        indexOfLastElement = i;
         break;
       }
-      indexOfLastElement = county;
     }
-    if (CheckJustAlphabet)
-    {
-        Anno = Anno.substring(index1, indexOfLastElement+1);
+    if (CheckJustAlphabet) {
+      result = Anno.substring(index1, Anno.length());
+    } else {
+      result = Anno.substring(index1, indexOfLastElement);
     }
-    else
-    {
-        Anno = Anno.substring(index1, indexOfLastElement);
-    }
-    return Anno;
+    return result;
   }
 
   /**
-   * For example, if we have @org.checkerframwork....Annotation, we will extract the @Annotation part.
+   * For example, if we have @org.checkerframwork....Annotation, we will extract the @Annotation
+   * part.
    */
   static String ExtractCompAnno(String Anno) {
-    //for example, if we have @org.checkerframework.dataflow.qual.SideEffectFree, we will extract the "@SideEffectFree"
     String[] breakk = Anno.split("[.]");
     int size = breakk.length;
-    String notic = breakk[size - 1];
+    String result = breakk[size - 1];
+    int count = 0;
     int indexOfLastElement = 0;
-    for (int county = 0; county < notic.length(); county++) {
-      if (!Character.isLetter(notic.charAt(county))) {
+    for (int i = 0; i < result.length(); i++) {
+      if (result.charAt(i) == ']') {
         break;
       }
       indexOfLastElement++;
     }
-    if (indexOfLastElement <= notic.length()) {
-      notic = notic.substring(0, indexOfLastElement);
+    if (indexOfLastElement <= result.length()) {
+      result = result.substring(0, indexOfLastElement);
+    } else {
+      result = result.substring(0, result.length());
     }
-    notic = "@" + notic;
-    return notic;
+    result = "@" + result;
+    return result;
   }
+
   /**
    * The main entry point. Running this outputs the percentage of annotations in some source file
    * that were inferred by WPI.
@@ -100,25 +108,52 @@ public class InferredAnnosCounter {
       String str;
       // lines counter, since somehow DiffAlgorithm counts the first line as 0
       int pos = -1;
-      boolean checkcomment=true;
+      boolean checkcomment = true;
+      int checkInString = -1;
+      boolean checkParathen = true;
+      String wordParaCase = "";
+      String wordNext;
       while ((str = br.readLine()) != null) {
         pos++;
         originalFile.add(str);
-        checkcomment=true;
+        checkcomment = true;
         // Split the word using space
         words = str.split(" ");
         for (int i = 0; i < words.length; i++) {
           String word = words[i];
           // the next two ifs are to check if "word" is a valid annotation
           if (word.length() != 0) {
-            int prePos=i-1;
-            if (prePos>=0) {
-              if (words[prePos].equals("*") || words[prePos].equals("//"))
-              {
-                checkcomment=false;
+            int prePos = i - 1;
+            if (prePos >= 0) {
+              if (words[prePos].equals("*") || words[prePos].equals("//")) checkcomment = false;
+            }
+            // check for case paratheses
+            if (word.contains("(")) {
+              checkParathen = false;
+            }
+            // keep looking and adding until we find the closing parethese
+            if (!checkParathen) {
+              while (!wordParaCase.contains(")") && i < words.length) {
+                wordNext = words[i];
+                wordParaCase = wordParaCase + " " + wordNext;
+                i++;
+              }
+              if (wordParaCase.contains(")")) {
+                checkParathen = true;
+                word = wordParaCase;
               }
             }
-            if (word.contains("@") && checkcomment) {
+            // check for the opening quotation mark
+            if (word.length() > 0) {
+              if (word.charAt(0) == '\"') {
+                checkInString = checkInString * -1;
+              }
+            }
+            if (word.contains("@")
+                && checkcomment
+                && word.length() >= 2
+                && checkInString < 0
+                && checkParathen) {
               word = ExtractHumanAnno(word);
               // get the position of that annotation in the code
               String posi = String.valueOf(pos);
@@ -133,6 +168,12 @@ public class InferredAnnosCounter {
               String annoLocate = word + "_" + posi;
               AnnoLocate.put(annoLocate, new Integer(0));
             }
+            // check for the closing quotation mark
+            for (int h = word.length() - 1; h > 0; h--) {
+              if (word.charAt(h) == '\"') {
+                checkInString = checkInString * -1;
+              }
+            }
           }
         }
       }
@@ -142,14 +183,18 @@ public class InferredAnnosCounter {
     }
     List<Patch<String>> diffs = new ArrayList<>(args.length - 1);
     for (int i = 1; i < args.length; ++i) {
-      file=new File(args[i]);
+      file = new File(args[i]);
       try (FileReader fr = new FileReader(file)) {
         List<String> newFile = new ArrayList<String>();
         String[] words = null;
         BufferedReader br = new BufferedReader(fr);
         String str;
         String search = "@org.checkerframework";
-        boolean checkcomment=true;
+        boolean checkcomment = true;
+        int checkInString = -1;
+        boolean checkParathen = true;
+        String wordParaCase = "";
+        String wordNext;
         while ((str = br.readLine()) != null) {
           newFile.add(str);
           words = str.split(" ");
@@ -160,16 +205,47 @@ public class InferredAnnosCounter {
             if (word.length() != 0) {
               int prePos = in - 1;
               if (prePos >= 0) {
-                if (words[prePos].equals("*") || words[prePos].equals("/")) {
+                if (words[prePos].equals("*") || words[prePos].equals("//")) {
                   checkcomment = false;
                 }
               }
+              // check for case paratheses
+              if (word.contains("(")) {
+                checkParathen = false;
+              }
+              // keep looking and adding until we find the closing parethese
+              if (!checkParathen) {
+                while (!wordParaCase.contains(")") && in < words.length) {
+                  wordNext = words[in];
+                  wordParaCase = wordParaCase + " " + wordNext;
+                  in++;
+                }
+                if (wordParaCase.contains(")")) {
+                  checkParathen = true;
+                  word = wordParaCase;
+                }
+              }
+              // check for the opening quotation mark
+              if (word.length() > 0) {
+                if (word.charAt(0) == '\"') {
+                  checkInString = checkInString * -1;
+                }
+              }
               // finding string that has annotation but not belong to a comment
-              if (word.contains(search) && checkcomment) {
-                  /* for an annotation such as "@org.checkerframework...Nullable", we will extract the
-                  "@Nullable" part */
+              if (word.contains(search)
+                  && checkcomment
+                  && word.length() >= 2
+                  && checkInString < 0) {
+                /* for an annotation such as "@org.checkerframework...Nullable", we will extract the
+                "@Nullable" part */
                 word = ExtractCompAnno(word);
                 ImportantAnno.add(word);
+              }
+              // check for the closing quotation mark
+              for (int h = word.length() - 1; h > 0; h--) {
+                if (word.charAt(h) == '\"') {
+                  checkInString = checkInString * -1;
+                }
               }
             }
           }
@@ -200,20 +276,21 @@ public class InferredAnnosCounter {
           for (String element : myList) {
             // we dont take differences in the comment section into consideration
             if (element.equals("[")) {
-              notcomment=true;
+              notcomment = true;
             }
             if (element.equals("//")) {
               notcomment = false;
             }
             if (notcomment && element.contains("@")) {
               /**
-               * The Diff algorithm will state that "@org.checkerframework.dataflow.qual.Pure" is different from
-               * "@Pure". We will let it do that and update the data of AnnoLocate based on that observation,
-               * which is to add the value of the @Pure key by 1. But we will add a piece of codes that see
-               * "@org.checkerframework.dataflow.qual.Pure" as "@Pure" and look it up on AnnoLocate, then
-               * decrease the value of that @Pure key in the AnnoLocate by 1.
+               * The Diff algorithm will state that "@org.checkerframework.dataflow.qual.Pure" is
+               * different from "@Pure". We will let it do that and update the data of AnnoLocate
+               * based on that observation, which is to add the value of the @Pure key by 1. But we
+               * will add a piece of codes that see "@org.checkerframework.dataflow.qual.Pure" as
+               * "@Pure" and look it up on AnnoLocate, then decrease the value of that @Pure key in
+               * the AnnoLocate by 1.
                */
-              if (element.contains("@org.checkerframework")) {
+              if (element.contains("@org.checkerframework") && element.length() >= 2) {
                 String notic = ExtractCompAnno(element);
                 notic = notic + "_" + newpos;
                 if (AnnoLocate.containsKey(notic)) {
@@ -221,9 +298,9 @@ public class InferredAnnosCounter {
                   value = value - 1;
                   AnnoLocate.put(notic, value);
                 }
-              } else {
+              } else if (element.length() > 2) {
                 element = ExtractHumanAnno(element);
-                int currLine=Integer.parseInt(newpos);
+                int currLine = Integer.parseInt(newpos);
                 // to match the one in AnnoLocate
                 result = element + "_" + newpos;
                 // update the data of AnnoLocate
@@ -231,12 +308,11 @@ public class InferredAnnosCounter {
                   int value = AnnoLocate.get(result);
                   value = value + 1;
                   AnnoLocate.put(result, value);
-                }
-                else {
-                  while (currLine<AnnoLocate.size()) {
+                } else {
+                  while (currLine < AnnoLocate.size()) {
                     currLine++;
-                    String curLine=String.valueOf(currLine);
-                    result= element+ currLine;
+                    String curLine = String.valueOf(currLine);
+                    result = element + currLine;
                     if (AnnoLocate.containsKey(result)) {
                       int value = AnnoLocate.get(result);
                       value = value + 1;
@@ -244,7 +320,6 @@ public class InferredAnnosCounter {
                       break;
                     }
                   }
-
                 }
               }
             }
