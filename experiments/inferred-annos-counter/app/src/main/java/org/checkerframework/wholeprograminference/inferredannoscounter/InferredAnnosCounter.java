@@ -234,10 +234,12 @@ public class InferredAnnosCounter {
               // finding string that has annotation but not belong to a comment
               if (word.contains(search)
                   && checkcomment
-                  && word.length() >= 2
                   && checkInString < 0) {
                 /* for an annotation such as "@org.checkerframework...Nullable", we will extract the
                 "@Nullable" part */
+                if (word.length()<2){
+                  throw new RuntimeException("Input file is invalid: @ symbol should not stand alone!");
+                }
                 word = ExtractCompAnno(word);
                 ImportantAnno.add(word);
               }
