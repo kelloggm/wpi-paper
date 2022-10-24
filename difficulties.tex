@@ -70,8 +70,41 @@ this as a theoretical problem. \todo{Mike should write this section.}
 \subsection{Output Format}
 \label{sec:output}
 
-Find a way to frame the various WPI modes (i.e., JAIF mode,
-stub mode, ajava mode) as a solution to a theoretical problem.
+\todo{This was a big engineering challenge, but I'm not sure if
+  it deserves this much space in the paper. Maybe cut it down to one
+  paragraph, move it to the implementation section, or both? Or
+  maybe cut it all together?}
 
-\todo{Think more about this and remember what other big problems
-  we had to solve, and then add corresponding subsections.}
+\Cref{alg:wpi-fixpoint} does not specify how to store the intermediate
+sets of candidate type qualfiers (\ie $A^{\prime}$). Choosing the right way
+to do so is a surprisingly difficult engineering task. This section describes some
+of the pitfalls and how we overcame them.
+
+An obvious solution (and the first we tried) is to store the annotations
+in the program itself, as if they had been written by the programmer. The
+problem with this strategy is that it becomes impossible to distinguish
+between qualifiers written by the programmer themselves and qualifiers
+inferred in previous fixpoint rounds. Because the programmer might write
+qualifiers themselves to prevent the inference system from making overly-precise
+refinements (which would result in type errors in \eg other modules not currently
+under compilation), the analysis should not further refine any qualifiers
+provided by the programmer.
+
+Our second approach was to store the type qualifiers in a side file, using
+the standard approach for providing specifications for
+libraries that the code under compilation depends on, but which were not
+themselves compiled with the pluggable typechecker (and therefore whose bytecode
+does not contain type qualifiers). The downside of this approach is that
+the requirements for ``library qualifier'' side files and inferred side files
+are quite different. Consider the case where a library qualifier side file and
+a source file exist for the same class. In this case, the sensible default is
+to \emph{ignore} the library qualifier file, because the source code is actually
+the ground truth. This problem is compounded by typechecker writers distributing
+library qualifier files for common libraries. We built a switch that would force
+all library qualifier files to be placed into source code, but this made inference
+not work properly on common libraries for which checker-distributed library qualifier files
+existed.
+
+Our third (and final) approach was to build an inference-specific side file mechanism.
+Though this required our implementation to be larger, it did not have any of the problems
+described above.
