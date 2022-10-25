@@ -212,13 +212,13 @@ public class InferredAnnosCounter {
     return anno.substring(0, para);
   }
 
-  /**
+   /**
    * This method is to print out all the annotations belong to a line.
    *
    * <p>
    *
-   * @param str a line
-   * @return
+   * @param str   a line
+   * @return      a Linked List containing all annotations of str.
    */
   private static LinkedList<String> extractString(String str) {
     LinkedList<String> result = new LinkedList<String>();
