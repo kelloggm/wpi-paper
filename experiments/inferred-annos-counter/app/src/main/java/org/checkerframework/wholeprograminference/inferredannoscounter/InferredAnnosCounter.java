@@ -40,24 +40,14 @@ public class InferredAnnosCounter {
         "index:assignment") // This method should only be called on strings that contain an "@"
     @NonNegative int index1 = anno.indexOf('@');
     String result = "";
-    @SuppressWarnings(
-        "index:assignment") // since indexOfLastElement can not be larger than the length of anno
-    @LTEqLengthOf("Anno") int indexOfLastElement = 0;
     /* if apart from the '@' symbol, the anno contains only alphabetical elements (for example: @NulLable), we will take
     the whole string. Otherwise, for cases such as @Nullable], we will ignore the last element of the anno.
     */
-    boolean CheckJustAlphabet = true;
-    for (int i = index1 + 1; i < anno.length(); i++) {
-      if (anno.charAt(i) == ']') {
-        CheckJustAlphabet = false;
-        indexOfLastElement = i;
-        break;
-      }
-    }
-    if (CheckJustAlphabet) {
+    int indexConsider=anno.indexOf("]");
+    if (indexConsider==-1) {
       result = anno.substring(index1, anno.length());
     } else {
-      result = anno.substring(index1, indexOfLastElement);
+      result = anno.substring(index1, indexConsider);
     }
     return result;
   }
