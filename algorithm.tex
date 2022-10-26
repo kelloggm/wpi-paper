@@ -74,11 +74,160 @@ support this feature~\cite{PapiACPE2008}~\todo{cite any other practical pluggabl
   Java itself supports this now for the base type system?} \todo{Also mention
   that this seems to be a general trend in language design, citing maybe Kotlin?}
 
-\todo{Create a figure with modified type rules for handling
-  inference, with one rule for each part of \<WholeProgramInference>.
-  We want to present this as a theoretical contribution: \ie, as
-  a new way of building a pluggable type system. Maybe take the original
-  rules from~\cite{FosterFFA99}?}
+\begin{figure*}
+  \begin{mathpar}
+    \inferrule* [right=INV]
+                {
+                  \std{\Gamma \vdash m(f_0,\ldots,f_n) : }~\qual{q_R}~\std{\tau_R}
+                  \\
+                  \std{\Gamma \vdash \forall i \in 0,\ldots,n,~e_i :~} \qual{q_{i_A}}~\std{\tau_{i_A}}
+                  \\
+                  \std{\Gamma \vdash \forall i \in 0,\ldots,n,~f_i :~} \qual{q_{i_F}}~\std{\tau_{i_F}}
+                  \\
+                  \std{\Gamma \vdash \forall i \in 0,\ldots,n,~} \qual{q_{i_A}}~\std{\tau_{i_A}~\sqsubseteq}~\qual{q_{i_F}}~\std{\tau_{i_F}}
+                  \\
+                  \infr{\infEnv \vdash \forall i \in 0,\ldots,n,~f_i~:~q_{i_I}~\tau_{i_F}}
+                }
+                {
+                  \std{\Gamma \vdash m(e_0,\ldots,e_n) : }~\qual{q_R}~\std{\tau_R}
+                  \\
+                  \infr{\infEnv \vdash \forall i \in 0,\ldots,n,~f_i~:~\mathit{LUB_Q}(q_{i_A},~q_{i_I})~\tau_{i_F} }
+                }
+                
+     \inferrule* [right=NEW]
+                {
+                  \std{\Gamma \vdash \<new T>(f_1,\ldots,f_n) : }~\qual{q_R}~\std{\tau_R}
+                  \\
+                  \std{\Gamma \vdash \forall i \in 1,\ldots,n,~e_i :~} \qual{q_{i_A}}~\std{\tau_{i_A}}
+                  \\
+                  \std{\Gamma \vdash \forall i \in 1,\ldots,n,~f_i :~} \qual{q_{i_F}}~\std{\tau_{i_F}}
+                  \\
+                  \std{\Gamma \vdash \forall i \in 1,\ldots,n,~} \qual{q_{i_A}}~\std{\tau_{i_A}~\sqsubseteq}~\qual{q_{i_F}}~\std{\tau_{i_F}}
+                  \\
+                  \infr{\infEnv \vdash \forall i \in 1,\ldots,n,~f_i~:~q_{i_I}~\tau_{i_F}}
+                }
+                {
+                  \std{\Gamma \vdash \<new T>(e_1,\ldots,e_n) : }~\qual{q_R}~\std{\tau_R}
+                  \\
+                  \infr{\infEnv \vdash \forall i \in 1,\ldots,n,~f_i~:~\mathit{LUB_Q}(q_{i_A},~q_{i_I})~\tau_{i_F} }
+                }
+
+     \inferrule* [right=FORMAL-ASSIGN]
+                {
+%                  \std{f~is~a~formal~parameter} \\
+                  \std{\Gamma \vdash e~:}~\qual{q_A}~\std{\tau_A} \\
+                  \std{\Gamma \vdash f~:}~\qual{q_F}~\std{\tau_F} \\
+                  \std{\Gamma \vdash} \qual{q_A}~\std{\tau_A~\sqsubseteq}~\qual{q_F}~\std{\tau_F} \\
+                  \infr{\infEnv \vdash f~:~q_I~\tau_F}
+                }
+                {
+                  \std{\Gamma \vdash f~:=~e} \\
+                  \infr{\infEnv \vdash f~:~\mathit{LUB_Q}(q_A, q_I)~\tau_F}
+                }
+
+     \inferrule* [right=FIELD-ASSIGN]
+                {
+%                  \std{f~is~a~formal~parameter} \\
+                  \std{\Gamma \vdash e~:}~\qual{q_A}~\std{\tau_A} \\
+                  \std{\Gamma \vdash x.f~:}~\qual{q_F}~\std{\tau_F} \\
+                  \std{\Gamma \vdash} \qual{q_A}~\std{\tau_A~\sqsubseteq}~\qual{q_F}~\std{\tau_F} \\
+                  \infr{\infEnv \vdash x.f~:~q_I~\tau_F}
+                }
+                {
+                  \std{\Gamma \vdash x.f~:=~e} \\
+                  \infr{\infEnv \vdash x.f~:~\mathit{LUB_Q}(q_A, q_I)~\tau_F}
+                }
+
+     \inferrule* [right=RETURN]
+                {
+%                  \std{f~is~a~formal~parameter} \\
+                  \std{\Gamma \vdash e~:}~\qual{q_A}~\std{\tau_A} \\
+                  \std{\Gamma \vdash m(f_0,\ldots,f_n)~:}~\qual{q_F}~\std{\tau_F} \\
+                  \std{\Gamma \vdash} \qual{q_A}~\std{\tau_A~\sqsubseteq}~\qual{q_F}~\std{\tau_F} \\
+                  \infr{\infEnv \vdash m(f_0,\ldots,f_n)~:~q_I~\tau_F}
+                }
+                {
+                  \std{\Gamma \vdash \<return>~e} \\
+                  \infr{\infEnv \vdash m(f_0,\ldots,f_n)~:~\mathit{LUB_Q}(q_A, q_I)~\tau_F}
+                }
+
+    \inferrule* [right=OVERRIDE]
+                {
+                  % return types
+                  \std{\Gamma \vdash m_1(f_{0_1},\ldots,f_{n_1}) : }~\qual{q_{R_1}}~\std{\tau_{R_1}}
+                  \\
+                  \std{\Gamma \vdash m_2(f_{0_2},\ldots,f_{n_2}) : }~\qual{q_{R_2}}~\std{\tau_{R_2}}
+                  \\
+                  \std{\Gamma \vdash} \qual{q_{R_1}}~\std{\tau_{R_1}~\sqsubseteq}~\qual{q_{R_2}}~\std{\tau_{R_2}}
+                  \\
+                  \std{\Gamma \vdash \forall i \in 0,\ldots,n_1,~f_{i_1} :~} \qual{q_{i_1}}~\std{\tau_{i_1}}
+                  \\
+                  \std{\Gamma \vdash \forall i \in 0,\ldots,n_2,~f_{i_2} :~} \qual{q_{i_2}}~\std{\tau_{i_2}}
+                  \\
+                  \std{\Gamma \vdash \forall i \in 0,\ldots,n_1,~} \qual{q_{i_1}}~\std{\tau_{i_1}~\sqsubseteq}~\qual{q_{i_2}}~\std{\tau_{i_2}}
+                  \\
+                  \std{\vdash n_1~=~n_2}
+                  \\
+                  \infr{\infEnv \vdash m_1(f_{0_1},\ldots,f_{n_1})~:~q_{R_1-I}~\tau_{R_1}}
+                  \\
+                  \infr{\infEnv \vdash m_2(f_{0_2},\ldots,f_{n_2})~:~q_{R_2-I}~\tau_{R_2}}
+                  \\
+                  \infr{\infEnv \vdash \forall i \in 0,\ldots,n_1,~f_{i_1}~:~q_{i_1-I}~\tau_{i_1}}
+                  \\
+                  \infr{\infEnv \vdash \forall i \in 0,\ldots,n_2,~f_{i_2}~:~q_{i_2-I}~\tau_{i_2}}
+                }
+                {
+                  \std{\Gamma \vdash m_1(f_{0_1},\ldots,f_{n_1})~\mathit{is~a~valid~override~of}~m_2(f_{0_2},\ldots,f_{n_2})}
+                  \\
+                  \infr{\infEnv \vdash m_2(f_{0_2},\ldots,f_{n_2})~:~\mathit{LUB_Q}(q_{R_1-I}, q_{R_2-I})~\tau_{R_2}}
+                  \\
+                  \infr{\infEnv \vdash \forall i \in 0,\ldots,n_2,~f_{i_2}~:~\mathit{LUB_Q}(q_{i_1-I},~q_{i_2-I})~\tau_{i_2} }
+                }
+                
+                
+  \end{mathpar}
+  \caption{Modified type rules used by our pluggable type framework. \std{Gray} indicates
+    standard type rules for a Java-like language. \qual{Black} indicates additions to support
+    pluggable typechecking. \infr{Red} indicates additions to support inference, \ie our
+    contribution in this paper.
+    Throughout, ``R'' subscripts refer to return types; ``F'' to formal parameters; ``A'' to
+    actual arguments; and ``I'' to inference results.
+    Type rules that do not require modification to support inference
+    are elided for space.}
+  \label{fig:type-rules}
+\end{figure*}
+
+The modified type rules appear in \cref{fig:type-rules}. \std{Gray} indicates
+standard type rules for a Java-like language. \qual{Black} indicates additions to support
+pluggable typechecking. \infr{Red} indicates additions to support inference, \ie our
+contribution in this paper.
+%
+Type rules that do not need to be modified to support inference are elided for space.
+%
+To read these type rules, we first need to define some terms.
+
+$\infEnv$ is the \emph{inference environment}, similar to the standard (qualified)
+typing environment $\Gamma$. $\Gamma$ maps expressions and declarations to qualified types.
+$\infEnv$ has two key differences: it maps only declarations to possibly-qualified types.
+$\infEnv$ only maps declarations because our inference procedure does not need to infer
+types for expressions: in fact, we assume that $\Gamma$ already does so (via flow-sensitive
+refinement). Rather, $\infEnv$'s purpose is to map declarations to the results of inference.
+Unlike $\Gamma$, the values in $\infEnv$ are possibly-qualified, meaning that they can either
+be qualified types or unqualified types. Initially, $\infEnv$ contains qualified types only
+for declarations that were qualified before the current round of inference (which may come from
+the programmer or from a previous inference round in the \cref{alg:wpi-fixpoint} fixpoint loop).
+Once the current round of inference terminates, $\infEnv$ is used to produce the results of the
+inference round by returning the set of all qualified types: any type that remains unqualified
+throughout inference is not annotated, because no information about it was learned.
+
+We define the function $\mathit{LUB_Q}(q_1, q_2)$ to account for possibly-qualified types.
+$q_1$ and $q_2$ are each either a type qualifier or ``not present''.
+If both arguments are qualifiers, then the result of $\mathit{LUB_Q}$
+is just their least upper bound. If only one qualifier is present, then $\mathit{LUB_Q}$'s result
+is that qualifier; if both qualifiers are not present, $\mathit{LUB_Q}$'s result is ``not present'',
+resulting in an unqualified result (since calls $\mathit{LUB_Q}$ must always precede a ground type
+from the original type system).
 
 \todo{Then, this section should describe the interesting parts of the
-  modified type rules in detail.}
+  modified type rules in detail? At a minimum, we should probably walk the reader through
+  one of the type rules.}
