@@ -150,6 +150,7 @@
 %% The "title" command has an optional parameter,
 %% allowing the author to define a "short title" to be used in page headers.
 \title{Type Inference for Pluggable Typecheckers}
+% or: \title{Inference of Pluggable Types}
 
 %%
 %% The "author" command and its associated commands are used to define
@@ -180,9 +181,10 @@
 %% The abstract is a short summary of the work to be presented in the
 %% article.
 \begin{abstract}
-  A pluggable type system extends a host type system with type qualifiers;
-  it enables detection and prevention of errors beyond the abilities of the
-  host type system.\todo{give some examples?}
+  A pluggable type system extends a programming language with type qualifiers.
+  It enables a programmer to write a type such as \<unsigned int>, \<secret
+  string>, or \<nonnull object>.
+  Type-checking with pluggable types detects and prevents more errors.
   The biggest obstacle to use of pluggable types is the need for
   programmers to write type qualifiers.
   Type inference can solve this problem.

@@ -68,9 +68,18 @@ system framework to record inferred summaries.
 Our approach then iteratively applies these modified rules until the summaries
 reach fixpoint to generate a candidate set of type qualifiers.
 We can then provide this candidate set of qualifiers to the original
-pluggable typechecker: assuming that the typechecker is sound, if the program
-typechecks with a candidate set of qualifiers, those qualifiers are trivially
-known to be correct.
+pluggable typechecker: assuming that the typechecker is sound,
+
+If the program typechecks with the candidate set of qualifiers, the program
+is correct with respect to that type system.
+If not, then the program contains a defect, or it is not internally
+consistent, or its correctness is beyond the capabilities of the
+type-checker (this is when a programmer would write a cast).
+In any event, the inferred type qualifiers can help the programmer.
+In our implementation, the user (a programmer) can decide whether to insert
+the type qualifiers in the source code, or to store them in a side file.
+
+
 
 We implemented this idea for the Checker Framework~\cite{PapiACPE2008},
 a popular open-source pluggable type system
@@ -80,10 +89,10 @@ framework for Java.
 impress you with our clever solution to tricky problems, and also how much
 engineering we did.}
 %
-We used our tools to run \todo{X} different pluggable typecheckers
+We used the extended Checker Framework to run \todo{X} different pluggable typecheckers
 on \todo{some massive number of} lines of code to demonstrate that
 our approach is both effective and general.
-We found that our inference approach infers \todo{Y\%} of human-written
+In experiments, our inference approach inferred \todo{Y\%} of human-written
 type qualifiers.
 
 \todo{Decide if we're actually going to do this.}
