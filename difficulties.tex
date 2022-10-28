@@ -22,11 +22,11 @@ is guaranteed to terminate when typechecking a program, but our
 inference algorithm can induce downward refinement.
 
 For example, consider a type system for integer intervals
-whose type qualifiers are of the form \<@IntRange(from, to)>.
-The type \<@IntRange(1, 10) int> therefore means ``an integer between
+whose type qualifiers are of the form \<@Int\-Range(from, to)>.
+The type \<@Int\-Range(1, 10) int> therefore means ``an integer between
 1 and 10, inclusive'' when running this pluggable typechecker.
-The subtyping relationship is straightforward: \<@IntRange(a, z)>
-is a supertype of \<@IntRange(b, y)> if and only if \codeid{a < b \&\& z > y}.
+The subtyping relationship is straightforward: \<@Int\-Range(a, z)>
+is a supertype of \<@Int\-Range(b, y)> if and only if \codeid{a < b \&\& z > y}.
 Then consider running our inference algorithm on the program in \cref{fig:descend}
 using this pluggable typechecker.
 
@@ -55,7 +55,10 @@ is undesirable.
 
 In practice, we found that a simple modification to the invocation rule that
 prevents type qualifier inference from recursive method calls is sufficient
-to prevent this problem in practice. Though mutual recursion is a problem in
+to prevent this problem in practice.\todo{Mention that a narrowing
+  approach, analogous to widening that is already used in dataflow/abstract
+  interpretation, would also be a possible solution.}
+ Though mutual recursion is a problem in
 theory, in our benchmarks we did not encounter any code that triggered such
 an infinite loop in the analysis. Future work should address this problem in
 a more principled way.
@@ -64,7 +67,7 @@ a more principled way.
 \label{sec:pre-post-conditions}
 
 Discuss some of the troubles that Mike encountered when
-he implemented pre- and post-condition support in WPI. Frame
+he implemented pre- and post-condition support in WPI\@. Frame
 this as a theoretical problem. \todo{Mike should write this section.}
 
 \subsection{Output Format}
@@ -76,7 +79,7 @@ this as a theoretical problem. \todo{Mike should write this section.}
   maybe cut it all together?}
 
 \Cref{alg:wpi-fixpoint} does not specify how to store the intermediate
-sets of candidate type qualfiers (\ie $A^{\prime}$). Choosing the right way
+sets of candidate type qualifiers (\ie $A^{\prime}$). Choosing the right way
 to do so is a surprisingly difficult engineering task. This section describes some
 of the pitfalls and how we overcame them.
 
@@ -89,6 +92,12 @@ qualifiers themselves to prevent the inference system from making overly-precise
 refinements (which would result in type errors in \eg other modules not currently
 under compilation), the analysis should not further refine any qualifiers
 provided by the programmer.
+
+\todo{I think the key is that future iterations can and should change
+  inferred output, but must not change programmer-provided input.  So these
+  must be input differently to the inference tool, so that it can treat
+  them differently.  Maybe organizing the section around that will make it
+  shorter and clearer.}
 
 Our second approach was to store the type qualifiers in a side file, using
 the standard approach for providing specifications for
@@ -105,6 +114,18 @@ all library qualifier files to be placed into source code, but this made inferen
 not work properly on common libraries for which checker-distributed library qualifier files
 existed.
 
+\todo{Try to avoid writing this as a narrative of things we did in the
+  order we did them.  Instead,
+  lay out alternatives and the pluses and minuses of each.}
+
 Our third (and final) approach was to build an inference-specific side file mechanism.
 Though this required our implementation to be larger, it did not have any of the problems
 described above.
+\todo{This deserves a little more explanation (even as other parts may be
+  shorter).  This inference-specific side file mechanism uses the same
+  syntax but different syntax than the existing side file mechanism.  The
+  implementation section can point out that we actually designed an new
+  mechanism (ajava files), because the existing mechanisms were not
+  adequate for inference.}
+
+% LocalWords:  typechecker typecheckers typechecking ajava

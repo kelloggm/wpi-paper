@@ -1,11 +1,11 @@
 % the core WPI fixpoint algorithm; that is, the outer WPI loop
 
-\begin{algorithm}[htbp]
+\begin{algorithm}
   \DontPrintSemicolon
   \SetKwInOut{Input}{input}
   \SetKwInOut{Output}{output}
   \Input{program $P$ and pluggable typechecker $T$}
-  \Output{Set of errors $E$ and set of specifications $A^{\prime}$}
+  \Output{Set of specifications (inferred types) $A^{\prime}$}
   \BlankLine
 %  \tcc{In each iteration, $A$ is the specification set before running $T$, and $A^{\prime}$ is the set after.}
   $A \gets \emptyset, A^{\prime} \gets \emptyset$ \;
@@ -16,9 +16,16 @@
     $A \gets A^{\prime}$ \;
     $E, A^{\prime} \gets T^{\prime}(P, A)$ \;
   }
+  % \Return $E, A^{\prime}$ \;
   \Return $E, A^{\prime}$ \;
 
   \caption{The core fixpoint algorithm for our type inference system.
-    The helper function \textsc{Instrument} is defined and explained in \cref{sec:instrument}.}
+    The helper function \textsc{Instrument} is defined and explained in \cref{sec:instrument}.
+\todo{Make this into a function and give it a name, probably
+  \textsc{Infer}.}
+\todo{Why is the caption so narrow, not taking up the whole column?}
+\todo{before ``$A \gets A^{\prime}$'', add a comment stating that $A'
+  \sqsubseteq A$.  Put a little proof of that fact in the body of the paper.}
+}
   \label{alg:wpi-fixpoint}
 \end{algorithm}

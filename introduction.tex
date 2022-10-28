@@ -1,31 +1,45 @@
 \section{Introduction}
 \label{sec:intro}
 
-\todo{Turn this into actual text with references rather than bullets.}
+\todo{Need to introduce the concepts of type qualifier, base/host type, and
+  type (which consists of both); that types can be unqualified or written with a type
+  annotation; that the checker does defaulting if the basetype is unannotated.}
+\todo{Explain the distinction between a ``specification'' and a type qualifier.}
 
-Pluggable type systems~\cite{FosterFFA99} augment a host type system
-with \emph{type qualifiers} that track information about a property of
-interest. Researchers have devised practical pluggable type systems
+\todo{Should we be more careful to distinguish type annotations (a
+  Java syntactic construct) from type qualifiers (a type-theoretic
+  concept)?}
+
+A pluggable type system~\cite{FosterFFA99} augments a host type system
+with \emph{type qualifiers} that refine it.  A qualified type is
+finer-grained than an unqualified one and therefore gives more precise
+information about what values are possible at run time.
+Researchers have devised practical pluggable type systems
 to prevent numerous kinds of defects, including null-pointer
 dereferences~\cite{BanerjeeCS2019,PapiACPE2008,DietlDEMS2011},
 array-bounds violations~\cite{KelloggDME2018},
 violations of locking discipline~\cite{ErnstLMST2016},
 mutations of immutable data~\cite{DietlDEMS2011,PapiACPE2008,coblenz2017glacier},
-and others. Industrial deployments of pluggable type systems
-have been reported by Amazon~\cite{KelloggSTE2020,KelloggRSSE2020},
-Uber~\cite{BanerjeeCS2019}, and \todo{references for others in Mike's
-  usual list, e.g., Google}.
+and others.
+A successful type-checking run proves that the undesirable behavior will
+never occur.
+Pluggable type systems are a standard practice in industry; for example,
+they are used at Amazon~\cite{KelloggSTE2020,KelloggRSSE2020},
+Google~\cite{SadowskiAEMCJ2018}, and Uber~\cite{BanerjeeCS2019}
 
-An advantage of deploying a pluggable type system is that programmers
-are familiar with type systems and are used to writing types, because
-they are programming in a host language like Java or C\# with static
-types.
-Once applied, the type qualifiers provide benefits: the typechecker can check
-their correctness, and they serve as concise documentation.
-However, the process of applying a pluggable type system to a legacy codebase
-(\ie writing type qualifiers)
+Pluggable types are an attractive verification and bug-finding strategy
+because programmers
+are familiar with type systems and are used to writing types.
+% because
+% they are programming in a host language like Java or C\# with static
+% types.
+The type qualifiers also serve as concise, machine-checked documentation.
+However, writing type qualifiers in a legacy codebase
 is time-consuming and intimidating for developers.
 
+\todo{Start out talking about languages like ML and Haskell, which are
+  strongly typed but use whole-program type inference.  It's towers of
+  exponential time in the (very rare) worst case.}
 This problem also applies to non-pluggable type systems: some developers
 prefer untyped or dynamically-typed languages like Python or JavaScript
 because they do not want to write type annotations.
@@ -42,35 +56,47 @@ Type inference for popular dynamic languages like Python is an open
 research problem. Researchers have proposed approaches based
 on MaxSAT~\cite{hassan2018maxsmt} and machine learning~\cite{xu2016python,peng2022static}.
 
-Unfortunately, none of these approaches are practical for pluggable types.
+Unfortunately, none of these approaches is practical for pluggable types.
 Building a type inference algorithm in the style of Algorithm W for each
-type system is impractical: there are too many pluggable type systems.
+type system is impractical: there are too many pluggable type
+systems.\todo{I don't buy this.  There aren't too many type systems to
+  implement.  Doing a bit of extra work to define inference for each is a
+  constant factor overhead over writing the type checker for each.}
 A similar problem occurs when trying to build a constraint system to
 dispatch to an SMT solver: the type rules of the specific pluggable type system
 need to be encoded in the constraint-generation rules. Finally, approaches
-based on machine learning, while promising, lack sufficient training data for
-many pluggable type systems.
+based on machine learning lack sufficient training data for
+many pluggable type systems, they give no guarantee of correctness, and may
+not be able to explain their choices to the programmer.
 %
 We desire an
 inference algorithm that is \emph{generic} over the pluggable type system
 to which it is applied: the type system designer should not need to
-make modifications to their type system implmentation in order to access
+modify their type system implmentation in order to access
 the benefits of type inference.
 
 To that end, we propose a general type inference algorithm for pluggable type
-systems that is applicable to any \emph{flow-sensitive} pluggable type system.
+systems that is applicable to any flow-sensitive pluggable type system.
 Our key insight is that
 practical frameworks for building pluggable type systems already provide
-\emph{local} type inference in the form of flow-sensitivity within the body
+local type inference in the form of flow-sensitivity within the body
 of methods.
-We modify the underlying qualified type rules provided by the pluggable type
-system framework to record inferred summaries.
-Our approach then iteratively applies these modified rules until the summaries
-reach fixpoint to generate a candidate set of type qualifiers.
-We can then provide this candidate set of qualifiers to the original
-pluggable typechecker: assuming that the typechecker is sound, if the program
-typechecks with a candidate set of qualifiers, those qualifiers are trivially
-known to be correct.
+We modify the framework to record inferred method/class/field summaries.
+Our approach iteratively type-checks the program, using and improving the
+summaries, until reading a fixed point.
+That fixed point is a candidate set of type qualifiers, which are
+consistent with the program.
+
+If the program typechecks with the candidate set of qualifiers, the program
+is correct with respect to that type system.
+If not, then the program contains a defect, or it is not internally
+consistent, or its correctness is beyond the capabilities of the
+type-checker (this is when a programmer would write a cast).
+In any event, the inferred type qualifiers can help the programmer.
+In our implementation, the user (a programmer) can decide whether to insert
+the type qualifiers in the source code, or to store them in a side file.
+
+
 
 We implemented this idea for the Checker Framework~\cite{PapiACPE2008},
 a popular open-source pluggable type system
@@ -80,10 +106,10 @@ framework for Java.
 impress you with our clever solution to tricky problems, and also how much
 engineering we did.}
 %
-We used our tools to run \todo{X} different pluggable typecheckers
+We used the extended Checker Framework to run \todo{X} different pluggable typecheckers
 on \todo{some massive number of} lines of code to demonstrate that
 our approach is both effective and general.
-We found that our inference approach infers \todo{Y\%} of human-written
+In experiments, our inference approach inferred \todo{Y\%} of human-written
 type qualifiers.
 
 \todo{Decide if we're actually going to do this.}
@@ -99,7 +125,7 @@ Our contributions are:
   typecheckers (\cref{sec:core-algorithm});
 \item a collection of enhancements to the algorithm that are necessary to
   make it practical (\cref{sec:difficulties});
-\item an implementation of our new type inference algorithm for a framework
+\item an implementation of our new type inference algorithm within a framework
   for building pluggable typecheckers (\cref{sec:implementation});
 \item an evaluation of our implementation, that shows that it can infer
   \todo{X}\% of human-written annotations in \todo{Y} projects totalling

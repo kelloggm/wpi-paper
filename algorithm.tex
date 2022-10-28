@@ -2,13 +2,33 @@
 \label{sec:algorithm}
 
 This section presents our type inference algorithm. This algorithm is
-polymorphic with respect to the underlying pluggable typechecker: that is,
+independent of the underlying pluggable typechecker: that is,
 it applies equally well to any pluggable typechecker that performs flow-sensitive
-local inference. The algorithm is described in two parts: first, the fixpoint
-algorithm used to infer types for a particular program (\cref{sec:core-algorithm});
-and second, the modifications we make to the pluggable typechecker to enable
-that algorithm (\ie the \textsc{Instrument} function of \cref{alg:wpi-fixpoint},
-in \cref{sec:instrument}).
+local inference.
+
+\todo{I don't like the term ``instrumented''.  It does describe what
+  happened at a low level.  It does not explain what the instrumentation
+  does or why it is valuable.  Maybe an ``inferring'' version of the type checker?}
+\todo{The paper should explain that ``specifications'' is really ``type
+  annotations'', to a first approximation.}
+
+The crux\todo{word choice} of the implementation is to use an
+``instrumented'' version of the type checker.  A typechecker
+$T : P \rightarrow E$
+takes a program and outputs a (possibly empty) set of
+type errors.  The instrumented type-checker
+$T' : \langle P, A \rangle \rightarrow \langle E, A' \rangle$
+takes a program along with extra specifications, and it outputs errors and
+inferences.  The errors are exactly those $T$ would output, if the
+specifications in $A$ were written on $P$.
+
+The algorithm is described in two parts: first,
+\Cref{sec:core-algorithm} gives the fixpoint
+algorithm used to infer types for a particular program.
+\Cref{alg:wpi-fixpoint} gives the modifications that convert a pluggable
+typechecker $T$ into an instrumented typechecker $T'$---that is,
+the \textsc{Instrument} function.
+
 
 \subsection{Fixpoint Algorithm}
 \label{sec:core-algorithm}
@@ -20,10 +40,9 @@ in \cref{alg:wpi-fixpoint}. The key idea is to iteratively analyze
 the target program ($P$) with an instrumented version of the
 pluggable typechecker, recording intermediate results at each
 step (the sets of specifications $A$ and $A^{\prime}$) until
-either the program can be typechecked (\ie $E \neq \emptyset$,
-meaning there are no remaining typechecking errors) or the
-specifications reach fixpoint (\ie $A = A^{\prime}$) and
-no further refinement is possible.
+either there are no remaining typechecking errors (\ie $E \neq \emptyset$)
+or the
+specifications reach fixpoint (\ie $A = A^{\prime}$).
 
 This fixpoint loop is quite general: its success for our
 purposes depends heavily on the \textsc{Instrument} procedure
@@ -34,7 +53,10 @@ applicable to any pluggable typechecker.
 \subsubsection{Soundness}
 \label{sec:soundness}
 
-Nevertheless, \cref{alg:wpi-fixpoint} is sound, assuming the underlying typechecker $T$
+\todo{This needs to define ``sound''.  I think that absolutely any
+  inference strategy is sound, when paired with a type-checking run
+  afterward.  I think it might be easier to say that.}
+\Cref{alg:wpi-fixpoint} is sound, assuming the underlying typechecker $T$
 is sound. The key intuition is that \cref{alg:wpi-fixpoint} always runs $T$
 on each set of proposed specifications. If any specification is incorrect,
 $T$ will report an error---in the same manner as if a human had written an
@@ -54,18 +76,25 @@ describes our approach to \emph{automatically} modify a given
 pluggable typechecker to support inference, corresponding to the
 \textsc{Instrument} helper function in \cref{alg:wpi-fixpoint}.
 
-The key idea behind our approach to instrumenting the typechecker
-is to do the instrumentation at the \emph{framework} level: that is
-we modify the underlying infrastructure that typecheckers rely on
-once, and the modifications can then be applied generically to any
-typechecker compatible with the original framework. Our modifications
+The key idea behind our inference approach to instrumenting the typechecker
+is to do modify the \emph{framework}.  Once the pluggable type-checking
+framework is modified, inference is enabled for every typechecker built on it.
+Our modifications
 can be conceptualized at the type-qualifier-theory level: that is,
 we modify the rules for typechecking \emph{any} pluggable type system
 so that inference is supported,
 regardless of the particular qualifiers it happens to support.
 
-Our modifications rely on the fact that modern pluggable type systems
-do \emph{local}, intra-procedural flow-sensitive type inference. This assumption is
+Our modifications rely on the fact that practical pluggable type systems
+do \emph{local}, intra-procedural flow-sensitive type inference.
+This means that programmers rarely need to write annotations within method bodies.
+Analogously, Java's \<var> keyword permits programmers to omit Java basetypes within
+method bodies.
+Programmers are more willing to write types on method
+signatures, where they form valuable documentation.  (Our goal is to lift
+even this burden, for type annotations)
+
+This assumption is
 reasonable in practice: programmers are generally not willing to
 write type qualifiers within method bodies, and so 
 the pluggable type frameworks that exist in practice \todo{all?}
@@ -76,47 +105,47 @@ support this feature~\cite{PapiACPE2008}~\todo{cite any other practical pluggabl
 
 \begin{figure*}
   \begin{mathpar}
-    \inferrule* [right=INV]
+    \inferrule* [right=INVOKE]
                 {
                   \std{\Gamma \vdash m(f_0,\ldots,f_n) : }~\qual{q_R}~\std{\tau_R}
                   \\
-                  \std{\Gamma \vdash \forall i \in 0,\ldots,n,~e_i :~} \qual{q_{i_A}}~\std{\tau_{i_A}}
+                  \std{\Gamma \vdash \forall i \in 0,\ldots,n . ~e_i :~} \qual{q_{i_A}}~\std{\tau_{i_A}}
                   \\
-                  \std{\Gamma \vdash \forall i \in 0,\ldots,n,~f_i :~} \qual{q_{i_F}}~\std{\tau_{i_F}}
+                  \std{\Gamma \vdash \forall i \in 0,\ldots,n . ~f_i :~} \qual{q_{i_F}}~\std{\tau_{i_F}}
                   \\
-                  \std{\Gamma \vdash \forall i \in 0,\ldots,n,~} \qual{q_{i_A}}~\std{\tau_{i_A}~\sqsubseteq}~\qual{q_{i_F}}~\std{\tau_{i_F}}
+                  \std{\Gamma \vdash \forall i \in 0,\ldots,n . ~} \qual{q_{i_A}}~\std{\tau_{i_A}~\sqsubseteq}~\qual{q_{i_F}}~\std{\tau_{i_F}}
                   \\
-                  \infr{\infEnv \vdash \forall i \in 0,\ldots,n,~f_i~:~q_{i_I}~\tau_{i_F}}
+                  \infr{\infEnv \vdash \forall i \in 0,\ldots,n . ~f_i~:~q_{i_I}~\tau_{i_F}}
                 }
                 {
                   \std{\Gamma \vdash m(e_0,\ldots,e_n) : }~\qual{q_R}~\std{\tau_R}
                   \\
-                  \infr{\infEnv \vdash \forall i \in 0,\ldots,n,~f_i~:~\mathit{LUB_Q}(q_{i_A},~q_{i_I})~\tau_{i_F} }
+                  \infr{\infEnv \vdash \forall i \in 0,\ldots,n . ~f_i~:~\mathit{LUB_Q}(q_{i_A},~q_{i_I})~\tau_{i_F} }
                 }
                 
      \inferrule* [right=NEW]
                 {
                   \std{\Gamma \vdash \<new T>(f_1,\ldots,f_n) : }~\qual{q_R}~\std{\tau_R}
                   \\
-                  \std{\Gamma \vdash \forall i \in 1,\ldots,n,~e_i :~} \qual{q_{i_A}}~\std{\tau_{i_A}}
+                  \std{\Gamma \vdash \forall i \in 1,\ldots,n . ~e_i :~} \qual{q_{i_A}}~\std{\tau_{i_A}}
                   \\
-                  \std{\Gamma \vdash \forall i \in 1,\ldots,n,~f_i :~} \qual{q_{i_F}}~\std{\tau_{i_F}}
+                  \std{\Gamma \vdash \forall i \in 1,\ldots,n . ~f_i :~} \qual{q_{i_F}}~\std{\tau_{i_F}}
                   \\
-                  \std{\Gamma \vdash \forall i \in 1,\ldots,n,~} \qual{q_{i_A}}~\std{\tau_{i_A}~\sqsubseteq}~\qual{q_{i_F}}~\std{\tau_{i_F}}
+                  \std{\Gamma \vdash \forall i \in 1,\ldots,n . ~} \qual{q_{i_A}}~\std{\tau_{i_A}~\sqsubseteq}~\qual{q_{i_F}}~\std{\tau_{i_F}}
                   \\
-                  \infr{\infEnv \vdash \forall i \in 1,\ldots,n,~f_i~:~q_{i_I}~\tau_{i_F}}
+                  \infr{\infEnv \vdash \forall i \in 1,\ldots,n . ~f_i~:~q_{i_I}~\tau_{i_F}}
                 }
                 {
                   \std{\Gamma \vdash \<new T>(e_1,\ldots,e_n) : }~\qual{q_R}~\std{\tau_R}
                   \\
-                  \infr{\infEnv \vdash \forall i \in 1,\ldots,n,~f_i~:~\mathit{LUB_Q}(q_{i_A},~q_{i_I})~\tau_{i_F} }
+                  \infr{\infEnv \vdash \forall i \in 1,\ldots,n . ~f_i~:~\mathit{LUB_Q}(q_{i_A},~q_{i_I})~\tau_{i_F} }
                 }
 
      \inferrule* [right=FORMAL-ASSIGN]
                 {
 %                  \std{f~is~a~formal~parameter} \\
-                  \std{\Gamma \vdash e~:}~\qual{q_A}~\std{\tau_A} \\
                   \std{\Gamma \vdash f~:}~\qual{q_F}~\std{\tau_F} \\
+                  \std{\Gamma \vdash e~:}~\qual{q_A}~\std{\tau_A} \\
                   \std{\Gamma \vdash} \qual{q_A}~\std{\tau_A~\sqsubseteq}~\qual{q_F}~\std{\tau_F} \\
                   \infr{\infEnv \vdash f~:~q_I~\tau_F}
                 }
@@ -128,8 +157,8 @@ support this feature~\cite{PapiACPE2008}~\todo{cite any other practical pluggabl
      \inferrule* [right=FIELD-ASSIGN]
                 {
 %                  \std{f~is~a~formal~parameter} \\
-                  \std{\Gamma \vdash e~:}~\qual{q_A}~\std{\tau_A} \\
                   \std{\Gamma \vdash x.f~:}~\qual{q_F}~\std{\tau_F} \\
+                  \std{\Gamma \vdash e~:}~\qual{q_A}~\std{\tau_A} \\
                   \std{\Gamma \vdash} \qual{q_A}~\std{\tau_A~\sqsubseteq}~\qual{q_F}~\std{\tau_F} \\
                   \infr{\infEnv \vdash x.f~:~q_I~\tau_F}
                 }
@@ -141,13 +170,14 @@ support this feature~\cite{PapiACPE2008}~\todo{cite any other practical pluggabl
      \inferrule* [right=RETURN]
                 {
 %                  \std{f~is~a~formal~parameter} \\
-                  \std{\Gamma \vdash e~:}~\qual{q_A}~\std{\tau_A} \\
                   \std{\Gamma \vdash m(f_0,\ldots,f_n)~:}~\qual{q_F}~\std{\tau_F} \\
+                  \std{\Gamma \vdash e~:}~\qual{q_A}~\std{\tau_A} \\
                   \std{\Gamma \vdash} \qual{q_A}~\std{\tau_A~\sqsubseteq}~\qual{q_F}~\std{\tau_F} \\
                   \infr{\infEnv \vdash m(f_0,\ldots,f_n)~:~q_I~\tau_F}
                 }
                 {
-                  \std{\Gamma \vdash \<return>~e} \\
+%                  \std{\Gamma \vdash \<return>~e} \\
+                  \std{\<return>~e \in m} \\
                   \infr{\infEnv \vdash m(f_0,\ldots,f_n)~:~\mathit{LUB_Q}(q_A, q_I)~\tau_F}
                 }
 
@@ -160,11 +190,11 @@ support this feature~\cite{PapiACPE2008}~\todo{cite any other practical pluggabl
                   \\
                   \std{\Gamma \vdash} \qual{q_{R_1}}~\std{\tau_{R_1}~\sqsubseteq}~\qual{q_{R_2}}~\std{\tau_{R_2}}
                   \\
-                  \std{\Gamma \vdash \forall i \in 0,\ldots,n_1,~f_{i_1} :~} \qual{q_{i_1}}~\std{\tau_{i_1}}
+                  \std{\Gamma \vdash \forall i \in 0,\ldots,n_1 . ~f_{i_1} :~} \qual{q_{i_1}}~\std{\tau_{i_1}}
                   \\
-                  \std{\Gamma \vdash \forall i \in 0,\ldots,n_2,~f_{i_2} :~} \qual{q_{i_2}}~\std{\tau_{i_2}}
+                  \std{\Gamma \vdash \forall i \in 0,\ldots,n_2 . ~f_{i_2} :~} \qual{q_{i_2}}~\std{\tau_{i_2}}
                   \\
-                  \std{\Gamma \vdash \forall i \in 0,\ldots,n_1,~} \qual{q_{i_1}}~\std{\tau_{i_1}~\sqsubseteq}~\qual{q_{i_2}}~\std{\tau_{i_2}}
+                  \std{\Gamma \vdash \forall i \in 0,\ldots,n_1 . ~} \qual{q_{i_1}}~\std{\tau_{i_1}~\sqsubseteq}~\qual{q_{i_2}}~\std{\tau_{i_2}}
                   \\
                   \std{\vdash n_1~=~n_2}
                   \\
@@ -172,26 +202,47 @@ support this feature~\cite{PapiACPE2008}~\todo{cite any other practical pluggabl
                   \\
                   \infr{\infEnv \vdash m_2(f_{0_2},\ldots,f_{n_2})~:~q_{R_2-I}~\tau_{R_2}}
                   \\
-                  \infr{\infEnv \vdash \forall i \in 0,\ldots,n_1,~f_{i_1}~:~q_{i_1-I}~\tau_{i_1}}
+                  \infr{\infEnv \vdash \forall i \in 0,\ldots,n_1 . ~f_{i_1}~:~q_{i_1-I}~\tau_{i_1}}
                   \\
-                  \infr{\infEnv \vdash \forall i \in 0,\ldots,n_2,~f_{i_2}~:~q_{i_2-I}~\tau_{i_2}}
+                  \infr{\infEnv \vdash \forall i \in 0,\ldots,n_2 .~f_{i_2}~:~q_{i_2-I}~\tau_{i_2}}
                 }
                 {
                   \std{\Gamma \vdash m_1(f_{0_1},\ldots,f_{n_1})~\mathit{is~a~valid~override~of}~m_2(f_{0_2},\ldots,f_{n_2})}
                   \\
                   \infr{\infEnv \vdash m_2(f_{0_2},\ldots,f_{n_2})~:~\mathit{LUB_Q}(q_{R_1-I}, q_{R_2-I})~\tau_{R_2}}
                   \\
-                  \infr{\infEnv \vdash \forall i \in 0,\ldots,n_2,~f_{i_2}~:~\mathit{LUB_Q}(q_{i_1-I},~q_{i_2-I})~\tau_{i_2} }
+                  \infr{\infEnv \vdash \forall i \in 0,\ldots,n_2 . ~f_{i_2}~:~\mathit{LUB_Q}(q_{i_1-I},~q_{i_2-I})~\tau_{i_2} }
                 }
                 
-                
   \end{mathpar}
+
+  \todo{In $m(f_0,\ldots,f_n)$ I don't see types.  Does $f_i$ stand for $\|qual|
+    \|basetype| \|varname|$?  Or maybe it stands for $q \tau$?}
+
+  \todo{In ``$\infEnv \vdash x.f$'' in \textsc{field-assign}, this is about
+    the declaration of $f$, not about the use with $x$ as receiver.  So it
+    should be ``decl($f$)'' or maybe ``class.$f$'' or the like.}
+
+  \todo{In \textsc{return}, its a bit surprising to see the subscript F in
+    $\std{\Gamma \vdash m(f_0,\ldots,f_n)~:}~\qual{q_F}~\std{\tau_F}$.  Why
+    is that subscript F and not R?  It could stand explanation.}
+
+  \todo{These rules do not seem to handle qualifier polymorphism, where the
+    return type can depend on the instantiation.  Somewhere the paper
+    should discuss this, and whether our inference algorithm can handle it
+    (maybe only when written by the programmer?)
+    and which types of polymorphism our algorithm can handle and the
+    challenges thereto.  This relevant to both \textsc{INVOKE} and \textsc{RETURN}.}
+
   \caption{Modified type rules used by our pluggable type framework. \std{Gray} indicates
     standard type rules for a Java-like language. \qual{Black} indicates additions to support
     pluggable typechecking. \infr{Red} indicates additions to support inference, \ie our
     contribution in this paper.
     Throughout, ``R'' subscripts refer to return types; ``F'' to formal parameters; ``A'' to
     actual arguments; and ``I'' to inference results.
+    \todo{Which of the qualifier variables can be ``unqualified''?  I guess
+      it is all of them?}
+    In as assignment \<x=y>, \<x> is the ``formal'' and \<y> is the ``actual''.
     Type rules that do not require modification to support inference
     are elided for space.}
   \label{fig:type-rules}
@@ -208,11 +259,11 @@ To read these type rules, we first need to define some terms.
 
 $\infEnv$ is the \emph{inference environment}, similar to the standard (qualified)
 typing environment $\Gamma$. $\Gamma$ maps expressions and declarations to qualified types.
-$\infEnv$ has two key differences: it maps only declarations to possibly-qualified types.
+$\infEnv$ maps declarations to possibly-qualified types.
 $\infEnv$ only maps declarations because our inference procedure does not need to infer
 types for expressions: in fact, we assume that $\Gamma$ already does so (via flow-sensitive
 refinement). Rather, $\infEnv$'s purpose is to map declarations to the results of inference.
-Unlike $\Gamma$, the values in $\infEnv$ are possibly-qualified, meaning that they can either
+Unlike $\Gamma$, the values in $\infEnv$ are \emph{possibly-qualified}, meaning that they can either
 be qualified types or unqualified types. Initially, $\infEnv$ contains qualified types only
 for declarations that were qualified before the current round of inference (which may come from
 the programmer or from a previous inference round in the \cref{alg:wpi-fixpoint} fixpoint loop).
@@ -220,14 +271,38 @@ Once the current round of inference terminates, $\infEnv$ is used to produce the
 inference round by returning the set of all qualified types: any type that remains unqualified
 throughout inference is not annotated, because no information about it was learned.
 
+A pluggable type \emph{checker} permits programmers to leave basetypes unqualified.
+On APIs (class/method/field declarations), the type checker uses defaulting
+rules to assign a qualifier to each unqualified basetype.
+Within a code block, the type checker performs local flow-sensitive type
+inference.
+
+
 We define the function $\mathit{LUB_Q}(q_1, q_2)$ to account for possibly-qualified types.
 $q_1$ and $q_2$ are each either a type qualifier or ``not present''.
 If both arguments are qualifiers, then the result of $\mathit{LUB_Q}$
 is just their least upper bound. If only one qualifier is present, then $\mathit{LUB_Q}$'s result
 is that qualifier; if both qualifiers are not present, $\mathit{LUB_Q}$'s result is ``not present'',
-resulting in an unqualified result (since calls $\mathit{LUB_Q}$ must always precede a ground type
-from the original type system).
+resulting in an unqualified result.
 
 \todo{Then, this section should describe the interesting parts of the
   modified type rules in detail? At a minimum, we should probably walk the reader through
   one of the type rules.}
+
+
+\todo{Here is a fact that I think we should explain to readers.
+  Within a single type-checking run, the type estimates only go up.
+  Between runs (that is, in \cref{alg:wpi-fixpoint}), the type estimates
+  only go down.}
+
+
+\todo{Somewhere, discuss completeness.  For a correct and verifiable
+  program, this algorithm is complete for type qualifiers.  Also for pre-
+  and post-conditions, I think.  But not for declaration annotations, for
+  which every type system must write its own special-case code:  heuristics
+  or other tweaks.  Most type systems don't have declaration annotations
+  (no extra work or customizations for ``standard''\todo{poor word} type
+  systems), but many do and need these enhancements.}
+
+% LocalWords:  typechecker typechecked typechecking typecheckers intra
+% LocalWords:  decl standard''
