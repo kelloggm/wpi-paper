@@ -76,47 +76,47 @@ support this feature~\cite{PapiACPE2008}~\todo{cite any other practical pluggabl
 
 \begin{figure*}
   \begin{mathpar}
-    \inferrule* [right=INV]
+    \inferrule* [right=INVOKE]
                 {
                   \std{\Gamma \vdash m(f_0,\ldots,f_n) : }~\qual{q_R}~\std{\tau_R}
                   \\
-                  \std{\Gamma \vdash \forall i \in 0,\ldots,n,~e_i :~} \qual{q_{i_A}}~\std{\tau_{i_A}}
+                  \std{\Gamma \vdash \forall i \in 0,\ldots,n . ~e_i :~} \qual{q_{i_A}}~\std{\tau_{i_A}}
                   \\
-                  \std{\Gamma \vdash \forall i \in 0,\ldots,n,~f_i :~} \qual{q_{i_F}}~\std{\tau_{i_F}}
+                  \std{\Gamma \vdash \forall i \in 0,\ldots,n . ~f_i :~} \qual{q_{i_F}}~\std{\tau_{i_F}}
                   \\
-                  \std{\Gamma \vdash \forall i \in 0,\ldots,n,~} \qual{q_{i_A}}~\std{\tau_{i_A}~\sqsubseteq}~\qual{q_{i_F}}~\std{\tau_{i_F}}
+                  \std{\Gamma \vdash \forall i \in 0,\ldots,n . ~} \qual{q_{i_A}}~\std{\tau_{i_A}~\sqsubseteq}~\qual{q_{i_F}}~\std{\tau_{i_F}}
                   \\
-                  \infr{\infEnv \vdash \forall i \in 0,\ldots,n,~f_i~:~q_{i_I}~\tau_{i_F}}
+                  \infr{\infEnv \vdash \forall i \in 0,\ldots,n . ~f_i~:~q_{i_I}~\tau_{i_F}}
                 }
                 {
                   \std{\Gamma \vdash m(e_0,\ldots,e_n) : }~\qual{q_R}~\std{\tau_R}
                   \\
-                  \infr{\infEnv \vdash \forall i \in 0,\ldots,n,~f_i~:~\mathit{LUB_Q}(q_{i_A},~q_{i_I})~\tau_{i_F} }
+                  \infr{\infEnv \vdash \forall i \in 0,\ldots,n . ~f_i~:~\mathit{LUB_Q}(q_{i_A},~q_{i_I})~\tau_{i_F} }
                 }
                 
      \inferrule* [right=NEW]
                 {
                   \std{\Gamma \vdash \<new T>(f_1,\ldots,f_n) : }~\qual{q_R}~\std{\tau_R}
                   \\
-                  \std{\Gamma \vdash \forall i \in 1,\ldots,n,~e_i :~} \qual{q_{i_A}}~\std{\tau_{i_A}}
+                  \std{\Gamma \vdash \forall i \in 1,\ldots,n . ~e_i :~} \qual{q_{i_A}}~\std{\tau_{i_A}}
                   \\
-                  \std{\Gamma \vdash \forall i \in 1,\ldots,n,~f_i :~} \qual{q_{i_F}}~\std{\tau_{i_F}}
+                  \std{\Gamma \vdash \forall i \in 1,\ldots,n . ~f_i :~} \qual{q_{i_F}}~\std{\tau_{i_F}}
                   \\
-                  \std{\Gamma \vdash \forall i \in 1,\ldots,n,~} \qual{q_{i_A}}~\std{\tau_{i_A}~\sqsubseteq}~\qual{q_{i_F}}~\std{\tau_{i_F}}
+                  \std{\Gamma \vdash \forall i \in 1,\ldots,n . ~} \qual{q_{i_A}}~\std{\tau_{i_A}~\sqsubseteq}~\qual{q_{i_F}}~\std{\tau_{i_F}}
                   \\
-                  \infr{\infEnv \vdash \forall i \in 1,\ldots,n,~f_i~:~q_{i_I}~\tau_{i_F}}
+                  \infr{\infEnv \vdash \forall i \in 1,\ldots,n . ~f_i~:~q_{i_I}~\tau_{i_F}}
                 }
                 {
                   \std{\Gamma \vdash \<new T>(e_1,\ldots,e_n) : }~\qual{q_R}~\std{\tau_R}
                   \\
-                  \infr{\infEnv \vdash \forall i \in 1,\ldots,n,~f_i~:~\mathit{LUB_Q}(q_{i_A},~q_{i_I})~\tau_{i_F} }
+                  \infr{\infEnv \vdash \forall i \in 1,\ldots,n . ~f_i~:~\mathit{LUB_Q}(q_{i_A},~q_{i_I})~\tau_{i_F} }
                 }
 
      \inferrule* [right=FORMAL-ASSIGN]
                 {
 %                  \std{f~is~a~formal~parameter} \\
-                  \std{\Gamma \vdash e~:}~\qual{q_A}~\std{\tau_A} \\
                   \std{\Gamma \vdash f~:}~\qual{q_F}~\std{\tau_F} \\
+                  \std{\Gamma \vdash e~:}~\qual{q_A}~\std{\tau_A} \\
                   \std{\Gamma \vdash} \qual{q_A}~\std{\tau_A~\sqsubseteq}~\qual{q_F}~\std{\tau_F} \\
                   \infr{\infEnv \vdash f~:~q_I~\tau_F}
                 }
@@ -128,8 +128,8 @@ support this feature~\cite{PapiACPE2008}~\todo{cite any other practical pluggabl
      \inferrule* [right=FIELD-ASSIGN]
                 {
 %                  \std{f~is~a~formal~parameter} \\
-                  \std{\Gamma \vdash e~:}~\qual{q_A}~\std{\tau_A} \\
                   \std{\Gamma \vdash x.f~:}~\qual{q_F}~\std{\tau_F} \\
+                  \std{\Gamma \vdash e~:}~\qual{q_A}~\std{\tau_A} \\
                   \std{\Gamma \vdash} \qual{q_A}~\std{\tau_A~\sqsubseteq}~\qual{q_F}~\std{\tau_F} \\
                   \infr{\infEnv \vdash x.f~:~q_I~\tau_F}
                 }
@@ -141,13 +141,14 @@ support this feature~\cite{PapiACPE2008}~\todo{cite any other practical pluggabl
      \inferrule* [right=RETURN]
                 {
 %                  \std{f~is~a~formal~parameter} \\
-                  \std{\Gamma \vdash e~:}~\qual{q_A}~\std{\tau_A} \\
                   \std{\Gamma \vdash m(f_0,\ldots,f_n)~:}~\qual{q_F}~\std{\tau_F} \\
+                  \std{\Gamma \vdash e~:}~\qual{q_A}~\std{\tau_A} \\
                   \std{\Gamma \vdash} \qual{q_A}~\std{\tau_A~\sqsubseteq}~\qual{q_F}~\std{\tau_F} \\
                   \infr{\infEnv \vdash m(f_0,\ldots,f_n)~:~q_I~\tau_F}
                 }
                 {
-                  \std{\Gamma \vdash \<return>~e} \\
+%                  \std{\Gamma \vdash \<return>~e} \\
+                  \std{\<return>~e \in m} \\
                   \infr{\infEnv \vdash m(f_0,\ldots,f_n)~:~\mathit{LUB_Q}(q_A, q_I)~\tau_F}
                 }
 
@@ -160,11 +161,11 @@ support this feature~\cite{PapiACPE2008}~\todo{cite any other practical pluggabl
                   \\
                   \std{\Gamma \vdash} \qual{q_{R_1}}~\std{\tau_{R_1}~\sqsubseteq}~\qual{q_{R_2}}~\std{\tau_{R_2}}
                   \\
-                  \std{\Gamma \vdash \forall i \in 0,\ldots,n_1,~f_{i_1} :~} \qual{q_{i_1}}~\std{\tau_{i_1}}
+                  \std{\Gamma \vdash \forall i \in 0,\ldots,n_1 . ~f_{i_1} :~} \qual{q_{i_1}}~\std{\tau_{i_1}}
                   \\
-                  \std{\Gamma \vdash \forall i \in 0,\ldots,n_2,~f_{i_2} :~} \qual{q_{i_2}}~\std{\tau_{i_2}}
+                  \std{\Gamma \vdash \forall i \in 0,\ldots,n_2 . ~f_{i_2} :~} \qual{q_{i_2}}~\std{\tau_{i_2}}
                   \\
-                  \std{\Gamma \vdash \forall i \in 0,\ldots,n_1,~} \qual{q_{i_1}}~\std{\tau_{i_1}~\sqsubseteq}~\qual{q_{i_2}}~\std{\tau_{i_2}}
+                  \std{\Gamma \vdash \forall i \in 0,\ldots,n_1 . ~} \qual{q_{i_1}}~\std{\tau_{i_1}~\sqsubseteq}~\qual{q_{i_2}}~\std{\tau_{i_2}}
                   \\
                   \std{\vdash n_1~=~n_2}
                   \\
@@ -172,26 +173,47 @@ support this feature~\cite{PapiACPE2008}~\todo{cite any other practical pluggabl
                   \\
                   \infr{\infEnv \vdash m_2(f_{0_2},\ldots,f_{n_2})~:~q_{R_2-I}~\tau_{R_2}}
                   \\
-                  \infr{\infEnv \vdash \forall i \in 0,\ldots,n_1,~f_{i_1}~:~q_{i_1-I}~\tau_{i_1}}
+                  \infr{\infEnv \vdash \forall i \in 0,\ldots,n_1 . ~f_{i_1}~:~q_{i_1-I}~\tau_{i_1}}
                   \\
-                  \infr{\infEnv \vdash \forall i \in 0,\ldots,n_2,~f_{i_2}~:~q_{i_2-I}~\tau_{i_2}}
+                  \infr{\infEnv \vdash \forall i \in 0,\ldots,n_2 .~f_{i_2}~:~q_{i_2-I}~\tau_{i_2}}
                 }
                 {
                   \std{\Gamma \vdash m_1(f_{0_1},\ldots,f_{n_1})~\mathit{is~a~valid~override~of}~m_2(f_{0_2},\ldots,f_{n_2})}
                   \\
                   \infr{\infEnv \vdash m_2(f_{0_2},\ldots,f_{n_2})~:~\mathit{LUB_Q}(q_{R_1-I}, q_{R_2-I})~\tau_{R_2}}
                   \\
-                  \infr{\infEnv \vdash \forall i \in 0,\ldots,n_2,~f_{i_2}~:~\mathit{LUB_Q}(q_{i_1-I},~q_{i_2-I})~\tau_{i_2} }
+                  \infr{\infEnv \vdash \forall i \in 0,\ldots,n_2 . ~f_{i_2}~:~\mathit{LUB_Q}(q_{i_1-I},~q_{i_2-I})~\tau_{i_2} }
                 }
                 
-                
   \end{mathpar}
+
+  \todo{In $m(f_0,\ldots,f_n)$ I don't see types.  Does $f_i$ stand for $\|qual|
+    \|basetype| \|varname|$?  Or maybe it stands for $q \tau$?}
+
+  \todo{In ``$\infEnv \vdash x.f$'' in \textsc{field-assign}, this is about
+    the declaration of $f$, not about the use with $x$ as receiver.  So it
+    should be ``decl($f$)'' or maybe ``class.$f$'' or the like.}
+
+  \todo{In \textsc{return}, its a bit surprising to see the subscript F in
+    $\std{\Gamma \vdash m(f_0,\ldots,f_n)~:}~\qual{q_F}~\std{\tau_F}$.  Why
+    is that subscript F and not R?  It coud stand explanation.}
+
+  \todo{These rules do not seem to handle qualifier polymorphism, where the
+    return type can depend on the instantiation.  Somewhere the paper
+    should discuss this, and whether our inference algorithm can handle it
+    (maybe only when written by the programmer?)
+    and which types of polymorphism our algorithm can handle and the
+    challenges thereto.  This revelant to both \textsc{INVOKE} and \textsc{RETURN}.}
+
   \caption{Modified type rules used by our pluggable type framework. \std{Gray} indicates
     standard type rules for a Java-like language. \qual{Black} indicates additions to support
     pluggable typechecking. \infr{Red} indicates additions to support inference, \ie our
     contribution in this paper.
     Throughout, ``R'' subscripts refer to return types; ``F'' to formal parameters; ``A'' to
     actual arguments; and ``I'' to inference results.
+    \todo{Which of the qualifier variables can be ``unqualified''?  I guess
+      it is all of them?}
+    In as assignment \<x=y>, \<x> is the ``formal'' and \<y> is the ``actual''.
     Type rules that do not require modification to support inference
     are elided for space.}
   \label{fig:type-rules}
@@ -231,3 +253,12 @@ from the original type system).
 \todo{Then, this section should describe the interesting parts of the
   modified type rules in detail? At a minimum, we should probably walk the reader through
   one of the type rules.}
+
+
+\todo{Somewhere, discuss completeness.  For a correct and verifiable
+  program, this algorithm is complete for type qualifiers.  Also for pre-
+  and post-conditions, I think.  But not for declaration annotations, for
+  which every type system must write its own special-case code:  heuristics
+  or other tweaks.  Most type systems don't have declaration annotations
+  (no extra work or customizations for ``standard''\todo{poor word} type
+  systems), but many do and need these enhancements.}

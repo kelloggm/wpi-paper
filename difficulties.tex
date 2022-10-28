@@ -90,6 +90,12 @@ refinements (which would result in type errors in \eg other modules not currentl
 under compilation), the analysis should not further refine any qualifiers
 provided by the programmer.
 
+\todo{I think the key is that future iterations can and should change
+  inferred output, but must not change programmer-provided input.  So these
+  must be input differently to the inference tool, so that it can treat
+  them differently.  Maybe organizing the section around that will make it
+  shorter and clearer.}
+
 Our second approach was to store the type qualifiers in a side file, using
 the standard approach for providing specifications for
 libraries that the code under compilation depends on, but which were not
@@ -105,6 +111,16 @@ all library qualifier files to be placed into source code, but this made inferen
 not work properly on common libraries for which checker-distributed library qualifier files
 existed.
 
+\todo{Try to avoid writing this as a narrative of things we did in the
+  order we did them.  Instead,
+  lay out alternatives and the pluses and minuses of each.}
+
 Our third (and final) approach was to build an inference-specific side file mechanism.
 Though this required our implementation to be larger, it did not have any of the problems
 described above.
+\todo{This deserves a little more explanation (even as other parts may be
+  shorter).  This inference-specific side file mechanism uses the same
+  syntax but different syntax than the existing side file mechanism.  The
+  implementation section can point out that we actually designed an new
+  mechanism (ajava files), because the existing mechanisms were not
+  adequate for inference.}
