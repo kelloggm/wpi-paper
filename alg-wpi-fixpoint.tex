@@ -2,30 +2,29 @@
 
 \begin{algorithm}
   \DontPrintSemicolon
+  \SetKwFunction{Infer}{infer}
+  \SetKwProg{Fn}{def}{:}{}
   \SetKwInOut{Input}{input}
   \SetKwInOut{Output}{output}
   \Input{program $P$ and pluggable typechecker $T$}
-  \Output{Set of specifications (inferred types) $A^{\prime}$}
-  \BlankLine
-%  \tcc{In each iteration, $A$ is the specification set before running $T$, and $A^{\prime}$ is the set after.}
-  $A \gets \emptyset, A^{\prime} \gets \emptyset$ \;
-%  \tcc{\textsc{Instrument} modifies $T$ to both check the program and collect a candidate specification set.}
-  $T^{\prime} \gets \textsc{Instrument}(T)$ \;
-  $E, A^{\prime} \gets T^{\prime}(P, A)$ \;
-  \While{$E \neq \emptyset \wedge A \neq A^{\prime}$}{
-    $A \gets A^{\prime}$ \;
+  \Output{set of errors $E$ and set of type qualifiers $A^{\prime}$}
+  \Fn{ \Infer{$P$, $T$} } {
+%    \tcc{In each iteration, $A$ is the specification set before running $T$, and $A^{\prime}$ is the set after.}
+    $A \gets \emptyset, A^{\prime} \gets \emptyset$ \;
+%    \tcc{\textsc{Instrument} modifies $T$ to both check the program and collect a candidate specification set.}
+    $T^{\prime} \gets \textsc{EnableInference}(T)$ \;
     $E, A^{\prime} \gets T^{\prime}(P, A)$ \;
+    \While{$E \neq \emptyset \wedge A \neq A^{\prime}$}{
+      \tcc{Note that each element of $A^{\prime}$ is either a new type qualifier or refines some element of $A$.}
+      $A \gets A^{\prime}$ \;
+      $E, A^{\prime} \gets T^{\prime}(P, A)$ \;
+    }
+    \Return $E, A^{\prime}$ \;
   }
-  % \Return $E, A^{\prime}$ \;
-  \Return $E, A^{\prime}$ \;
-
   \caption{The core fixpoint algorithm for our type inference system.
-    The helper function \textsc{Instrument} is defined and explained in \cref{sec:instrument}.
-\todo{Make this into a function and give it a name, probably
-  \textsc{Infer}.}
-\todo{Why is the caption so narrow, not taking up the whole column?}
-\todo{before ``$A \gets A^{\prime}$'', add a comment stating that $A'
-  \sqsubseteq A$.  Put a little proof of that fact in the body of the paper.}
+    The helper function \textsc{EnableInference} is defined by the modifications
+    to the framework described in \cref{sec:instrument}.
+    \todo{Why is the caption so narrow, not taking up the whole column?}
 }
   \label{alg:wpi-fixpoint}
 \end{algorithm}

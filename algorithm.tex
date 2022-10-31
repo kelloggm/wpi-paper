@@ -12,22 +12,29 @@ local inference.
 \todo{The paper should explain that ``specifications'' is really ``type
   annotations'', to a first approximation.}
 
-The crux\todo{word choice} of the implementation is to use an
-``instrumented'' version of the type checker.  A typechecker
-$T : P \rightarrow E$
-takes a program and outputs a (possibly empty) set of
-type errors.  The instrumented type-checker
-$T' : \langle P, A \rangle \rightarrow \langle E, A' \rangle$
-takes a program along with extra specifications, and it outputs errors and
-inferences.  The errors are exactly those $T$ would output, if the
-specifications in $A$ were written on $P$.
+The key idea is to modify the underlying \emph{framework}
+on which the target pluggable typecheckers are built. Pluggable
+typecheckers use a modified version of the host type system
+that supports type qualifiers. Our approach modifies this support
+layer for pluggable typechecking in order to support inference for
+any typechecker.
 
-The algorithm is described in two parts: first,
+A typechecker $T : P \rightarrow E$
+takes a program and outputs a (possibly empty) set of
+type errors.  A typechecker running using our modified framework
+$T' : \langle P, A \rangle \rightarrow \langle E, A' \rangle$
+takes a program along with a set of type qualifiers $A$, and outputs errors and
+inferences (\ie $A'$, a new set of type qualifiers).
+The errors $E$ are exactly those $T$ would output, if the
+type qualifiers in $A$ had been written on $P$ by a programmer.
+
+We describe the algorithm in two parts: first,
 \Cref{sec:core-algorithm} gives the fixpoint
-algorithm used to infer types for a particular program.
-\Cref{alg:wpi-fixpoint} gives the modifications that convert a pluggable
-typechecker $T$ into an instrumented typechecker $T'$---that is,
-the \textsc{Instrument} function.
+algorithm used to infer types for a particular program
+using our modified typechecking framework.
+\Cref{sec:instrument} explains the modifications to the pluggable
+typechecking framework that enable type inference for a pluggable
+typechecker $T$ (\ie convert it to $T'$ in \cref{alg:wpi-fixpoint}).
 
 
 \subsection{Fixpoint Algorithm}
@@ -37,33 +44,34 @@ the \textsc{Instrument} function.
 
 This section presents the core fixpoint algorithm, which appears
 in \cref{alg:wpi-fixpoint}. The key idea is to iteratively analyze
-the target program ($P$) with an instrumented version of the
-pluggable typechecker, recording intermediate results at each
-step (the sets of specifications $A$ and $A^{\prime}$) until
-either there are no remaining typechecking errors (\ie $E \neq \emptyset$)
+the target program ($P$) with a version of the
+pluggable typechecker whose core qualified type rules
+have been modified to support inference in the manner described in
+\cref{sec:instrument}, recording intermediate results at each
+step (the sets of inferred type qualifiers $A$ and $A^{\prime}$) until
+either there are no remaining typechecking errors
+(\ie $E \neq \emptyset$)
 or the
-specifications reach fixpoint (\ie $A = A^{\prime}$).
+type qualifiers reach fixpoint (\ie $A = A^{\prime}$).
 
-This fixpoint loop is quite general: its success for our
-purposes depends heavily on the \textsc{Instrument} procedure
-that outputs locally-inferred specifications. \Cref{sec:instrument}
-describes how we implement \textsc{Instrument} in a way that is
-applicable to any pluggable typechecker.
+%% This fixpoint loop is quite general: its success for our
+%% purposes depends heavily on the \textsc{Instrument} procedure
+%% that outputs locally-inferred specifications. \Cref{sec:instrument}
+%% describes how we implement \textsc{Instrument} in a way that is
+%% applicable to any pluggable typechecker.
+
+Note that this algorithm monotonically refines types---\ie
+each element $a^{\prime}$ of $A^{\prime}$ is either 1) not present in $A$, or
+2) there exists some element $a$ in $A$ such that $a^{\prime} \sqsubseteq a$
+and both $a$ and $a^{\prime}$ qualify the same base type in the same program location.
+The proof of this is by induction on the type rules in \cref{sec:instrument}.
 
 \subsubsection{Soundness}
 \label{sec:soundness}
 
-\todo{This needs to define ``sound''.  I think that absolutely any
-  inference strategy is sound, when paired with a type-checking run
-  afterward.  I think it might be easier to say that.}
-\Cref{alg:wpi-fixpoint} is sound, assuming the underlying typechecker $T$
-is sound. The key intuition is that \cref{alg:wpi-fixpoint} always runs $T$
-on each set of proposed specifications. If any specification is incorrect,
-$T$ will report an error---in the same manner as if a human had written an
-incorrect specification. In particular, this means that the instrumentation
-(\cref{sec:instrument}) has no obligation to produce annotations that are sound,
-so long as the underlying typechecking algorithm itself is not modified.
-\todo{Maybe formalize this a bit more?}
+Any inference algorithm is sound so long as the typechecker is run afterward:
+even if the inference algorithm were to produce incorrect type qualifiers,
+the typechecker would reject them.
 
 \subsection{Modifications to the Typechecker}
 \label{sec:instrument}

@@ -25,7 +25,7 @@ A successful type-checking run proves that the undesirable behavior will
 never occur.
 Pluggable type systems are a standard practice in industry; for example,
 they are used at Amazon~\cite{KelloggSTE2020,KelloggRSSE2020},
-Google~\cite{SadowskiAEMCJ2018}, and Uber~\cite{BanerjeeCS2019}
+Google~\cite{SadowskiAEMCJ2018}, and Uber~\cite{BanerjeeCS2019}.
 
 Pluggable types are an attractive verification and bug-finding strategy
 because programmers
@@ -37,42 +37,51 @@ The type qualifiers also serve as concise, machine-checked documentation.
 However, writing type qualifiers in a legacy codebase
 is time-consuming and intimidating for developers.
 
-\todo{Start out talking about languages like ML and Haskell, which are
-  strongly typed but use whole-program type inference.  It's towers of
-  exponential time in the (very rare) worst case.}
-This problem also applies to non-pluggable type systems: some developers
-prefer untyped or dynamically-typed languages like Python or JavaScript
-because they do not want to write type annotations.
-%
-The traditional approach to solving this problem is \emph{type inference}:
+The traditional approach to solving this problem
+is \emph{type inference}:
 deducing the proper types for a program from the program's structure
 by solving a set of constraints induced by type uses.
 %
-Type inference systems for languages with Hindley-Milner type systems
-are well-developed~\cite{DamasM1982} (\todo{add more recent citations, maybe
-  say something about more complex dependent type systems?}).
+For example, languages with Hindley-Milner type systems like ML and Haskell
+include type inference (based on algorithm W~\cite{DamasM1982})
+in their compilers, so programmers do not need to write types at all.
 %
-Type inference for popular dynamic languages like Python is an open
+This approach is impractical for popular object-oriented programming
+languages such as Java or Python, because subtyping prevents efficient
+unification of types (\todo{say something about row polymorphism as a
+  possible alternative, as is done in OCaml, here?}).
+%
+Type inference for dynamically-typed languages like Python is an open
 research problem. Researchers have proposed approaches based
 on MaxSAT~\cite{hassan2018maxsmt} and machine learning~\cite{xu2016python,peng2022static}.
 
-Unfortunately, none of these approaches is practical for pluggable types.
-Building a type inference algorithm in the style of Algorithm W for each
-type system is impractical: there are too many pluggable type
-systems.\todo{I don't buy this.  There aren't too many type systems to
-  implement.  Doing a bit of extra work to define inference for each is a
-  constant factor overhead over writing the type checker for each.}
-A similar problem occurs when trying to build a constraint system to
-dispatch to an SMT solver: the type rules of the specific pluggable type system
-need to be encoded in the constraint-generation rules. Finally, approaches
-based on machine learning lack sufficient training data for
+Unfortunately, none of these approaches is obviously practical for pluggable types.
+%% Actually, this is basically what we're going to do, so I shouldn't be so harsh on it.
+%% Building a type inference algorithm in the style of algorithm W for each
+%% type system is impractical: there are too many pluggable type
+%% systems.\todo{I don't buy this.  There aren't too many type systems to
+%%   implement.  Doing a bit of extra work to define inference for each is a
+%%   constant factor overhead over writing the type checker for each.}
+A natural idea is to build a set of constraints based on the property the
+pluggable type system is trying to prove (\eg, build constraints based on
+nullability for a nullness pluggable type system, constraints based on indexing
+for an array bounds system, \etc) and then dispatch those constraints
+to a solver.
+%
+Unfortunately, this approach requires significant work for every pluggable type
+system (as all of its type rules must be re-encoded as constraints) and rapidly
+reduces to building an alternative verification tool, making it unattractive as
+a general solution to the inference problem.
+%
+Approaches based on machine learning lack sufficient training data for
 many pluggable type systems, they give no guarantee of correctness, and may
 not be able to explain their choices to the programmer.
 %
 We desire an
 inference algorithm that is \emph{generic} over the pluggable type system
-to which it is applied: the type system designer should not need to
-modify their type system implmentation in order to access
+to which it is applied in that same way that algorithm W is generic over
+all Hindley-Milner type systems: the pluggable type system designer should not need to
+modify their pluggable type system's implmentation in order to access
 the benefits of type inference.
 
 To that end, we propose a general type inference algorithm for pluggable type
@@ -81,9 +90,10 @@ Our key insight is that
 practical frameworks for building pluggable type systems already provide
 local type inference in the form of flow-sensitivity within the body
 of methods.
-We modify the framework to record inferred method/class/field summaries.
-Our approach iteratively type-checks the program, using and improving the
-summaries, until reading a fixed point.
+We modify the framework to record inferred method, class, and field summaries
+based on the results of flow-sensitive typechecking.
+Our approach iteratively typechecks the program, using and improving the
+summaries, until reaching a fixed point.
 That fixed point is a candidate set of type qualifiers, which are
 consistent with the program.
 
@@ -91,12 +101,10 @@ If the program typechecks with the candidate set of qualifiers, the program
 is correct with respect to that type system.
 If not, then the program contains a defect, or it is not internally
 consistent, or its correctness is beyond the capabilities of the
-type-checker (this is when a programmer would write a cast).
+typechecker (this is when a programmer would write a cast).
 In any event, the inferred type qualifiers can help the programmer.
 In our implementation, the user (a programmer) can decide whether to insert
 the type qualifiers in the source code, or to store them in a side file.
-
-
 
 We implemented this idea for the Checker Framework~\cite{PapiACPE2008},
 a popular open-source pluggable type system
