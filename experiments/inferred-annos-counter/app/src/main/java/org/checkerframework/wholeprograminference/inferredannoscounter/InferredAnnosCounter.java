@@ -48,6 +48,12 @@ public class InferredAnnosCounter {
       result = anno.substring(index1, anno.length());
     } else {
       result = anno.substring(index1, indexConsider);
+      int indexConsider2 = anno.indexOf(",");
+      if (indexConsider2 == -1) {
+        result = anno.substring(index1, result.length());
+      } else {
+        result = anno.substring(index1, indexConsider2);
+      }
     }
     return result;
   }
@@ -64,7 +70,7 @@ public class InferredAnnosCounter {
   private static String getAnnos(String line) {
     String[] words = line.split(" ");
     String result = words[0];
-    return "@" + result;
+    return result;
   }
 
   /**
@@ -146,8 +152,8 @@ public class InferredAnnosCounter {
     if (indexDashStar != -1) {
       finalLine = line.substring(0, indexDashStar);
     }
-    if (indexStar == 0) {
-      finalLine = line.substring(0, 0);
+    if (indexStar != -1) {
+      finalLine = line.substring(0, indexStar);
     }
     return finalLine;
   }
@@ -155,34 +161,28 @@ public class InferredAnnosCounter {
   /**
    * This method is to format a line in a computer-generated file before passing it to the Diff
    * algorithm. The way this method format the line is to change all annotaions written in the
-   * "@org.checkerframework..." format to the human -written format.
+   * "@org.checkerframework..." format to the human-written format.
    *
    * <p>
    *
    * @param line a line belong to a computer-generated file
    * @return the same line with all the annotations being changed to the human-written format.
+   *
    */
+
   private static String extractCheckerPackage(String line) {
     String[] temp = line.split(" ");
-    String result = "";
-    if (line.length() == 0) {
-      result = "";
-    } else {
+    String result = line;
+    if (line.length() != 0) {
       for (String word : temp) {
         if (word.contains("@org.checkerframework")) {
           String[] tempo = word.split("[.]");
           String tempResult = "@" + tempo[tempo.length - 1];
-          if (word == temp[1]) {
-            result = " " + tempResult;
-          } else {
-            result = result + " " + tempResult;
-          }
-        } else {
-          if (word == temp[0]) {
-            result = word;
-          } else {
-            result = result + " " + word;
-          }
+          int begin = result.indexOf(word);
+          int end = begin+word.length();
+          String firstPart= result.substring(0, begin);
+          String secondPart=result.substring(end, result.length());
+          result=firstPart+ tempResult+ secondPart;
         }
       }
     }
@@ -212,7 +212,7 @@ public class InferredAnnosCounter {
     return anno.substring(0, para);
   }
 
-   /**
+  /**
    * This method is to print out all the annotations belong to a line.
    *
    * <p>
@@ -227,17 +227,19 @@ public class InferredAnnosCounter {
     String temp = str;
     for (int i = 0; i < countAnno; i++) {
       int index1 = temp.indexOf("@");
-      temp = temp.substring(index1 + 1, temp.length());
-      anno = getAnnos(temp);
-      String tempAnno = anno.substring(1, anno.length());
-      if (checkInString(index1, str) && checkerFramworkPackage.contains(tempAnno)) {
+      @SuppressWarnings("index:argument") // index1 + 1 must be LTLengthOf temp, because in an annotation, the @ is never the last character
+      String substr = temp.substring(index1 + 1, temp.length());
+      temp = substr;
+      String tempAnno = getAnnos(temp);
+      if (checkInString(index1, temp) && checkerFramworkPackage.contains(tempAnno)) {
         if (anno.contains("(")) {
-          if (str.contains(")")) {
-            anno = str.substring(index1, str.indexOf(")") + 1);
+          if (temp.contains(")")) {
+            anno = temp.substring(index1, temp.indexOf(")") + 1);
           } else {
-            anno = str.substring(index1, str.length());
+            anno = temp.substring(index1, temp.length());
           }
         }
+        anno="@" + tempAnno;
         result.add(anno);
       }
     }
@@ -265,11 +267,12 @@ public class InferredAnnosCounter {
     /* the name of the types of annotations and their "correct" numbers (meaning the number of annotations of that
     type not missed by computer-written files) */
     Map<String, Integer> AnnoSimilar = new HashMap<String, Integer>();
+    int pos;
     File file = new File(args[0]);
     try (FileReader fr = new FileReader(file)) {
       BufferedReader br = new BufferedReader(fr);
-      @NonNull String str;
-      int pos = -1;
+      String str;
+      pos = -1;
       LinkedList<String> annoList = new LinkedList<String>();
       while ((str = br.readLine()) != null) {
         pos++;
@@ -314,32 +317,23 @@ public class InferredAnnosCounter {
     }
     for (int i = 0; i < args.length - 1; i++) {
       Patch<String> patch = diffs.get(i);
-      boolean notcomment = false;
       for (AbstractDelta<String> delta : patch.getDeltas()) {
         // get the delta in string format
         String deltaInString = delta.toString();
-        notcomment = true;
         String newpos = "";
         // we change the delta output to a string, then break that string into different parts
         List<String> myList = new ArrayList<String>(Arrays.asList(deltaInString.split(" ")));
         // just take the delta with annotations into consideration
         if (deltaInString.contains("@")) {
           // get the position of that annotation in the delta, which is something like "5," or "6,".
-          String pos = myList.get(2);
+          String posi = myList.get(2);
           // take the "," out
-          if (pos.length() > 1) {
-            newpos = pos.substring(0, pos.length() - 1);
+          if (posi.length() > 1) {
+            newpos = posi.substring(0, posi.length() - 1);
           }
           String result = "";
           for (String element : myList) {
-            // we dont take differences in the comment section into consideration
-            if (element.equals("[")) {
-              notcomment = true;
-            }
-            if (element.equals("//")) {
-              notcomment = false;
-            }
-            if (notcomment && element.contains("@")) {
+            if (element.contains("@")) {
               if (element.length() > 2) {
                 element = TrimAnnotation(element);
                 int currLine = Integer.parseInt(newpos);
@@ -350,9 +344,9 @@ public class InferredAnnosCounter {
                   int value = AnnoLocate.get(result);
                   AnnoLocate.put(result, value + 1);
                 } else {
-                  while (currLine < AnnoLocate.size()) {
+                  while (currLine < pos) {
                     currLine++;
-                    result = element + currLine;
+                    result = element +"_"+ currLine;
                     if (AnnoLocate.containsKey(result)) {
                       int value = AnnoLocate.get(result);
                       AnnoLocate.put(result, value + 1);
