@@ -36,40 +36,48 @@ public class InferredAnnosCounter {
    * @return the annotation itself without no "]"
    */
   private static String TrimAnnotation(@MinLen(2) String anno) {
+    String result =anno;
     @SuppressWarnings(
         "index:assignment") // This method should only be called on strings that contain an "@"
-    @NonNegative int index1 = anno.indexOf('@');
-    String result = "";
+    @NonNegative int index1 = result.indexOf('@');
     /* if apart from the '@' symbol, the anno contains only alphabetical elements (for example: @NulLable), we will take
     the whole string. Otherwise, for cases such as @Nullable], we will ignore the last element of the anno.
     */
-    int indexConsider=anno.indexOf("]");
+    int indexConsider=result.indexOf("]");
     if (indexConsider==-1) {
-      result = anno.substring(index1, anno.length());
+      result = result.substring(index1, result.length());
     } else {
-      result = anno.substring(index1, indexConsider);
-      int indexConsider2 = anno.indexOf(",");
+      result = result.substring(index1, indexConsider);
+      int indexConsider2 = result.indexOf(',');
       if (indexConsider2 == -1) {
-        result = anno.substring(index1, result.length());
+        result = result.substring(index1, result.length());
       } else {
-        result = anno.substring(index1, indexConsider2);
+        result = result.substring(index1, indexConsider2);
       }
     }
     return result;
   }
 
   /**
-   * This method will take a line, which begins with an annotation, and return the first annotation
-   * in that line
+   * This method will take a line, which contains at least one annotation, and return the first annotation
+   * in that line.
    *
    * <p>
    *
-   * @param line a non-empty line beginning with an annotation a
+   * @param line a non-empty line containing at least one annotation
    * @return the annotation which the line begins with
    */
   private static String getAnnos(String line) {
-    String[] words = line.split(" ");
-    String result = words[0];
+    String[] temp = line.split(" ");
+    String result="";
+    for (String word: temp) {
+      if (word.length()>=1) {
+        if (word.charAt(0)=='@') {
+          result=word.substring(1, word.length());
+          break;
+      }
+      }
+    }
     return result;
   }
 
@@ -159,13 +167,13 @@ public class InferredAnnosCounter {
   }
 
   /**
-   * This method is to format a line in a computer-generated file before passing it to the Diff
-   * algorithm. The way this method format the line is to change all annotaions written in the
-   * "@org.checkerframework..." format to the human-written format.
+   * This method is to format a line that may or may not contain fully-qualified annotation before passing it to the
+   * Diff algorithm. The way this method format that line is to change all annotaions written in the fully-qualified
+   * format to the short-name format.
    *
    * <p>
    *
-   * @param line a line belong to a computer-generated file
+   * @param line a line that belongs to the input files
    * @return the same line with all the annotations being changed to the human-written format.
    *
    */
@@ -178,7 +186,9 @@ public class InferredAnnosCounter {
         if (word.contains("@org.checkerframework")) {
           String[] tempo = word.split("[.]");
           String tempResult = "@" + tempo[tempo.length - 1];
-          int begin = result.indexOf(word);
+          @SuppressWarnings("index:assignment")
+          @NonNegative int begin = result.indexOf(word);
+          @SuppressWarnings("index:assignment")
           int end = begin+word.length();
           String firstPart= result.substring(0, begin);
           String secondPart=result.substring(end, result.length());
@@ -222,26 +232,30 @@ public class InferredAnnosCounter {
    */
   private static LinkedList<String> extractString(String str) {
     LinkedList<String> result = new LinkedList<String>();
-    String anno = "";
     int countAnno = countAnnos(str);
     String temp = str;
     for (int i = 0; i < countAnno; i++) {
-      int index1 = temp.indexOf("@");
-      @SuppressWarnings("index:argument") // index1 + 1 must be LTLengthOf temp, because in an annotation, the @ is never the last character
-      String substr = temp.substring(index1 + 1, temp.length());
-      temp = substr;
+      int index1 = temp.indexOf('@');
+      if (index1==-1) {
+        throw new RuntimeException("This method relies on the countAnnos method. Either the countAnnos method is wrong" +
+                "or it was not called properly");
+      }
       String tempAnno = getAnnos(temp);
       if (checkInString(index1, temp) && checkerFramworkPackage.contains(tempAnno)) {
-        if (anno.contains("(")) {
+        if (tempAnno.contains("(")) {
           if (temp.contains(")")) {
-            anno = temp.substring(index1, temp.indexOf(")") + 1);
+            tempAnno = temp.substring(index1, temp.indexOf(')') + 1);
           } else {
-            anno = temp.substring(index1, temp.length());
+            tempAnno = temp.substring(index1, temp.length());
           }
+          result.add("@"+tempAnno);
         }
-        anno="@" + tempAnno;
-        result.add(anno);
+        else {
+          System.out.println(tempAnno);
+          result.add("@"+tempAnno);
+        }
       }
+      temp = temp.substring(index1 + 1, temp.length());
     }
     return result;
   }
@@ -277,6 +291,7 @@ public class InferredAnnosCounter {
       while ((str = br.readLine()) != null) {
         pos++;
         str = ignoreComment(str);
+        str = extractCheckerPackage(str);
         originalFile.add(str);
         annoList = extractString(str);
         for (String anno : annoList) {
