@@ -19,7 +19,8 @@ pluggable typecheckers~\cite{Cousot1997}) forbids
 infinite ascending chains but permits infinite descending chains.
 A typechecker whose type system includes an infinite descending chain
 is guaranteed to terminate when typechecking a program, but our
-inference algorithm can induce downward refinement.
+inference algorithm can induce downward refinement in the outer loop
+(\ie during \cref{alg:wpi-fixpoint}).
 
 For example, consider a type system for integer intervals
 whose type qualifiers are of the form \<@Int\-Range(from, to)>.
@@ -45,7 +46,7 @@ recurse(0);
 
 When typechecking this program, the pluggable typechecker will
 treat both the input and output of \<recurse> as the top type
-(\ie any integer). However, the invocation rule in \todo{rules figure}
+(\ie any integer). However, the \textsc{INVOKE} rule in \cref{fig:type-rules}
 results in the fixpoint algorithm getting stuck in an arbitrarily-long
 loop attempting to infer a type for the parameter \<x>: the call to \<recurse(0)>
 results in a qualified type of \<@IntRange(0, 0)> for \<x>. Constant
@@ -55,13 +56,20 @@ is undesirable.
 
 In practice, we found that a simple modification to the invocation rule that
 prevents type qualifier inference from recursive method calls is sufficient
-to prevent this problem in practice.\todo{Mention that a narrowing
-  approach, analogous to widening that is already used in dataflow/abstract
-  interpretation, would also be a possible solution.}
- Though mutual recursion is a problem in
+to prevent this problem in practice.
+%
+Though mutual recursion is a problem in
 theory, in our benchmarks we did not encounter any code that triggered such
-an infinite loop in the analysis. Future work should address this problem in
-a more principled way.
+an infinite loop in the analysis.
+%
+Future work should address this problem in
+a more principled way, such as by introducing narrowing operators
+(similar to widening operators in an abstract interpretation, which
+permits an abstract interpretation to handle lattices with infinite
+ascending chains~\cite{CousotC77:AI}~\todo{Is this the right citation for widening?}).
+A downside to using narrowing operators is that defining them would
+be a per-typechecker task, but fortunately the type hierarchies of many
+pluggable typecheckers do not contain infinite descending chains at all.
 
 \subsection{Pre- and Post-conditions}
 \label{sec:pre-post-conditions}
@@ -73,19 +81,25 @@ this as a theoretical problem. \todo{Mike should write this section.}
 \subsection{Output Format}
 \label{sec:output}
 
-\todo{This was a big engineering challenge, but I'm not sure if
-  it deserves this much space in the paper. Maybe cut it down to one
-  paragraph, move it to the implementation section, or both? Or
-  maybe cut it all together?}
-
 \Cref{alg:wpi-fixpoint} does not specify how to store the intermediate
-sets of candidate type qualifiers (\ie $A^{\prime}$). Choosing the right way
-to do so is a surprisingly difficult engineering task. This section describes some
-of the pitfalls and how we overcame them.
+sets of candidate type qualifiers (\ie $A^{\prime}$). How these intermediate
+sets of type qualifiers are stored presents a subtle challenge: we need
+to treat type qualifers supplied by the programmer differently than
+type qualifiers that were produced during earlier rounds of inference:
+the latter may be further refined, but the former must not be.
 
-An obvious solution (and the first we tried) is to store the annotations
-in the program itself, as if they had been written by the programmer. The
-problem with this strategy is that it becomes impossible to distinguish
+We considered three approaches to store intermediate candidate qualifier sets:
+\begin{enumerate}
+\item insert the inferred type qualifiers directly into the program.
+\item store the inferred type qualifiers in a side file, as if they were
+  programmer-provided specifications for unannotated libraries.
+\item store the inferred type qualifiers in a special, inference-specific
+  side file.
+\end{enumerate}
+
+Only strategy 3 is effective in practice.
+
+The problem with strategy 1 is that it becomes impossible to distinguish
 between qualifiers written by the programmer themselves and qualifiers
 inferred in previous fixpoint rounds. Because the programmer might write
 qualifiers themselves to prevent the inference system from making overly-precise
@@ -93,39 +107,28 @@ refinements (which would result in type errors in \eg other modules not currentl
 under compilation), the analysis should not further refine any qualifiers
 provided by the programmer.
 
-\todo{I think the key is that future iterations can and should change
-  inferred output, but must not change programmer-provided input.  So these
-  must be input differently to the inference tool, so that it can treat
-  them differently.  Maybe organizing the section around that will make it
-  shorter and clearer.}
-
-Our second approach was to store the type qualifiers in a side file, using
-the standard approach for providing specifications for
-libraries that the code under compilation depends on, but which were not
-themselves compiled with the pluggable typechecker (and therefore whose bytecode
-does not contain type qualifiers). The downside of this approach is that
+The problem with strategy 2 is that
 the requirements for ``library qualifier'' side files and inferred side files
 are quite different. Consider the case where a library qualifier side file and
 a source file exist for the same class. In this case, the sensible default is
 to \emph{ignore} the library qualifier file, because the source code is actually
 the ground truth. This problem is compounded by typechecker writers distributing
-library qualifier files for common libraries. We built a switch that would force
+library qualifier files for common libraries. We tried forcing
 all library qualifier files to be placed into source code, but this made inference
 not work properly on common libraries for which checker-distributed library qualifier files
 existed.
 
-\todo{Try to avoid writing this as a narrative of things we did in the
-  order we did them.  Instead,
-  lay out alternatives and the pluses and minuses of each.}
+In strategy 3, the side files share the same syntax as library side files, but
+have different semantics: they are treated totally separately. Library side files
+are never modified during the inference process, but inference side files change
+on each iteration of the outer loop in \cref{alg:wpi-fixpoint}.
 
-Our third (and final) approach was to build an inference-specific side file mechanism.
-Though this required our implementation to be larger, it did not have any of the problems
-described above.
-\todo{This deserves a little more explanation (even as other parts may be
-  shorter).  This inference-specific side file mechanism uses the same
-  syntax but different syntax than the existing side file mechanism.  The
-  implementation section can point out that we actually designed an new
-  mechanism (ajava files), because the existing mechanisms were not
-  adequate for inference.}
+\subsection{Inference of Purity}
+\label{sec:purity-inference}
+
+\todo{Write a section about how important it is to infer purity annotations,
+  and how our approach does that. Mike should probably write this section
+  (Martin definitely did not implement the purity inference mechanism; he is not
+  sure who did.)}
 
 % LocalWords:  typechecker typecheckers typechecking ajava
