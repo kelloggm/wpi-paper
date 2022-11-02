@@ -36,6 +36,24 @@ using our modified typechecking framework.
 typechecking framework that enable type inference for a pluggable
 typechecker $T$ (\ie convert it to $T'$ in \cref{alg:wpi-fixpoint}).
 
+Note that in these two phases of our algorithm, estimates for
+candidate type qualifiers move in different directions in the
+type qualifier hierarchy.
+%
+In the outer loop (\cref{sec:core-algorithm}),
+estimates only go down (or stay that same): that is,
+type qualifiers become more refined.
+%
+In a single round of type inference, however, type qualifier
+estimates go up in the hierarchy: for example, the estimate
+for the type of a field is the least upper bound of the types
+of all the expressions that are assigned into that field.
+
+%% \todo{Here is a fact that I think we should explain to readers.
+%%   Within a single type-checking run, the type estimates only go up.
+%%   Between runs (that is, in \cref{alg:wpi-fixpoint}), the type estimates
+%%   only go down.}
+
 
 \subsection{Fixpoint Algorithm}
 \label{sec:core-algorithm}
@@ -253,11 +271,11 @@ standard type rules for a Java-like language. \qual{Black} indicates additions t
 pluggable typechecking. \infr{Red} indicates additions to support inference, \ie our
 contribution in this paper.
 %
-$m(f_0,\ldots,f_n)$ refers to a method declaration: $m$ is a unique method name,
+$m(f_0,~\ldots,~f_n)$ refers to a method declaration: $m$ is a unique method name,
 and each $f_i$ refers to one of the method's formal parameter declarations. When
-we write $m(f_0,\ldots,f_n) : q_R \tau_R$, we mean that $m$'s (qualified) return
-type is $q_R \tau_R$. When we write $f_i : q_F \tau_F$, we mean that the declared
-type of the formal parameter $f_i$ (of $m$) is $q_F \tau_F$.
+we write $m(f_0,~\ldots,~f_n)~:~q_R~\tau_R$, we mean that $m$'s (qualified) return
+type is $q_R~\tau_R$. When we write $f_i~:~q_F~\tau_F$, we mean that the declared
+type of the formal parameter $f_i$ (of $m$) is $q_F~\tau_F$.
 %
 Type rules that do not need to be modified to support inference are elided for space.
 %
@@ -293,12 +311,6 @@ resulting in an unqualified result.
 \todo{Then, this section should describe the interesting parts of the
   modified type rules in detail? At a minimum, we should probably walk the reader through
   one of the type rules.}
-
-
-\todo{Here is a fact that I think we should explain to readers.
-  Within a single type-checking run, the type estimates only go up.
-  Between runs (that is, in \cref{alg:wpi-fixpoint}), the type estimates
-  only go down.}
 
 \subsubsection{Completeness}
 \label{sec:complete}
