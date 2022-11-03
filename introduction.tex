@@ -15,7 +15,7 @@ Pluggable type systems are a standard practice in industry; for example,
 they are used at Amazon~\cite{KelloggSTE2020,KelloggRSSE2020},
 Google~\cite{SadowskiAEMCJ2018}, and Uber~\cite{BanerjeeCS2019}.
 Pluggable type systems
-can prevent\todo{Diversity citations for submission.  Ernst should not be the most-cited
+can prevent\todo{Diversify citations for submission.  Ernst should not be the most-cited
   author in the citations in the submission (can be tied for first).
   Reinstate more citations (don't remove any) for camera-ready.}  null-pointer
 dereferences~\cite{BanerjeeCS2019,PapiACPE2008,DietlDEMS2011},
@@ -35,17 +35,19 @@ are familiar with type systems and are used to writing types.
 The type qualifiers also serve as concise, machine-checked documentation.
 However, writing type qualifiers in a legacy codebase
 is time-consuming and intimidating for developers.
-\todo{A sentence about \emph{type inference} as the solution.}
+An alternative is type inference, which computes a set of type
+qualifiers that are consistent with the program.
 
-The traditional approach to type inference is constraint-based:
-deducing types for a program from the program's structure
-by solving a set of constraints induced by type uses.
+The traditional approach to type inference is constraint-based.
+First, generate a set of constraints induced by source code, similarly to
+how type-checking rules apply to code.
+Then, solve the constraints, which requires iterating over them.
 \todo{Say something about how this is whole-program, somewhere.}
 %
-For example, languages like ML and Haskell
-include Hindley-Milner type inference (based on algorithm
-W~\cite{DamasM1982}), so programmers do not need to write types at all,
-except as useful documentation\todo{Cite a ML or Haskell best practice}.
+For example, languages like ML and Haskell use
+Hindley-Milner type inference (based on algorithm
+W~\cite{DamasM1982}); programmers optionally write types
+as useful documentation\todo{Cite a ML or Haskell best practice}.
 %
 This approach is impractical\todo{Be specific.  Just inefficient?  If so,
   so what?  Ours is also inefficient.} for popular object-oriented programming
@@ -53,17 +55,20 @@ languages such as Java or Python, because subtyping prevents efficient
 unification of types\todo{say something about row polymorphism as a
   possible alternative, as is done in OCaml, here?}.
 %
-Type inference for dynamically-typed languages like Python is an open
-research problem. Researchers have proposed approaches based
-on MaxSAT~\cite{hassan2018maxsmt} and machine learning~\cite{xu2016python,peng2022static}.
+This approach requires writing a type constraint generator for every type
+(qualifier) system, which is a heavy burden.
+%
+We desire an
+inference algorithm that is \emph{generic} over the pluggable type system
+to which it is applied in that same way that algorithm W is generic over
+all Hindley-Milner type systems: the pluggable type system designer should not need to
+modify their pluggable type system's implementation in order to access
+the benefits of type inference.
 
-Unfortunately, none of these approaches is obviously practical for pluggable types.
-%% Actually, this is basically what we're going to do, so I shouldn't be so harsh on it.
-%% Building a type inference algorithm in the style of algorithm W for each
-%% type system is impractical: there are too many pluggable type
-%% systems.\todo{I don't buy this.  There aren't too many type systems to
-%%   implement.  Doing a bit of extra work to define inference for each is a
-%%   constant factor overhead over writing the type checker for each.}
+\todo{Why doesn't just using Hindley-Milner work for us?}
+
+
+\todo{Is all of this now redundant?}
 A natural idea is to build a set of constraints based on the property the
 pluggable type system is trying to prove (\eg, build constraints based on
 nullability for a nullness pluggable type system, constraints based on indexing
@@ -75,38 +80,46 @@ system (as all of its type rules must be re-encoded as constraints) and rapidly
 reduces to building an alternative verification tool, making it unattractive as
 a general solution to the inference problem.
 %
-Approaches based on machine learning lack sufficient training data for
-many pluggable type systems, they give no guarantee of correctness, and may
-not be able to explain their choices to the programmer.
-%
-We desire an
-inference algorithm that is \emph{generic} over the pluggable type system
-to which it is applied in that same way that algorithm W is generic over
-all Hindley-Milner type systems: the pluggable type system designer should not need to
-modify their pluggable type system's implmentation in order to access
-the benefits of type inference.
+Type inference for dynamically-typed languages like Python is an open
+research problem\todo{Just because of efficiency, or for other reasons too?}. 
+% MaxSAT~\cite{hassan2018maxsmt} and 
 
-To that end, we propose a general type inference algorithm for pluggable type
+Researchers have proposed type inference based on machine
+learning~\cite{xu2016python,peng2022static}.  Approaches based on machine
+learning lack training data for a newly-created pluggable type systems.  In
+addition, they give no guarantee of correctness, currently have low
+accuracy, and may not be able to explain their choices to the programmer.
+
+%% Actually, this is basically what we're going to do, so I shouldn't be so harsh on it.
+%% Building a type inference algorithm in the style of algorithm W for each
+%% type system is impractical: there are too many pluggable type
+%% systems.\todo{I don't buy this.  There aren't too many type systems to
+%%   implement.  Doing a bit of extra work to define inference for each is a
+%%   constant factor overhead over writing the type checker for each.}
+%
+%
+
+We propose a general type inference algorithm for pluggable type
 systems that is applicable to any flow-sensitive pluggable type system.
 Our key insight is that
 practical frameworks for building pluggable type systems already provide
 local type inference in the form of flow-sensitivity within the body
 of methods.
-We modify the framework to record inferred method, class, and field summaries
+Our approach first
+modifies the framework to record inferred method, class, and field summaries
 based on the results of flow-sensitive typechecking.
-Our approach iteratively typechecks the program, using and improving the
+Then, it iteratively typechecks the program, using and improving the
 summaries, until reaching a fixed point.
 That fixed point is a candidate set of type qualifiers, which are
 consistent with the program.
 
-If the program typechecks with the candidate set of qualifiers, the program
+If the program typechecks with the inferred qualifiers, the program
 is correct with respect to that type system.
-If not, then the program contains a defect, or it is not internally
-consistent, or its correctness is beyond the capabilities of the
+If not, then the program contains a defect
+or its correctness is beyond the capabilities of the
 typechecker (this is when a programmer would write a cast).
-In any event, the inferred type qualifiers can help the programmer.
 In our implementation, the user (a programmer) can decide whether to insert
-the type qualifiers in the source code, or to store them in a side file.
+the type qualifiers in the source code or to store them in a side file.
 
 We implemented this idea for the Checker Framework~\cite{PapiACPE2008},
 a popular open-source pluggable type system
@@ -116,10 +129,9 @@ framework for Java.
 impress you with our clever solution to tricky problems, and also how much
 engineering we did.}
 %
-We used the extended Checker Framework to run \todo{X} different pluggable typecheckers
-on \todo{some massive number of} lines of code to demonstrate that
-our approach is both effective and general.
-In experiments, our inference approach inferred \todo{Y\%} of human-written
+We used the extended Checker Framework to run \numTypeSystems different pluggable typecheckers
+on \numLOC lines of code in \numProjects projects.
+In experiments, our inference approach inferred \percentInferred of human-written
 type qualifiers.
 
 \todo{Decide if we're actually going to do this.}
@@ -133,16 +145,19 @@ Our contributions are:
 \begin{itemize}
 \item a novel type inference algorithm for flow-sensitive pluggable
   typecheckers (\cref{sec:core-algorithm});
-\item a collection of enhancements to the algorithm that are necessary to
+\item enhancements to the algorithm that
   make it practical (\cref{sec:difficulties});
 \item an implementation of our new type inference algorithm within a framework
   for building pluggable typecheckers (\cref{sec:implementation});
 \item an evaluation of our implementation, that shows that it can infer
-  \todo{X}\% of human-written annotations in \todo{Y} projects totalling
-  \todo{Z} lines of non-comment, non-blank Java code, across \todo{W} different
-  pluggable typecheckers (\cref{sec:evaluation}); and,
+  \percentInferred of human-written annotations in \numProjects projects totaling
+  \numLOC lines of non-comment, non-blank Java code, across \numTypeSystems different
+  pluggable type systems (\cref{sec:evaluation}); and
 \item a comparison of our generic algorithm to specialized inference
   techniques for specific typecheckers, which demonstrates that our generic
   approach is about as good at inferring annotations but requires less
   custom code (\cref{sec:comparison}).
 \end{itemize}
+
+% LocalWords:  nullability typechecks typechecker typecheckers CFI
+% LocalWords:  typechecking
