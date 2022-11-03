@@ -11,18 +11,20 @@ A pluggable type system~\cite{FosterFFA99} augments a host type system
 with \emph{type qualifiers} that refine it.  A qualified type is
 finer-grained than an unqualified one and therefore gives more precise
 information about what values are possible at run time.
-Researchers have devised practical pluggable type systems
-to prevent numerous kinds of defects, including null-pointer
+Pluggable type systems are a standard practice in industry; for example,
+they are used at Amazon~\cite{KelloggSTE2020,KelloggRSSE2020},
+Google~\cite{SadowskiAEMCJ2018}, and Uber~\cite{BanerjeeCS2019}.
+Pluggable type systems
+can prevent\todo{Diversity citations for submission.  Ernst should not be the most-cited
+  author in the citations in the submission (can be tied for first).
+  Reinstate more citations (don't remove any) for camera-ready.}  null-pointer
 dereferences~\cite{BanerjeeCS2019,PapiACPE2008,DietlDEMS2011},
 array-bounds violations~\cite{KelloggDME2018},
 violations of locking discipline~\cite{ErnstLMST2016},
 mutations of immutable data~\cite{DietlDEMS2011,PapiACPE2008,coblenz2017glacier},
-and others.
+and more.
 A successful type-checking run proves that the undesirable behavior will
 never occur.
-Pluggable type systems are a standard practice in industry; for example,
-they are used at Amazon~\cite{KelloggSTE2020,KelloggRSSE2020},
-Google~\cite{SadowskiAEMCJ2018}, and Uber~\cite{BanerjeeCS2019}.
 
 Pluggable types are an attractive verification and bug-finding strategy
 because programmers
@@ -33,20 +35,23 @@ are familiar with type systems and are used to writing types.
 The type qualifiers also serve as concise, machine-checked documentation.
 However, writing type qualifiers in a legacy codebase
 is time-consuming and intimidating for developers.
+\todo{A sentence about \emph{type inference} as the solution.}
 
-The traditional approach to solving this problem
-is \emph{type inference}:
-deducing the proper types for a program from the program's structure
+The traditional approach to type inference is constraint-based:
+deducing types for a program from the program's structure
 by solving a set of constraints induced by type uses.
+\todo{Say something about how this is whole-program, somewhere.}
 %
-For example, languages with Hindley-Milner type systems like ML and Haskell
-include type inference (based on algorithm W~\cite{DamasM1982})
-in their compilers, so programmers do not need to write types at all.
+For example, languages like ML and Haskell
+include Hindley-Milner type inference (based on algorithm
+W~\cite{DamasM1982}), so programmers do not need to write types at all,
+except as useful documentation\todo{Cite a ML or Haskell best practice}.
 %
-This approach is impractical for popular object-oriented programming
+This approach is impractical\todo{Be specific.  Just inefficient?  If so,
+  so what?  Ours is also inefficient.} for popular object-oriented programming
 languages such as Java or Python, because subtyping prevents efficient
-unification of types (\todo{say something about row polymorphism as a
-  possible alternative, as is done in OCaml, here?}).
+unification of types\todo{say something about row polymorphism as a
+  possible alternative, as is done in OCaml, here?}.
 %
 Type inference for dynamically-typed languages like Python is an open
 research problem. Researchers have proposed approaches based
