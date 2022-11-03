@@ -17,10 +17,6 @@
 \newcommand{\anonurl}[1]{\ifanonymous URL removed for anonymity.\else\url{#1}\fi}
 \newcommand{\footnoteanonurl}[1]{\footnote{\anonurl{#1}}}
 
-%% The name of our tool.
-\newcommand{\Tool}{The Resource Leak Checker\xspace}
-\newcommand{\tool}{the Resource Leak Checker\xspace}
-
 % \|name| or \mathid{name} denotes identifiers and slots in formulas
 \def\|#1|{\mathid{#1}}
 \newcommand{\mathid}[1]{\ensuremath{\mathit{#1}}}
@@ -48,6 +44,15 @@
 \newcommand{\trtext}[1]{\mbox{\smaller\smaller #1}}
 \newcommand{\trquoted}[1]{\trcode{"}#1\trcode{"}}
 
+
+%%% Computed values
+
+\newcommand{\numTypeSystems}{\todo{numTypeSystems}\xspace}
+\newcommand{\numProjects}{\todo{numProjects}\xspace}
+\newcommand{\percentInferred{\todo{percentInferred\%}\xspace}
+
+
+%%% Miscellaneous
 
 \hyphenation{type-state}        % LaTeX defaults to "types-tate"
 
