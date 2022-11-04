@@ -19,8 +19,7 @@ split by checker ("original annotations")
 * the number of annotations inferred by WPI, split by checker
 ("inferred annotations")
 * the number of remaining errors after running WPI
-* the percentage of the original annotations that WPI inferred
-[[TODO: Is this the percentage that were inferred exactly?  How about counting differences?  Inference might be more or less precise.  Manual examination would be required in places where they differ, but would be worthwhile.]]
+* the number of the annotations in the original source code that WPI was able to infer
 
 Prerequisites:
 * TODO: list required software. Incomplete list of software you must have installed:
@@ -30,32 +29,35 @@ git, a JDK, the Checker Framework (see next item)
 that your $CHECKERFRAMEWORK environment variable is set, because that is used
 in some of the steps of the experimental procedure below.
 
-Example outputs of this experimental procedure (which may become inputs for downstream tools) 
-can be found in (/main/experiments/inferred-annos-counter/inputExamples). 
-[[TODO: It's rather confusing that the *outputs* are named `inputExamples`.  Anything can be input or output from some tool, so those names don't convey anything.  Name the directory by its contents, not how it is used by one particular tool.]]
-These example inputs should only be created for smaller projects.
-
 The procedure:
 
-1. Fork and then clone the project, and checkout the commit[[What is "the commit"?]] in the
-projects/ directory.[[Where is `the projects/` directory found?]] In the file `projects.in`, record the URL (of your fork) and
-commit ID. Then, add a row to the "summary" sheet in the spreadsheet
+1. Fork and then clone the project. In the file `projects.in`, record the URL (of your fork) and
+commit ID of the main/master branch. Then, add a row to the "summary" sheet in the spreadsheet
 (https://docs.google.com/spreadsheets/d/1r_NhumolEp5CiOL7CmsvZaa4-FDUxCJXfswyJoKg8uM/edit?usp=sharing)
 with both the original and forked url as well as the commit ID.
 
 2. Create a new branch called "baseline" at that commit:
-`git checkout -b baseline ; git push origin baseline`
+   a. `git checkout -b baseline ; git push origin baseline`
+   b. Ensure that the project compiles and typechecks. Checking this varies depending on
+   build system: on Gradle, `./gradlew compileJava`; on Maven, `./mvnw compile` or `mvn compile`;
+   on Ant `ant compile`; etc. Determine the build system and check that the appropriate command succeeds.
+   If you cannot build the project, record that in the spreadsheet by changing the row color
+   to red, and abort the process.
+   c. Inspect the project's build system and determine the list of typecheckers from the Checker
+   Framework that the project runs. How this is expressed also varies by build system. For example, in
+   a Gradle project that uses the checkerframework-gradle-plugin, you would check the `checkers` block.
+   In other build systems, look for a `-processor` argument. Record the names of the typecheckers in the
+   "Checkers" column of the spreadsheet.
 
 3. Create a new branch called "unannotated" from the same commit, with annotations removed:
    a. `git checkout -b unannotated`
-   b. Run the `RemoveAnnotationsForInference` program on the source, no ouput means it ran successfully:
+   b. Run the `RemoveAnnotationsForInference` program on the source; no ouput means it ran successfully:
       `java -cp "$CHECKERFRAMEWORK/checker/dist/checker.jar" org.checkerframework.framework.stub.RemoveAnnotationsForInference .`
    c. Push the unannotated code:
       `git commit -am "output of RemoveAnnotationsForInference" ; git push origin unannotated`
-
-[[TODO: If possible, each of the numbered steps should verify the work.  For
-instance, the `baseline` branch should compile and pass type-checking.  The
-`unannotated branch should compile but not pass typechecking.]]
+   d. Verify that, because the annotations have been removed, the program no longer typechecks. You should
+   see an error from one of the Checker Framework checkers you recorded in step 2c when you re-run whatever
+   command you used to run the typechecker before.
 
 4. Collect the number of original annotations in the code:
    a. run `git checkout -b annotation-statistics origin/baseline`
@@ -86,8 +88,8 @@ instance, the `baseline` branch should compile and pass type-checking.  The
    e. add this script: `chmod +x wpi.sh ; git add wpi.sh`
    f. commit the script and buildfile changes: `git commit -am "enable WPI" ; git push origin wpi-enabled`
    g. execute the script: `./wpi.sh`
-   h. record[[TODO: where?]] the number of errors issued by the typecheckers (and which
-   typechecker issued the error) after the script is finished
+   h. record (in the spreadsheet, in a tab for this project; you may need to create one by copying another tab)
+   the number of errors issued by the typecheckers (and which typechecker issued the error) after the script is finished
 
 7. Create a branch for the code with inferred annotations
    a. Create a branch: `git checkout -b wpi-annotations annotation-statistics`
