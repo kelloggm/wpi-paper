@@ -86,6 +86,10 @@
 % xspace command
 \usepackage{xspace}
 
+% Reduce font size in verbatim environment
+\usepackage{fancyvrb}
+\RecustomVerbatimEnvironment{Verbatim}{Verbatim}{fontsize=\smaller}
+
 % lstlisting command
 \usepackage{listings}
 \usepackage[scaled]{beramono}
@@ -181,24 +185,22 @@
 %% The abstract is a short summary of the work to be presented in the
 %% article.
 \begin{abstract}
-  A pluggable type system extends a programming language with type qualifiers.
+  A pluggable type system extends a host programming language with type qualifiers.
   It enables a programmer to write a type such as \<unsigned int>, \<secret
   string>, or \<nonnull object>.
-  Type-checking with pluggable types detects and prevents more errors.
-  The biggest obstacle to use of pluggable types is the need for
+  Type-checking with pluggable types detects and prevents more errors than
+  the host type system.
+  Type inference can solve the biggest obstacle to use of pluggable types: the need for
   programmers to write type qualifiers.
-  Type inference can solve this problem.
   Traditional approaches to type inference are type-system-specific:
   build and then solve a system
   of constraints corresponding to the rules of the underlying type system.
-  This approach does not scale well to pluggable type
-  systems: for each new pluggable type system, the type inference algorithm
+  For each new pluggable type system, the type inference algorithm
   must be extended to build and then solve constraints specific
   to that pluggable type system.
 
-  We propose a novel type inference algorithm for pluggable type systems
-  that is generic over the pluggable type system to which it is applied.
-  That is, our system can infer type qualifiers for \emph{any} pluggable
+  We propose a novel type inference algorithm
+  that can infer type qualifiers for \emph{any} pluggable
   type system with no new\todo{This is a bit strong.  We do need custom
     code to deal with special cases (the framework has hooks for some of
     these), including non-qualifiers (declaration
@@ -213,9 +215,9 @@
 
   We have implemented our algorithm for the open-source Checker Framework
   project, which is widely used in industry and on which dozens of specialized pluggable typecheckers
-  have been built. In experiments, with \todo{some number of} distinct
-  pluggable typecheckers and \todo{some number of} projects, our algorithm
-  inferred \todo{X}\% of the annotations that programmers wrote. We also compared our
+  have been built. In experiments with \numTypeSystems distinct
+  pluggable type systems and \numProjects projects, our algorithm
+  inferred \percentInferred of the annotations that programmers wrote. We also compared our
   technique to other techniques for type inference.
 \end{abstract}
 
