@@ -49,3 +49,10 @@ application {
     // Define the main class for the application.
     mainClass = 'org.checkerframework.wholeprograminference.inferredannoscounter.App'
 }
+
+test {
+  testLogging {
+    events "failed"
+    exceptionFormat "full"
+  }
+}
