@@ -1,4 +1,4 @@
  @Pure
  //some methods here...//
- String x = "@NonNull";
+ @NonNull
  @SideEffectFree

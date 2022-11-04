@@ -1,0 +1,4 @@
+ @org.checkerframework.dataflow.qual.Pure
+ //some methods here...//
+ @org.checkerframework.checker.nullness.qual.NonNull
+ @org.checkerframework.dataflow.qual.SideEffectFree
