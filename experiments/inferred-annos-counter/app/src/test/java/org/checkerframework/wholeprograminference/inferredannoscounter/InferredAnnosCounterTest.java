@@ -48,7 +48,9 @@ public class InferredAnnosCounterTest {
   @Test
   public void MatchThreeAnnotations() {
     InferredAnnosCounter.main(
-        new String[] {"testCases/MatchThreeAnnotations.java", "testCases/MatchThreeAnnotations.ajava"});
+        new String[] {
+          "testCases/MatchThreeAnnotations.java", "testCases/MatchThreeAnnotations.ajava"
+        });
     String line1 = "@Pure got 1/1";
     String line2 = "@NonNull got 1/1";
     String line3 = "@SideEffectFree got 1/1";
@@ -60,7 +62,9 @@ public class InferredAnnosCounterTest {
   @Test
   public void ignoreOneAnnoInCommentOfComputer() {
     InferredAnnosCounter.main(
-        new String[] {"testCases/ignoreOneAnnoInComment.java", "testCases/ignoreOneAnnoInComment.ajava"});
+        new String[] {
+          "testCases/ignoreOneAnnoInComment.java", "testCases/ignoreOneAnnoInComment.ajava"
+        });
     String line1 = "@Pure got 1/1";
     String line2 = "@NonNull got 1/1";
     String line3 = "@SideEffectFree got 1/1";
@@ -71,7 +75,8 @@ public class InferredAnnosCounterTest {
 
   @Test
   public void CommentInMiddle() {
-    InferredAnnosCounter.main(new String[] {"testCases/CommentInMiddle.java", "testCases/CommentInMiddle.ajava"});
+    InferredAnnosCounter.main(
+        new String[] {"testCases/CommentInMiddle.java", "testCases/CommentInMiddle.ajava"});
     String line1 = "@Pure got 1/1";
     String line2 = "@NonNull got 1/1";
     String line3 = "@SideEffectFree got 1/1";
@@ -82,7 +87,8 @@ public class InferredAnnosCounterTest {
 
   @Test
   public void AnnotationInString() {
-    InferredAnnosCounter.main(new String[] {"testCases/AnnotationInString.java", "testCases/AnnotationInString.ajava"});
+    InferredAnnosCounter.main(
+        new String[] {"testCases/AnnotationInString.java", "testCases/AnnotationInString.ajava"});
     String line1 = "@Pure got 1/1";
     String line2 = "@NonNull got 1/1";
     String line3 = "@SideEffectFree got 1/1";
