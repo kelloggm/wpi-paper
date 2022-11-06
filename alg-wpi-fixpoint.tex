@@ -7,21 +7,23 @@
   \SetKwInOut{Input}{input}
   \SetKwInOut{Output}{output}
   \Input{program $P$ and pluggable typechecker $T$}
-  \Output{set of errors $E$ and set of type qualifiers $A^{\prime}$}
+  \Output{set of errors $E$ and set of type qualifiers $A$}
   \Fn{ \Infer{$P$, $T$} } {
-%    \tcc{In each iteration, $A$ is the specification set before running $T$, and $A^{\prime}$ is the set after.}
-    $A \gets \emptyset, A^{\prime} \gets \emptyset$ \;
+%    \tcc{In each iteration, $\|prevA|$ is the specification set before running $T$, and $A$ is the set after.}
+%    $\|prevA| \gets \emptyset, A \gets \emptyset$ \;
+    $A \gets \emptyset$ \;
 %    \tcc{\textsc{Instrument} modifies $T$ to both check the program and collect a candidate specification set.}
-    $T^{\prime} \gets \textsc{EnableInference}(T)$ \;
-    $E, A^{\prime} \gets T^{\prime}(P, A)$ \;
-    \While{$E \neq \emptyset \wedge A \neq A^{\prime}$}{
-      \tcc{Note that each element of $A^{\prime}$ is either a new type qualifier or refines some element of $A$.}
-      $A \gets A^{\prime}$ \;
-      $E, A^{\prime} \gets T^{\prime}(P, A)$ \;
+    $T_I \gets \textsc{EnableInference}(T)$ \;
+%    $E, A \gets T_I(P, \|prevA|)$ \;
+    \Repeat{$E = \emptyset \vee \|prevA| = A$}{
+      % \tcc{Note that each element of $A$ is either a new type qualifier or refines some element of $\|prevA|$.}
+      $\|prevA| \gets A$ \;
+      $E, A \gets T_I(P, \|prevA|)$ \;
     }
-    \Return $E, A^{\prime}$ \;
+    \Return $E, A$ \;
   }
-  \caption{The core fixpoint algorithm for our type inference system.
+  \caption{Iterated local type inference algorithm.  This is the ``outer
+    loop'' of the approach, which iterates to a fixed point.
     The helper function \textsc{EnableInference} is defined by the modifications
     to the framework described in \cref{sec:instrument}.
     \todo{Why is the caption so narrow, not taking up the whole column?}

@@ -2,34 +2,34 @@
 \label{sec:difficulties}
 
 The algorithm and type rules in \cref{sec:algorithm} define our
-basic approach. However, there are also some other challenges
-that need to be addressed in order to build a system that applies
+basic approach. This section describes some challenges
+in building a system that applies
 to every pluggable typechecker and is effective at inferring
-type qualifiers for real programs. This section describes the
-challenges we encountered while building a tool that implements
-the algorithm in \cref{sec:algorithm} and our solutions to those
-challenges.
+type qualifiers for real programs.
+
 
 \subsection{Analysis Termination: Infinite Descending Chains and Recursive Calls}
 \label{sec:infinite-descending-chains}
 
 The usual lattice definition in an abstract interpretation
-(or equivalently, a type system with flow-sensitive refinement like our
-pluggable typecheckers~\cite{Cousot1997}) forbids
+(or equivalently~\cite{Cousot1997}, a type system with flow-sensitive type
+refinement) forbids
 infinite ascending chains but permits infinite descending chains.
 A typechecker whose type system includes an infinite descending chain
-is guaranteed to terminate when typechecking a program, but our
-inference algorithm can induce downward refinement in the outer loop
+is guaranteed to terminate when typechecking a program (that is, the inner
+loop of the iterated local type inference algorithm), but the
+algorithm can induce downward refinement in the outer loop
 (\ie during \cref{alg:wpi-fixpoint}).
 
 For example, consider a type system for integer intervals
-whose type qualifiers are of the form \<@Int\-Range(from, to)>.
-The type \<@Int\-Range(1, 10) int> therefore means ``an integer between
-1 and 10, inclusive'' when running this pluggable typechecker.
-The subtyping relationship is straightforward: \<@Int\-Range(a, z)>
-is a supertype of \<@Int\-Range(b, y)> if and only if \codeid{a < b \&\& z > y}.
+whose type qualifiers are of the form \<range(\|from|, \|to|)>.
+The type \<range(1, 10) int> means ``an integer between
+1 and 10, inclusive''.
+The subtyping relationship is straightforward: \<range(a, z)>
+is a supertype of \<range(b, y)> if and only if $\<a> \le \<b> \wedge \<z>
+\ge \<y>$.\todo{That relationship looks exactly backward to me.}
 Then consider running our inference algorithm on the program in \cref{fig:descend}
-using this pluggable typechecker.
+using this type system.
 
 \begin{figure}
 \begin{verbatim}
@@ -39,8 +39,9 @@ int recurse(int x) {
 
 recurse(0);
 \end{verbatim}
-\caption{Simple example which would trigger an infinite loop in a naive
-  implementation of our analysis.}
+\caption{Simple example that would trigger an infinite loop in a naive
+  implementation of our analysis.}\todo{Talk about infinite downward
+  chains, probably.}
 \label{fig:descend}
 \end{figure}
 
@@ -49,9 +50,10 @@ treat both the input and output of \<recurse> as the top type
 (\ie any integer). However, the \textsc{INVOKE} rule in \cref{fig:type-rules}
 results in the fixpoint algorithm getting stuck in an arbitrarily-long
 loop attempting to infer a type for the parameter \<x>: the call to \<recurse(0)>
-results in a qualified type of \<@IntRange(0, 0)> for \<x>. Constant
-propagation then leads to the type \<@IntRange(0, 1)> in the next iteration
-of the overall fixpoint loop, then to \<@IntRange(0, 2)>, \ldots, which
+results in a qualified type of \<range(0, 0)> for \<x>. Constant
+propagation then leads to the type \<range(0, 1)> in the next iteration
+of the outer (fixpoint) loop, then to \<range(0, 2)>\todo{This is a
+  \emph{supertype} of \<range(0, 1)>: it admits more values.}, \ldots, which
 is undesirable.
 
 In practice, we found that a simple modification to the invocation rule that
@@ -78,8 +80,15 @@ Discuss some of the troubles that Mike encountered when
 he implemented pre- and post-condition support in WPI\@. Frame
 this as a theoretical problem. \todo{Mike should write this section.}
 
-\subsection{Output Format}
+
+\subsection{Type-system-specific inference}
+\label{sec:type-system-specific}
+
+
+\subsection{Storing intermediate results}
 \label{sec:output}
+
+\todo{Restructure}
 
 \Cref{alg:wpi-fixpoint} does not specify how to store the intermediate
 sets of candidate type qualifiers (\ie $A^{\prime}$). How these intermediate

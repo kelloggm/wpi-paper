@@ -8,7 +8,11 @@
     ``NCNB LoC'' is the number of lines of non-comment, non-blank code.
     ``Annos.'' is the number of human-written annotations, across all typecheckers.
     ``WPI \% Inferred'' is the percentage of the human-written annotations that WPI
-    inferred.
+    inferred.\todo{What if WPI inferred something weaker or stronger?  How
+      does that count?}\todo{Does it make sense to measure precision as
+      well as recall?}\todo{Does it make sense to record the number of
+      type-checking errors?  I don't think so:  the number of wrong
+      inferred annotations is a better measure of remaining human effort.}
   }
   \label{tab:case-studies}
   \posttablecaption
