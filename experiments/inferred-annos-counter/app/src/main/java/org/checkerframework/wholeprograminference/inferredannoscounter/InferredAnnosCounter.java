@@ -199,7 +199,7 @@ public class InferredAnnosCounter {
   }
 
   /**
-   * This method trim out the parenthesized part in an annotation, for example, @Annotation(abc)
+   * This method trims out the parenthesized part in an annotation, for example, @Annotation(abc)
    * will be changed to @Annotation.
    *
    * <p>This method need to be used with care. We want to use it to update the final result. This
