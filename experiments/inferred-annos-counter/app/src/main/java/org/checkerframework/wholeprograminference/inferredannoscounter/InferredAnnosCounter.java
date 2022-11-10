@@ -168,9 +168,10 @@ public class InferredAnnosCounter {
   }
 
   /**
-   * This method formats a line that may or may not contain fully-qualified annotation. The way this method formats that line is to change all
-   * annotations written in the fully-qualified format to the simple format. For example, changing
-   * "@org.checkerframework.dataflow.qual.Pure" to "@Pure." This method should be applied before passing a line to the Diff algorithm.
+   * This method formats a line that may or may not contain fully-qualified annotation. The way this
+   * method formats that line is to change all annotations written in the fully-qualified format to
+   * the simple format. For example, changing "@org.checkerframework.dataflow.qual.Pure" to "@Pure."
+   * This method should be applied before passing a line to the Diff algorithm.
    *
    * @param line a line that belongs to the input files
    * @return the same line with all the annotations being changed to the simple format.
