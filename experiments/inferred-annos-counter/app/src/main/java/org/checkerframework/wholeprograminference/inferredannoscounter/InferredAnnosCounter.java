@@ -53,17 +53,14 @@ public class InferredAnnosCounter {
     /* if apart from the '@' symbol, the anno contains only alphabetical elements (for example: @NulLable), we will take
     the whole string. Otherwise, for cases such as @Nullable], we will ignore the last element of the anno.
     */
-    int indexConsider = result.indexOf("]");
-    if (indexConsider == -1) {
-      result = result.substring(index1, result.length());
-    } else {
-      result = result.substring(index1, indexConsider);
+    result = result.substring(index1, result.length());
+    int indexConsider = result.indexOf(']');
+    if (indexConsider != -1) {
+      result = result.substring(0, indexConsider);
     }
     int indexConsider2 = result.indexOf(',');
-    if (indexConsider2 == -1) {
-      result = result.substring(index1, result.length());
-    } else {
-      result = result.substring(index1, indexConsider2);
+    if (indexConsider2 != -1) {
+      result = result.substring(0, indexConsider2);
     }
     return result;
   }
@@ -80,8 +77,12 @@ public class InferredAnnosCounter {
     String result = "";
     for (String word : temp) {
       if (word.length() >= 1) {
-        if (word.charAt(0) == '@') {
-          result = word.substring(1, word.length());
+        if (word.indexOf('@') != -1) {
+          @SuppressWarnings(
+              "index:assignment") // Since '@' can not be the last character in a line in a Java
+          // file.
+          int begin = word.indexOf('@') + 1;
+          result = word.substring(begin, word.length());
           break;
         }
       }
@@ -199,7 +200,7 @@ public class InferredAnnosCounter {
   }
 
   /**
-   * This method trims out the parenthesized part in an annotation, for example, @Annotation(abc)
+   * This method trim out the parenthesized part in an annotation, for example, @Annotation(abc)
    * will be changed to @Annotation.
    *
    * <p>This method need to be used with care. We want to use it to update the final result. This
@@ -308,16 +309,15 @@ public class InferredAnnosCounter {
           if (checkerFramworkPackage.contains(annoNoPara)) {
             String finalAnno = "@" + annoNoPara;
             if (AnnoCount.containsKey(finalAnno)) {
-              System.out.println(finalAnno);
               int numberOfAnno = AnnoCount.get(finalAnno);
               AnnoCount.put(finalAnno, numberOfAnno + 1);
             } else {
-              AnnoCount.put(finalAnno, new Integer(1));
+              AnnoCount.put(finalAnno, Integer.valueOf(1));
             }
-            AnnoSimilar.put(finalAnno, new Integer(0));
+            AnnoSimilar.put(finalAnno, Integer.valueOf(0));
             // we want the keys in the map AnnoLocate has this following format: type_position
             String posi = String.valueOf(pos);
-            AnnoLocate.put("@" + anno + "_" + posi, new Integer(0));
+            AnnoLocate.put("@" + anno + "_" + posi, Integer.valueOf(0));
           }
         }
       }
@@ -367,7 +367,6 @@ public class InferredAnnosCounter {
                 int currLine = Integer.parseInt(newpos);
                 // to match the one in AnnoLocate
                 result = element + "_" + newpos;
-                System.out.println(result);
                 // update the data of AnnoLocate
                 if (AnnoLocate.containsKey(result)) {
                   int value = AnnoLocate.get(result);
