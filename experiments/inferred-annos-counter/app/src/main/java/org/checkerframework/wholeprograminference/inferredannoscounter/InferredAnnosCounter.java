@@ -9,7 +9,6 @@ import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import org.checkerframework.checker.index.qual.IndexFor;
@@ -286,7 +285,8 @@ public class InferredAnnosCounter {
 
     // These variables are maintained throughout:
 
-    // The original file, reformatted to remove comments and clean up annotation names (i.e., remove package names),
+    // The original file, reformatted to remove comments and clean up annotation names (i.e., remove
+    // package names),
     // etc.
     List<String> originalFile = new ArrayList<>();
     // specific annotations and the number of computer-written files missing them
