@@ -261,14 +261,14 @@ public class InferredAnnosCounter {
    * <p>-param args the files. The first element is the original source file. All remaining elements
    * should be corresponding .ajava files produced by WPI. This program assumes that all inputs have
    * been converted to some unified formatting style to eliminate unnecessary changes (e.g., by
-   * running gjf on each input).
+   * running google java format on each input).
    */
   public static void main(String[] args) {
     if (args.length <= 1) {
       throw new RuntimeException(
           "Provide at least one .java file and one or more" + ".ajava files.");
     }
-    File file;
+    File file = new File(args[0]);
     // This is to be used after successfully implementing the command line to update
     // type-qualifiers.txt
     /*List<String> checkerPackage=new ArrayList<String>();
@@ -283,66 +283,74 @@ public class InferredAnnosCounter {
       throw new RuntimeException("Could not read type-qualifiers.txt, check if it exists?");
     }
     */
-    List<String> originalFile = new ArrayList<String>();
+
+    // These variables are maintained throughout:
+
+    // The original file, reformatted to remove comments and clean up annotation names (i.e., remove package names),
+    // etc.
+    List<String> originalFile = new ArrayList<>();
     // specific annotations and the number of computer-written files missing them
-    Map<String, Integer> AnnoLocate = new HashMap<String, Integer>();
+    Map<String, Integer> annoLocate = new HashMap<>();
     // the name of the types of annotation and their numbers in the human-written file
-    Map<String, Integer> AnnoCount = new HashMap<String, Integer>();
+    Map<String, Integer> annoCount = new HashMap<>();
     /* the name of the types of annotations and their "correct" numbers (meaning the number of annotations of that
     type not missed by computer-written files) */
-    Map<String, Integer> AnnoSimilar = new HashMap<String, Integer>();
-    int pos;
-    file = new File(args[0]);
-    try (FileReader fr = new FileReader(file)) {
-      BufferedReader br = new BufferedReader(fr);
-      String str;
-      pos = -1;
-      List<String> annoList = new ArrayList<String>();
-      while ((str = br.readLine()) != null) {
-        pos++;
-        str = ignoreComment(str);
-        str = extractCheckerPackage(str);
-        originalFile.add(str);
-        annoList = extractString(str);
+    Map<String, Integer> annoSimilar = new HashMap<>();
+    // the number of lines in the original file
+    int originalFileLineCount;
+
+    // Read the original file once to determine the annotations that written by the human.
+    try (BufferedReader br = new BufferedReader(new FileReader(file))) {
+      String originalFileLine;
+      int originalFileLineIndex = -1;
+      while ((originalFileLine = br.readLine()) != null) {
+        originalFileLineIndex++;
+        originalFileLine = ignoreComment(originalFileLine);
+        originalFileLine = extractCheckerPackage(originalFileLine);
+        originalFile.add(originalFileLine);
+        List<String> annoList = extractString(originalFileLine);
         for (String anno : annoList) {
           String annoNoPara = trimParen(anno);
           if (checkerFramworkPackage.contains(annoNoPara)) {
             String finalAnno = "@" + annoNoPara;
-            if (AnnoCount.containsKey(finalAnno)) {
-              int numberOfAnno = AnnoCount.get(finalAnno);
-              AnnoCount.put(finalAnno, numberOfAnno + 1);
+            if (annoCount.containsKey(finalAnno)) {
+              int numberOfAnno = annoCount.get(finalAnno);
+              annoCount.put(finalAnno, numberOfAnno + 1);
             } else {
-              AnnoCount.put(finalAnno, Integer.valueOf(1));
+              annoCount.put(finalAnno, 1);
             }
-            AnnoSimilar.put(finalAnno, Integer.valueOf(0));
-            // we want the keys in the map AnnoLocate has this following format: type_position
-            String posi = String.valueOf(pos);
-            AnnoLocate.put("@" + anno + "_" + posi, Integer.valueOf(0));
+            annoSimilar.put(finalAnno, 0);
+            // we want the keys in the map annoLocate has this following format: type_position
+            annoLocate.put("@" + anno + "_" + originalFileLineIndex, 0);
           }
         }
       }
-      fr.close();
+      originalFileLineCount = originalFileLineIndex;
     } catch (Exception e) {
       throw new RuntimeException("Could not read file: " + args[0] + ". Check that it exists?");
     }
+
+    // Iterate over the arguments from 1 to the end and diff each with the original,
+    // putting the results into diffs.
     List<Patch<String>> diffs = new ArrayList<>(args.length - 1);
     for (int i = 1; i < args.length; ++i) {
-      file = new File(args[i]);
-      try (FileReader fr = new FileReader(file)) {
-        List<String> newFile = new ArrayList<String>();
-        BufferedReader br = new BufferedReader(fr);
-        String str;
-        LinkedList<String> annoList = new LinkedList<String>();
-        while ((str = br.readLine()) != null) {
-          str = ignoreComment(str);
-          str = extractCheckerPackage(str);
-          newFile.add(str);
+      File ajavaFile = new File(args[i]);
+      try (BufferedReader br = new BufferedReader(new FileReader(ajavaFile))) {
+        List<String> newFile = new ArrayList<>();
+        String ajavaFileLine;
+        while ((ajavaFileLine = br.readLine()) != null) {
+          ajavaFileLine = ignoreComment(ajavaFileLine);
+          ajavaFileLine = extractCheckerPackage(ajavaFileLine);
+          newFile.add(ajavaFileLine);
         }
         diffs.add(DiffUtils.diff(originalFile, newFile));
       } catch (Exception e) {
         throw new RuntimeException("Could not read file: " + args[i] + ". Check that it exists?");
       }
     }
+
+    // Iterate over the list of diffs and process each. There must be args.length - 1 diffs, since
+    // there is one diff between args[0] and each other element of args.
     for (int i = 0; i < args.length - 1; i++) {
       Patch<String> patch = diffs.get(i);
       for (AbstractDelta<String> delta : patch.getDeltas()) {
@@ -368,16 +376,16 @@ public class InferredAnnosCounter {
                 // to match the one in AnnoLocate
                 result = element + "_" + newpos;
                 // update the data of AnnoLocate
-                if (AnnoLocate.containsKey(result)) {
-                  int value = AnnoLocate.get(result);
-                  AnnoLocate.put(result, value + 1);
+                if (annoLocate.containsKey(result)) {
+                  int value = annoLocate.get(result);
+                  annoLocate.put(result, value + 1);
                 } else {
-                  while (currLine < pos) {
+                  while (currLine < originalFileLineCount) {
                     currLine++;
                     result = element + "_" + currLine;
-                    if (AnnoLocate.containsKey(result)) {
-                      int value = AnnoLocate.get(result);
-                      AnnoLocate.put(result, value + 1);
+                    if (annoLocate.containsKey(result)) {
+                      int value = annoLocate.get(result);
+                      annoLocate.put(result, value + 1);
                       break;
                     }
                   }
@@ -388,27 +396,30 @@ public class InferredAnnosCounter {
         }
       }
     }
-    // update the data of AnnoSimilar
-    for (Map.Entry<String, Integer> me : AnnoLocate.entrySet()) {
+
+    // Update the data of AnnoSimilar.
+    for (Map.Entry<String, Integer> me : annoLocate.entrySet()) {
       String annoName = me.getKey();
-      /*if the number of computer-written code missing that element is less than the total number of codes written
-      by computer, the at least one of those computer-written code must have gotten the annotation correct*/
+      /* If the number of computer-written code missing that element is less than the total number of codes written
+      by computer, the at least one of those computer-written code must have gotten the annotation correct. */
       if (me.getValue() < args.length - 1) {
-        // for example, if we have @Option_345, we will only need "@Option" since we want the
-        // general type here
+        // For example, if we have @Option_345, we will only need "@Option" since we want the
+        // general type here.
         int index = annoName.indexOf("_");
         if (index >= 0) annoName = annoName.substring(0, index);
         annoName = trimParen(annoName);
-        int value = AnnoSimilar.get(annoName);
+        int value = annoSimilar.get(annoName);
         value = value + 1;
-        AnnoSimilar.put(annoName, value);
+        annoSimilar.put(annoName, value);
       }
     }
+
+    // Output the results.
     System.out.println();
-    for (Map.Entry<String, Integer> e : AnnoCount.entrySet()) {
+    for (Map.Entry<String, Integer> e : annoCount.entrySet()) {
       int totalCount = e.getValue();
       String value = e.getKey();
-      int correctCount = AnnoSimilar.get(value);
+      int correctCount = annoSimilar.get(value);
       System.out.println(value + " got " + correctCount + "/" + totalCount);
     }
   }
