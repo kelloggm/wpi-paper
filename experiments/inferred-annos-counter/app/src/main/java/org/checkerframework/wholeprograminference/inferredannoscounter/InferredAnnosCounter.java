@@ -357,7 +357,7 @@ public class InferredAnnosCounter {
         // get the delta in string format
         String deltaInString = delta.toString();
         String newpos = "";
-        // we change the delta output to a string, then break that string into different parts
+        // We change the delta output to a string, then break that string into different parts.
         List<String> myList = new ArrayList<String>(Arrays.asList(deltaInString.split(" ")));
         // just take the delta with annotations into consideration
         if (deltaInString.contains("@")) {
