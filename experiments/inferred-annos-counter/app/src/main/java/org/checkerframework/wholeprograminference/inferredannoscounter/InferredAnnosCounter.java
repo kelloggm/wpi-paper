@@ -57,10 +57,8 @@ public class InferredAnnosCounter {
   }
 
   /**
-   * This method will take a line, which contains at least one annotation, and return the first
+   * This method takes a line, which contains at least one annotation, and return the first
    * annotation in that line.
-   *
-   * <p>
    *
    * @param line a non-empty line containing at least one annotation
    * @return the annotation which the line begins with
@@ -70,8 +68,9 @@ public class InferredAnnosCounter {
     String result = "";
     for (String word : temp) {
       if (word.length() >= 1) {
-        if (word.charAt(0) == '@') {
-          result = word.substring(1, word.length());
+        if (word.indexOf('@') != -1) {
+          int begin = word.indexOf('@') + 1;
+          result = word.substring(begin, word.length());
           break;
         }
       }
