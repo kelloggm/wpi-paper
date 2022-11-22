@@ -100,12 +100,15 @@ public class InferredAnnosCounterTest {
   @Test
   public void AnnotaionInMiddleOfADeclaration() {
     InferredAnnosCounter.main(
-        new String[] {"testCases/AnnotationInString.java", "testCases/AnnotationInString.ajava"});
+        new String[] {
+          "testCases/AnnotationInMiddleOfADeclaration.java",
+          "testCases/AnnotationInMiddleOfADeclaration.ajava"
+        });
     String line1 = "@Pure got 1/1";
-    String line2 = "@NonNull got 1/1";
+    String line2 = "@NonNull got 0/1";
     String line3 = "@SideEffectFree got 1/1";
     assertTrue(outputStreamCaptor.toString().trim().contains(line1));
-    assertTrue(!outputStreamCaptor.toString().trim().contains(line2));
+    assertTrue(outputStreamCaptor.toString().trim().contains(line2));
     assertTrue(outputStreamCaptor.toString().trim().contains(line3));
   }
 }
