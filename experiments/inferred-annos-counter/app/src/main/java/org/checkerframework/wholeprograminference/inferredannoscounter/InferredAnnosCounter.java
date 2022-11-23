@@ -322,6 +322,8 @@ public class InferredAnnosCounter {
         String deltaInString = delta.toString();
         String newpos = "";
         // just take the delta with annotations into consideration
+        // INSERT type indicates that the annotations only appear in the computer-generated files.
+        // So we don't take it into consideration.
         if (deltaInString.contains("@") && delta.getType() != DeltaType.INSERT) {
           List<String> myList = delta.getSource().getLines();
           // get the position of that annotation in the delta, which is something like "5," or "6,".
