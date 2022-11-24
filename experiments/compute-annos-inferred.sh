@@ -1,4 +1,5 @@
 #!/bin/sh
+# When running, confirm you are running with the correct shell, may cause issues otherwise. 
 
 # This script uses runs the AnnotationStatistics utility of the Checker
 # Framework on the results of WPI on each checker for which annotations
@@ -27,37 +28,41 @@ CHECKER_LIST=""
 if [ -f compute-annos-inferred-out ]; then
     # from https://betterprogramming.pub/24-bashism-to-avoid-for-posix-compliant-shell-scripts-8e7c09e0f49a, in response to a shellcheck error noting that $RANDOM is not POSIX-compliant
     var1=$(date +%s)
-    var2=$$
-    random="$var1$var2"
+    var2=$$ # get the pid value of this script 
+    random="$var1$var2" # get random name for file using pid and date
     echo "making a backup of compute-annos-inferred-out in compute-annos-inferred-out-${random}"
     mv compute-annos-inferred-out compute-annos-inferred-out-"${random}"
 fi
 
-for ajava_filename in ${AJAVA_FILE_LIST};
+for ajava_filename in ${AJAVA_FILE_LIST}; 
 do
-    tmp=${ajava_filename##*-};
+    tmp=${ajava_filename##*-}; # loop through all files, add any that have .ajava file (TODO: check if all are present)
+    echo $tmp #lets confirm all files 
     CHECKER_LIST="${CHECKER_LIST} ${tmp%.ajava}"
 done
-CHECKER_LIST=$(echo "${CHECKER_LIST}" | sort | uniq)
+CHECKER_LIST=$(echo "${CHECKER_LIST}" | sort | uniq) 
 
-JAVA_FILES=$(cd ${JAVA_SRC_DIR} && find . -name "*.java")
+JAVA_FILES=$(cd ${JAVA_SRC_DIR} && find . -name "*.java") # get a list of java files
 
-for checker in ${CHECKER_LIST}; do
+for checker in ${CHECKER_LIST}; do # for each checker in the checkerlist 
+    echo $checker  #lets confirm all files
     # copy the ajava files generated for the relevant checker to the
     # corresponding places in the source tree
     echo "======== RUNNING ANNOTATION STATISTIC FOR INFERRED ANNOTATIONS FROM ${checker} ========"
     for java_file in ${JAVA_FILES}; do
 	# strip the ".java" from the end of the file name
-	base_filename="${java_file%.*}"
-	ajava_file="${WPI_RESULTS_DIR}/${base_filename}-${checker}.ajava"
-	if [ -f "${ajava_file}" ]; then
-	    cp "${ajava_file}" "${JAVA_SRC_DIR}/${java_file}"
+    echo $java_file #lets confirm all files
+	base_filename="${java_file%.*}" #delete everything at the end starting from .
+	ajava_file="${WPI_RESULTS_DIR}/${base_filename}-${checker}.ajava"  # copy new ajava file into WPI results dir 
+	if [ -f "${ajava_file}" ]; then 
+	    cp "${ajava_file}" "${JAVA_SRC_DIR}/${java_file}" #copy ajava in to java dir 
 	fi
     done
     # run AnnotationStatistics and append the results to the output file
-    eval "${RUN_ANNO_STATS}" >> compute-annos-inferred-out 2>&1
+    OUTPUT=$(eval "${RUN_ANNO_STATS}") >> compute-annos-inferred-out 2>&1 #
+    echo "$OUTPUT"
     # reset to the state before doing the copying
-    git reset --hard wpi-annotations -- > /dev/null 2>&1
+    git reset --hard wpi-annotations -- > /dev/null 2>&1 # remove this 
 done
 
 # find the lines from AnnotationStatistics listing annotations
