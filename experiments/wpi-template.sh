@@ -5,16 +5,27 @@
 # script with values that make sense for your project; the values there
 # now are examples.
 
+if [ "$#" -lt 1 ]; then
+    echo "Usage: $0 PATH/TO/TMP PATH/TO/OUT" 
+    echo "OUTDIR not required, default set if not supplied."
+fi
+
 # Where should the output be placed at the end? This directory is also
 # used to store intermediate WPI results. The directory does not need to
 # exist. If it does exist when this script starts, it will be deleted.
-WPITEMPDIR=/tmp/icalavailable-wpi
+WPITEMPDIR=$1
 
 # Where is WPI's output placed by the Checker Framework? This is some
 # directory ending in build/whole-program-inference. For most projects,
 # this directory is just ./build/whole-program-inference.
 # This example is the output directory when running via the gradle plugin.
 WPIOUTDIR=~/.gradle/workers/build/whole-program-inference
+
+# Check if WPIOUTDIR was set
+[ -z "$2" ] || WPIOUTDIR=$2
+
+# Check directories are the same
+[ "$WPIOUTDIR" == "$WPITEMPDIR" ] && echo "FAILED: directories are the same" ; exit 1
 
 # The compile and clean commands for the project's build system.
 BUILD_CMD="./gradlew compileJava"
