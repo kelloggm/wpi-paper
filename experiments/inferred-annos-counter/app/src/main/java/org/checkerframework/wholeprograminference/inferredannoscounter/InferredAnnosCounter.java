@@ -167,7 +167,7 @@ public class InferredAnnosCounter {
    * This method trims out the parenthesized part in an annotation, for example, @Annotation(abc)
    * will be changed to @Annotation.
    *
-   * <p>This method need to be used with care. We want to use it to update the final result. This
+   * <p>This method needs to be used with care. We want to use it to update the final result. This
    * method should not be used for any list or string that will become the input of the Diff
    * algorithm. If we do that, the Diff algorithm will not be able to recognize any potential
    * difference in the parentheses between an annotation written by human and an annotation
