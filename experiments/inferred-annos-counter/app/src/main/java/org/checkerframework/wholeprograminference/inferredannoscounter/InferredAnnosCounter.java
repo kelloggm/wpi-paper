@@ -202,12 +202,13 @@ public class InferredAnnosCounter {
                 + "or it was not called properly");
       }
       String tempAnno = getAnnos(temp);
-      if (checkInString(index1, temp) && checkerFramworkPackage.contains(tempAnno)) {
+      String tempAnnoWithNoPara = trimParen(tempAnno);
+      if (checkInString(index1, temp) && checkerFramworkPackage.contains(tempAnnoWithNoPara)) {
         if (tempAnno.contains("(")) {
           if (temp.contains(")")) {
-            tempAnno = temp.substring(index1, temp.indexOf(')') + 1);
+            tempAnno = temp.substring(index1 + 1, temp.indexOf(')') + 1);
           } else {
-            tempAnno = temp.substring(index1, temp.length());
+            tempAnno = temp.substring(index1 + 1, temp.length());
           }
           result.add(tempAnno);
         } else {
@@ -276,18 +277,16 @@ public class InferredAnnosCounter {
         List<String> annoList = extractString(originalFileLine);
         for (String anno : annoList) {
           String annoNoPara = trimParen(anno);
-          if (checkerFramworkPackage.contains(annoNoPara)) {
-            String finalAnno = "@" + annoNoPara;
-            if (annoCount.containsKey(finalAnno)) {
-              int numberOfAnno = annoCount.get(finalAnno);
-              annoCount.put(finalAnno, numberOfAnno + 1);
-            } else {
-              annoCount.put(finalAnno, 1);
-            }
-            annoSimilar.put(finalAnno, 0);
-            // we want the keys in the map annoLocate has this following format: type_position
-            annoLocate.put("@" + anno + "_" + originalFileLineIndex, 0);
+          String finalAnno = "@" + annoNoPara;
+          if (annoCount.containsKey(finalAnno)) {
+            int numberOfAnno = annoCount.get(finalAnno);
+            annoCount.put(finalAnno, numberOfAnno + 1);
+          } else {
+            annoCount.put(finalAnno, 1);
           }
+          annoSimilar.put(finalAnno, 0);
+          // we want the keys in the map annoLocate has this following format: type_position
+          annoLocate.put("@" + anno + "_" + originalFileLineIndex, 0);
         }
       }
       originalFileLineCount = originalFileLineIndex;
