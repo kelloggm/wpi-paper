@@ -432,9 +432,7 @@ public class InferredAnnosCounter {
   public static void main(String[] args) {
     int fileCount = 0;
     List<String> checkerPackage = new ArrayList<String>();
-    File file1 =
-        new File(
-            "C:/Users/nguye/Desktop/wpi-paper-main/experiments/inferred-annos-counter/type-qualifiers.txt");
+    File file1 = new File("wpi-paper/experiments/inferred-annos-counter/type-qualifiers.txt");
     try (FileReader fr = new FileReader(file1)) {
       BufferedReader br = new BufferedReader(fr);
       String str;
@@ -522,26 +520,6 @@ public class InferredAnnosCounter {
       }
       diffs.add(DiffUtils.diff(originalFile, newFile));
     }
-    /*
-    for (int i = 0; i < fileList.size(); ++i) {
-      int lineCount = 0;
-      String ajavaName = args[1] + "\\" + fileList.get(i);
-      List<String> preFile2 = quickReadAndFormat(ajavaName);
-      fileCount++;
-      List<String> inputFile2 = eachAnnotationInOneSingleLine(preFile2);
-      List<String> newFile = new ArrayList<>();
-      for (String ajavaFileLine : inputFile2) {
-        lineCount++;
-        ajavaFileLine = ignoreComment(ajavaFileLine);
-        ajavaFileLine = extractCheckerPackage(ajavaFileLine);
-        ajavaFileLine = ajavaFileLine.trim();
-        System.out.println(ajavaFileLine);
-        newFile.add(ajavaFileLine);
-      }
-      lineCount = 0;
-      diffs.add(DiffUtils.diff(originalFile, newFile));
-    }*/
-
     // Iterate over the list of diffs and process each. There must be args.length - 1 diffs, since
     // there is one diff between args[0] and each other element of args.
     for (int i = 0; i < args.length - 1; i++) {
