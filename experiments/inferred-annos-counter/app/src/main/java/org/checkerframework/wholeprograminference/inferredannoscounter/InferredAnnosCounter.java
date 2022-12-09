@@ -335,16 +335,6 @@ public class InferredAnnosCounter {
           String tempResult = tempo[tempo.length - 1];
           String newWord = word.replace(originalPart, tempResult);
           result = result.replace(word, newWord);
-          /*
-          @SuppressWarnings(
-              "index:assignment") /* "temp" is an array created by splitting the string "result". As "word"
-                                  is an element of the array "temp", it is also contained in the string result. So "begin" can not be negative. */
-          /*@NonNegative int begin = result.indexOf(word);
-          int end = begin + word.length();
-          String firstPart = result.substring(0, begin);
-          String secondPart = result.substring(end, result.length());
-          result = firstPart + tempResult + secondPart;
-          System.out.println(word); */
         }
       }
     }
@@ -352,7 +342,7 @@ public class InferredAnnosCounter {
   }
 
   /**
-   * This method trim out the parenthesized part in an annotation, for example, @Annotation(abc)
+   * This method trims out the parenthesized part in an annotation, for example, @Annotation(abc)
    * will be changed to @Annotation.
    *
    * <p>This method need to be used with care. We want to use it to update the final result. This
@@ -390,9 +380,7 @@ public class InferredAnnosCounter {
                 + "or it was not called properly");
       }
       String tempAnno = getAnnos(temp);
-      // System.out.println(tempAnnoWithNoPara);
       if (checkInString(index1, temp)) {
-        // System.out.println(tempAnnoWithNoPara);
         if (tempAnno.contains("(")) {
           if (temp.contains(")")) {
             tempAnno = temp.substring(index1 + 1, temp.indexOf(')') + 1);
@@ -519,7 +507,6 @@ public class InferredAnnosCounter {
         // INSERT type indicates that the annotations only appear in the computer-generated files.
         // So we don't take it into consideration.
         if (deltaInString.contains("@") && delta.getType() != DeltaType.INSERT) {
-          System.out.println(deltaInString);
           List<String> myList = delta.getSource().getLines();
           // get the position of that annotation in the delta, which is something like "5," or "6,".
           int position = delta.getSource().getPosition();
