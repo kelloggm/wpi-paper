@@ -12,7 +12,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.checkerframework.checker.index.qual.IndexFor;
-import org.checkerframework.checker.index.qual.NonNegative;
 
 /**
  * The entry point for the inferred annos counter. Run this by passing arguments, with the first
@@ -28,8 +27,6 @@ import org.checkerframework.checker.index.qual.NonNegative;
  * order.
  */
 public class InferredAnnosCounter {
-  private static String checkerFramworkPackage =
-      "A2F A2FReducer AbstractAnalysis AbstractAnalysis.Worklist AbstractAtmComboVisitor AbstractCFGVisualizer AbstractCFGVisualizer.VisualizeWhere AbstractMostlySingleton AbstractMostlySingleton.State AbstractNodeVisitor AbstractQualifierPolymorphism AbstractTypeProcessor AbstractValue Acceleration AccumulationAnnotatedTypeFactory AccumulationChecker AccumulationChecker.AliasAnalysis AccumulationTransfer AccumulationVisitor AddAnnotatedFor AFConstraint AFReducer AggregateChecker AliasingAnnotatedTypeFactory AliasingChecker AliasingTransfer AliasingVisitor AlwaysSafe Analysis Analysis.BeforeOrAfter Analysis.Direction AnalysisResult Angle AnnotatedFor AnnotatedTypeCombiner AnnotatedTypeCopier AnnotatedTypeCopierWithReplacement AnnotatedTypeCopierWithReplacement.Visitor AnnotatedTypeFactory AnnotatedTypeFactory.ParameterizedExecutableType AnnotatedTypeFormatter AnnotatedTypeMirror AnnotatedTypeMirror.AnnotatedArrayType AnnotatedTypeMirror.AnnotatedDeclaredType AnnotatedTypeMirror.AnnotatedExecutableType AnnotatedTypeMirror.AnnotatedIntersectionType AnnotatedTypeMirror.AnnotatedNoType AnnotatedTypeMirror.AnnotatedNullType AnnotatedTypeMirror.AnnotatedPrimitiveType AnnotatedTypeMirror.AnnotatedTypeVariable AnnotatedTypeMirror.AnnotatedUnionType AnnotatedTypeMirror.AnnotatedWildcardType AnnotatedTypeParameterBounds AnnotatedTypeReplacer AnnotatedTypes AnnotatedTypeScanner AnnotatedTypeScanner.Reduce AnnotatedTypeVisitor AnnotationBuilder AnnotationClassLoader AnnotationConverter AnnotationEqualityVisitor AnnotationFileElementTypes AnnotationFileParser AnnotationFileParser.AnnotationFileAnnotations AnnotationFileParser.AnnotationFileParserException AnnotationFileParser.RecordComponentStub AnnotationFileParser.RecordStub AnnotationFileResource AnnotationFileStore AnnotationFileUtil AnnotationFileUtil.AnnotationFileType AnnotationFormatter AnnotationMirrorMap AnnotationMirrorSet AnnotationMirrorToAnnotationExprConversion AnnotationProvider AnnotationStatistics AnnotationTransferVisitor AnnotationUtils Area ArrayAccess ArrayAccessNode ArrayCreation ArrayCreationNode ArrayLen ArrayLenRange ArrayTypeNode ArrayWithoutPackage ASceneWrapper AssertionErrorNode AssertNonNullIfNonNull AssignmentNode AsSuperVisitor AtmCombo AtmComboVisitor AutoValueSupport AwtAlphaCompositingRule AwtColorSpace AwtCursorType AwtFlowLayout BackwardAnalysis BackwardAnalysisImpl BackwardTransferFunction BaseAnnotatedTypeFactory BaseAnnotatedTypeFactoryForIndexChecker BaseTypeChecker BaseTypeValidator BaseTypeVisitor BasicAnnotationProvider BasicTypeProcessor BinaryName BinaryNameOrPrimitiveType BinaryNameWithoutPackage BinaryOperation BinaryOperationNode BitwiseAndNode BitwiseComplementNode BitwiseOrNode BitwiseXorNode Block Block.BlockType BlockImpl BooleanLiteralNode BoolVal Bottom BottomThis BottomVal BoundsInitializer BugInCF BuilderFrameworkSupport BuilderFrameworkSupportUtils ByteMath C CalledMethods CalledMethods CalledMethodsAnalysis CalledMethodsAnnotatedTypeFactory CalledMethodsBottom CalledMethodsChecker CalledMethodsPredicate CalledMethodsTransfer CalledMethodsVisitor CanonicalName CanonicalNameAndBinaryName CanonicalNameOrEmpty CanonicalNameOrPrimitiveType CaseNode cd CFAbstractAnalysis CFAbstractAnalysis.FieldInitialValue CFAbstractStore CFAbstractTransfer CFAbstractValue CFAnalysis CFCFGBuilder CFCFGBuilder.CFCFGTranslationPhaseOne CFComment CFGBuilder CFGProcessor CFGProcessor.CFGProcessResult CFGTranslationPhaseOne CFGTranslationPhaseThree CFGTranslationPhaseThree.PredecessorHolder CFGTranslationPhaseTwo CFGVisualizeLauncher CFGVisualizer CFStore CFTransfer CFTreeBuilder CFValue CharacterLiteralNode CheckerMain ClassBound ClassDeclarationNode ClassGetName ClassGetSimpleName ClassName ClassNameNode ClassTypeParamApplier ClassVal ClassValAnnotatedTypeFactory ClassValBottom ClassValChecker ClassValVisitor CollectionToArrayHeuristics CollectionUtils CompareToMethod CompilerMessageKey CompilerMessageKeyBottom CompilerMessagesAnnotatedTypeFactory CompilerMessagesChecker ConditionalAndNode ConditionalBlock ConditionalBlockImpl ConditionalJump ConditionalNotNode ConditionalOrNode ConditionalPostconditionAnnotation ConditionalTransferResult Constant Constant.Type ConstantPropagationPlayground ConstantPropagationStore ConstantPropagationTransfer ConstraintMap ConstraintMapBuilder Contract Contract.ConditionalPostcondition Contract.Kind Contract.Postcondition Contract.Precondition ContractsFromMethod ControlFlowGraph ConversionCategory Covariant CreatesMustCallFor CreatesMustCallFor.List CreatesMustCallForElementSupplier CreatesMustCallForToJavaExpression Current DebugListTreeAnnotator DeclarationsIntoElements Default DefaultAnnotatedTypeFormatter DefaultAnnotatedTypeFormatter.FormattingVisitor DefaultAnnotationFormatter DefaultFor DefaultForTypeAnnotator DefaultInferredTypesApplier DefaultJointVisitor DefaultQualifier DefaultQualifier.List DefaultQualifierForUse DefaultQualifierForUseTypeAnnotator DefaultQualifierInHierarchy DefaultQualifierKindHierarchy DefaultQualifierKindHierarchy.DefaultQualifierKind DefaultQualifierPolymorphism DefaultReflectionResolver DefaultTypeArgumentInference DefaultTypeHierarchy degrees DependentTypesError DependentTypesHelper DependentTypesTreeAnnotator DetachedVarSymbol Deterministic DiagMessage DoNothingChecker DOTCFGVisualizer DotSeparatedIdentifiers DotSeparatedIdentifiersOrPrimitiveType DoubleAnnotatedTypeScanner DoubleJavaParserVisitor DoubleLiteralNode DoubleMath DoubleVal Effect Effect.EffectRange ElementAnnotationApplier ElementAnnotationUtil ElementAnnotationUtil.ErrorTypeKindException ElementAnnotationUtil.UnexpectedAnnotationLocationException ElementQualifierHierarchy ElementUtils EmptyProcessor EnsuresCalledMethods EnsuresCalledMethodsIf EnsuresCalledMethodsIf.List EnsuresCalledMethodsVarArgs EnsuresInitializedFields EnsuresInitializedFields.List EnsuresKeyFor EnsuresKeyFor.List EnsuresKeyForIf EnsuresKeyForIf.List EnsuresLockHeld EnsuresLockHeld.List EnsuresLockHeldIf EnsuresLockHeldIf.List EnsuresLTLengthOf EnsuresLTLengthOf.List EnsuresLTLengthOfIf EnsuresLTLengthOfIf.List EnsuresMinLenIf EnsuresMinLenIf.List EnsuresNonNull EnsuresNonNull.List EnsuresNonNullIf EnsuresNonNullIf.List EnsuresQualifier EnsuresQualifier.List EnsuresQualifierIf EnsuresQualifierIf.List EnumVal EqualitiesSolver EqualityAtmComparer EqualsMethod EqualToNode EquivalentAtmComboScanner ExceptionBlock ExceptionBlockImpl ExecUtil ExecUtil.Redirection ExpectedTreesVisitor ExplicitThisNode ExtendedNode ExtendedNode.ExtendedNodeType F2A F2AReducer FBCBottom Fenum FenumAnnotatedTypeFactory FenumBottom FenumChecker FenumTop FenumUnqualified FenumVisitor FieldAccess FieldAccessNode FieldDescriptor FieldDescriptorForPrimitive FieldDescriptorWithoutPackage FieldInvariant FieldInvariants FileAnnotationFileResource FindDistinct FIsA FIsAReducer FloatingDivisionNode FloatingRemainderNode FloatLiteralNode FloatMath FluentAPIGenerator Force FormalParameter Format FormatBottom FormatMethod FormatMethod FormatterAnnotatedTypeFactory FormatterChecker FormatterTransfer FormatterTreeUtil FormatterTreeUtil.InvocationType FormatterTreeUtil.Result FormatterVisitor FormatUtil FormatUtil.ExcessiveOrMissingFormatArgumentException FormatUtil.IllegalFormatConversionCategoryException ForName ForwardAnalysis ForwardAnalysisImpl ForwardTransferFunction FqBinaryName FromByteCode FromStubFile FullyQualifiedName FunctionalInterfaceNode g GenericAnnotatedTypeFactory GenericAnnotatedTypeFactory.ScanState GetClass GetConstructor GetMethod GlbUtil GreaterThanNode GreaterThanOrEqualNode GTENegativeOne GuardedBy GuardedByBottom GuardedByUnknown GuardSatisfied GuiEffectChecker GuiEffectTypeFactory GuiEffectVisitor h HashcodeAtmVisitor HasQualifierParameter HasSubsequence Heuristics Heuristics.Matcher Heuristics.OfKind Heuristics.OrMatcher Heuristics.PreceededBy Heuristics.Within Heuristics.WithinTrueBranch Holding I18nAnnotatedTypeFactory I18nChecker I18nChecksFormat I18nConversionCategory I18nFormat I18nFormatBottom I18nFormatFor I18nFormatterAnnotatedTypeFactory I18nFormatterChecker I18nFormatterTransfer I18nFormatterTreeUtil I18nFormatterTreeUtil.FormatType I18nFormatterVisitor I18nFormatUtil I18nInvalidFormat I18nMakeFormat I18nSubchecker I18nUnknownFormat I18nValidFormat Identifier IdentifierOrPrimitiveType IdentityMostlySingleton IgnoreInWholeProgramInference ImplicitThisNode IndexAbstractTransfer IndexChecker IndexFor IndexMethodIdentifier IndexOrHigh IndexOrLow IndexRefinementInfo IndexUtil InferenceResult InferredValue InferredValue.InferredTarget InferredValue.InferredType InheritableMustCall InheritedAnnotation InitializationAnnotatedTypeFactory InitializationChecker InitializationStore InitializationTransfer InitializationVisitor Initialized InitializedFields InitializedFieldsAnnotatedTypeFactory InitializedFieldsBottom InitializedFieldsChecker InitializedFieldsTransfer InsertAjavaAnnotations InstanceOfNode IntegerDivisionNode IntegerLiteralNode IntegerMath IntegerRemainderNode InternalForm InternalUtils Interned InternedDistinct InterningAnnotatedTypeFactory InterningChecker InterningVisitor InternMethod IntRange IntRangeFromGTENegativeOne IntRangeFromNonNegative IntRangeFromPositive IntVal InvalidFormat InvisibleQualifier Invoke IrrelevantTypeAnnotator JarEntryAnnotationFileResource JavaCodeStatistics JavaExpression JavaExpression JavaExpressionConverter JavaExpressionOptimizer JavaExpressionParseUtil JavaExpressionParseUtil.JavaExpressionParseException JavaExpressionScanner JavaExpressionVisitor JavaParserUtil JavaParserUtil.StringLiteralConcatenateVisitor JavaStubifier JointJavacJavaParserVisitor JointVisitorWithDefaultAction K KeyFor KeyForAnalysis KeyForAnnotatedTypeFactory KeyForAnnotatedTypeFactory.KeyForTypeHierarchy KeyForBottom KeyForPropagationTreeAnnotator KeyForPropagator KeyForPropagator.PropagationDirection KeyForStore KeyForSubchecker KeyForTransfer KeyForValue kg km km2 km3 kmPERh kN Label LambdaResultExpressionNode LeakedToResult LeftShiftNode Length LengthOf LessThan LessThanAnnotatedTypeFactory LessThanBottom LessThanChecker LessThanNode LessThanOrEqualNode LessThanTransfer LessThanUnknown LessThanVisitor ListTreeAnnotator ListTypeAnnotator LiteralKind LiteralTreeAnnotator LiveVariablePlayground LiveVarStore LiveVarTransfer LiveVarValue LocalizableKey LocalizableKeyAnnotatedTypeFactory LocalizableKeyBottom LocalizableKeyChecker Localized LocalVariable LocalVariableNode LockAnalysis LockAnnotatedTypeFactory LockChecker LockHeld LockingFree LockPossiblyHeld LockStore LockTransfer LockTreeAnnotator LockVisitor LombokSupport LongLiteralNode LongMath LowerBoundAnnotatedTypeFactory LowerBoundBottom LowerBoundChecker LowerBoundTransfer LowerBoundUnknown LowerBoundVisitor LTEqLengthOf LTLengthOf LTOMLengthOf Luminance m m2 m3 MarkerNode Mass MatchesRegex MaybeAliased MaybeLeaked MaybePresent MayReleaseLocks MethodAccessNode MethodApplier MethodCall MethodDescriptor MethodInvocationNode MethodTypeParamApplier MethodVal MethodValAnnotatedTypeFactory MethodValBottom MethodValChecker MethodValVisitor min MinLen MinLenFieldInvariant MixedUnits mm mm2 mm3 mol MonotonicNonNull MonotonicQualifier MostlyNoElementQualifierHierarchy MostlySingleton mPERs mPERs2 MustCall MustCallAlias MustCallAnnotatedTypeFactory MustCallChecker MustCallInferenceLogic MustCallNoCreatesMustCallForChecker MustCallTransfer MustCallTypeAnnotator MustCallUnknown MustCallVisitor N NarrowingConversionNode NegativeIndexFor NewInstance NewObject Node NoDefaultQualifierForUse NodeUtils NodeVisitor NoElementQualifierHierarchy NonLeaked NonNegative NonNull NoQualifierParameter NotCalledMethods NotEqualNode NotOnlyInitialized NotOwning Nullable NullChkNode NullLiteralNode NullnessAnalysis NullnessAnnotatedTypeFactory NullnessAnnotatedTypeFactory.NullnessPropagationTreeAnnotator NullnessAnnotatedTypeFormatter NullnessAnnotatedTypeFormatter.NullnessFormattingVisitor NullnessChecker NullnessStore NullnessTransfer NullnessUtil NullnessValue NullnessVisitor NumberMath NumberUtils NumericalAdditionNode NumericalMinusNode NumericalMultiplicationNode NumericalPlusNode NumericalSubtractionNode ObjectCreationNode OffsetDependentTypesHelper OffsetEquation Opt OptionalBottom OptionalChecker OptionalVisitor OptionConfiguration Owning PackageNameNode Pair ParamApplier ParameterizedTypeNode PartialRegex PhaseOneResult PolyFenum PolyIndex PolyInitializedFields PolyInterned PolyKeyFor PolyLength PolyLowerBound PolymorphicQualifier PolyMustCall PolyNull PolyPresent PolyRegex PolySameLen PolySignature PolySigned PolyTainted PolyUI PolyUIEffect PolyUIType PolyUnit PolyUpperBound PolyValue Positive PostconditionAnnotation PreconditionAnnotation Prefix Present PrimitiveType PrimitiveTypeNode PropagationTreeAnnotator PropagationTypeAnnotator PropertyKey PropertyKeyAnnotatedTypeFactory PropertyKeyBottom PropertyKeyChecker Pure Pure Pure.Kind PurityAnnotatedTypeFactory PurityChecker PurityChecker PurityChecker.PurityCheckerHelper PurityChecker.PurityResult PurityUnqualified PurityUtils QualifierArgument QualifierDefaults QualifierDefaults.BoundType QualifierForLiterals QualifierHierarchy QualifierKind QualifierKindHierarchy QualifierPolymorphism QualifierUpperBounds radians Range ReflectionResolver ReflectiveEvaluator Regex RegexAnnotatedTypeFactory RegexBottom RegexChecker RegexTransfer RegexUtil RegexUtil.CheckedPatternSyntaxException RegexVisitor RegularBlock RegularBlockImpl RegularTransferResult ReleasesNoLocks RelevantJavaTypes RemoveAnnotationsForInference ReportCall ReportChecker ReportCreation ReportInherit ReportOverride ReportReadWrite ReportUnqualified ReportUse ReportVisitor ReportWrite RequiresCalledMethods RequiresCalledMethods.List RequiresNonNull RequiresNonNull.List RequiresQualifier RequiresQualifier.List Resolver ResourceLeakAnalysis ResourceLeakAnnotatedTypeFactory ResourceLeakChecker ResourceLeakTransfer ResourceLeakVisitor ReturnNode ReturnsFormat ReturnsReceiver ReturnsReceiverAnnotatedTypeFactory ReturnsReceiverChecker ReturnsReceiverVisitor s SafeEffect SafeType SameLen SameLenAnnotatedTypeFactory SameLenBottom SameLenChecker SameLenTransfer SameLenUnknown SameLenVisitor SceneToStubWriter SearchIndexAnnotatedTypeFactory SearchIndexBottom SearchIndexChecker SearchIndexFor SearchIndexTransfer SearchIndexUnknown ShortLiteralNode ShortMath SideEffectFree SignatureAnnotatedTypeFactory SignatureBottom SignatureChecker SignaturePrinter SignatureTransfer SignatureUnknown Signed SignednessAnnotatedTypeFactory SignednessBottom SignednessChecker SignednessGlb SignednessUtil SignednessUtilExtra SignednessVisitor SignedPositive SignedPositiveFromUnsigned SignedRightShiftNode SimpleAnnotatedTypeScanner SimpleAnnotatedTypeScanner.DefaultAction SimpleAnnotatedTypeVisitor SingleSuccessorBlock SingleSuccessorBlockImpl SourceChecker SourceVisitor SpecialBlock SpecialBlock.SpecialBlockType SpecialBlockImpl Speed StaticallyExecutable Store Store.FlowRule Store.Kind StringCFGVisualizer StringConcatenateAssignmentNode StringConcatenateNode StringConversionNode StringLiteralNode StringToJavaExpression StringVal StructuralEqualityComparer StructuralEqualityVisitHistory StubFiles StubGenerator Subsequence Substance SubstringIndexAnnotatedTypeFactory SubstringIndexBottom SubstringIndexChecker SubstringIndexFor SubstringIndexUnknown SubtypeIsSubsetQualifierHierarchy SubtypeIsSupersetQualifierHierarchy SubtypeOf SubtypesSolver SubtypeVisitHistory SubtypingAnnotatedTypeFactory SubtypingAnnotationClassLoader SubtypingChecker SuperNode SuperTypeApplier SupertypesSolver SupportedLintOptions SupportedOptions SuppressWarningsPrefix SwingBoxOrientation SwingCompassDirection SwingElementOrientation SwingHorizontalOrientation SwingSplitPaneOrientation SwingTextOrientation SwingTitleJustification SwingTitlePosition SwingVerticalOrientation SwitchExpressionNode SwitchExpressionScanner SwitchExpressionScanner.FunctionalSwitchExpressionScanner SynchronizedNode SyntheticArrays SystemGetPropertyHandler SystemUtil t Tainted TaintingChecker TaintingVisitor TargetConstraints TargetConstraints.Equalities TargetConstraints.Subtypes TargetConstraints.Supertypes TargetLocations Temperature TerminatesExecution TernaryExpressionNode This ThisNode ThisReference ThrowNode Time TIsU ToIndexFileConverter TransferFunction TransferInput TransferResult TreeAnnotator TreeBuilder TreeDebug TreeDebug.Visitor TreeParser TreePathCacher TreePathUtil TreePrinter TreeScannerWithDefaults TreeUtils TSubU TSuperU TUConstraint TypeAnnotationMover TypeAnnotationUtils TypeAnnotator TypeArgInferenceUtil TypeArgumentInference TypeArgumentMapper TypeCastNode TypeDeclarationApplier TypeHierarchy TypeKind TypeKindUtils TypeKindUtils.PrimitiveConversionKind TypeOutputtingChecker TypeOutputtingChecker.GeneralAnnotatedTypeFactory TypeOutputtingChecker.Visitor TypesIntoElements TypesUtils TypeSystemError TypeUseLocation TypeValidator TypeVariableSubstitutor TypeVarUseApplier TypeVisualizer UBQualifier UBQualifier.LessThanLengthOf UBQualifier.UpperBoundLiteralQualifier UBQualifier.UpperBoundUnknownQualifier UI UIEffect UIPackage UIType UnaryOperation UnaryOperationNode UnderInitialization UnderlyingAST UnderlyingAST.CFGLambda UnderlyingAST.CFGMethod UnderlyingAST.CFGStatement UnderlyingAST.Kind Unique UnitsAnnotatedTypeFactory UnitsAnnotatedTypeFactory.UnitsQualifierKindHierarchy UnitsAnnotatedTypeFormatter UnitsAnnotatedTypeFormatter.UnitsAnnotationFormatter UnitsAnnotatedTypeFormatter.UnitsFormattingVisitor UnitsAnnotationClassLoader UnitsBottom UnitsChecker UnitsMultiple UnitsRelations UnitsRelations UnitsRelationsDefault UnitsRelationsTools UnitsTools UnitsVisitor Unknown UnknownClass UnknownCompilerMessageKey UnknownFormat UnknownInitialization UnknownInterned UnknownKeyFor UnknownLocalizableKey UnknownLocalized UnknownMethod UnknownPropertyKey UnknownRegex UnknownSignedness UnknownThis UnknownUnits UnknownVal UnmodifiableIdentityHashMap Unqualified Unsigned UnsignedRightShiftNode Untainted Unused UpperBoundAnnotatedTypeFactory UpperBoundBottom UpperBoundChecker UpperBoundFor UpperBoundLiteral UpperBoundTransfer UpperBoundUnknown UpperBoundVisitor UserError UsesObjectEquals ValueAnnotatedTypeFactory ValueChecker ValueCheckerUtils ValueLiteral ValueLiteralNode ValueTransfer ValueVisitor VariableApplier VariableDeclarationNode ViewpointAdaptJavaExpression VoidVisitorWithDefaultAction Volume WholeProgramInference WholeProgramInference.OutputFormat WholeProgramInferenceImplementation WholeProgramInferenceJavaParserStorage WholeProgramInferenceScenesStorage WholeProgramInferenceScenesStorage.AnnotationsInContexts WholeProgramInferenceStorage WideningConversionNode";
 
   /**
    * This method returns true if the first not-a-whitespace character of a line is a dot. It returns
@@ -207,7 +204,7 @@ public class InferredAnnosCounter {
   }
 
   /**
-   * This method takes a line, which contains at least one annotation, and returns the first
+   * This method takes a line, which contains at least one annotation, and return the first
    * annotation in that line.
    *
    * @param line a non-empty line containing at least one annotation
@@ -288,7 +285,7 @@ public class InferredAnnosCounter {
   private static String ignoreComment(String line) {
     int indexComment = line.length() + 1;
     String finalLine = line;
-    int indexDash = line.indexOf("//");
+    int indexDash = line.indexOf("// ");
     int indexStar = line.indexOf("*");
     int indexDashStar = line.indexOf("/*");
     if (indexDash != -1) {
@@ -321,17 +318,33 @@ public class InferredAnnosCounter {
     String result = line;
     if (line.length() != 0) {
       for (String word : temp) {
-        if (word.contains("@org.checkerframework")) {
-          String[] tempo = word.split("[.]");
-          String tempResult = "@" + tempo[tempo.length - 1];
+        int indexOfPackage = word.indexOf("org.");
+        if (indexOfPackage != -1) {
+          int indexOfParen = word.indexOf('(');
+          if (indexOfParen != -1) {
+            String insideParen = word.substring(indexOfParen + 1, word.length());
+            if (insideParen.contains("org.")) {
+              String newInsideParen = extractCheckerPackage(insideParen);
+              String newWord = word.replace(insideParen, newInsideParen);
+              result = result.replace(word, newWord);
+              word = newWord;
+            }
+          }
+          String originalPart = word.substring(indexOfPackage, word.length());
+          String[] tempo = originalPart.split("[.]");
+          String tempResult = tempo[tempo.length - 1];
+          String newWord = word.replace(originalPart, tempResult);
+          result = result.replace(word, newWord);
+          /*
           @SuppressWarnings(
               "index:assignment") /* "temp" is an array created by splitting the string "result". As "word"
                                   is an element of the array "temp", it is also contained in the string result. So "begin" can not be negative. */
-          @NonNegative int begin = result.indexOf(word);
+          /*@NonNegative int begin = result.indexOf(word);
           int end = begin + word.length();
           String firstPart = result.substring(0, begin);
           String secondPart = result.substring(end, result.length());
           result = firstPart + tempResult + secondPart;
+          System.out.println(word); */
         }
       }
     }
@@ -339,10 +352,10 @@ public class InferredAnnosCounter {
   }
 
   /**
-   * This method trims out the parenthesized part in an annotation, for example, @Annotation(abc)
+   * This method trim out the parenthesized part in an annotation, for example, @Annotation(abc)
    * will be changed to @Annotation.
    *
-   * <p>This method needs to be used with care. We want to use it to update the final result. This
+   * <p>This method need to be used with care. We want to use it to update the final result. This
    * method should not be used for any list or string that will become the input of the Diff
    * algorithm. If we do that, the Diff algorithm will not be able to recognize any potential
    * difference in the parentheses between an annotation written by human and an annotation
@@ -377,8 +390,9 @@ public class InferredAnnosCounter {
                 + "or it was not called properly");
       }
       String tempAnno = getAnnos(temp);
-      String tempAnnoWithNoPara = trimParen(tempAnno);
-      if (checkInString(index1, temp) && checkerFramworkPackage.contains(tempAnnoWithNoPara)) {
+      // System.out.println(tempAnnoWithNoPara);
+      if (checkInString(index1, temp)) {
+        // System.out.println(tempAnnoWithNoPara);
         if (tempAnno.contains("(")) {
           if (temp.contains(")")) {
             tempAnno = temp.substring(index1 + 1, temp.indexOf(')') + 1);
@@ -394,6 +408,18 @@ public class InferredAnnosCounter {
     }
     return result;
   }
+
+  public static List listFilesForFolder(final File folder) {
+    List<String> fileList = new ArrayList<>();
+    for (final File fileEntry : folder.listFiles()) {
+      if (fileEntry.isDirectory()) {
+        listFilesForFolder(fileEntry);
+      } else {
+        fileList.add(fileEntry.getName());
+      }
+    }
+    return fileList;
+  }
   /**
    * The main entry point. Running this outputs the percentage of annotations in some source file
    * that were inferred by WPI.
@@ -404,25 +430,30 @@ public class InferredAnnosCounter {
    * running google java format on each input).
    */
   public static void main(String[] args) {
-    if (args.length <= 1) {
-      throw new RuntimeException(
-          "Provide at least one .java file and one or more" + ".ajava files.");
-    }
-    File file = new File(args[0]);
-    // This is to be used after successfully implementing the command line to update
-    // type-qualifiers.txt
-    /*List<String> checkerPackage=new ArrayList<String>();
-    file = new File("type-qualifiers.txt");
-    try (FileReader fr = new FileReader(file)) {
+    int fileCount = 0;
+    List<String> checkerPackage = new ArrayList<String>();
+    File file1 =
+        new File(
+            "C:/Users/nguye/Desktop/wpi-paper-main/experiments/inferred-annos-counter/type-qualifiers.txt");
+    try (FileReader fr = new FileReader(file1)) {
       BufferedReader br = new BufferedReader(fr);
       String str;
       while ((str = br.readLine()) != null) {
+        // the extractCheckerPackage will keep the char element of the string, such as '@' or '"'.
+        // So we need to add a
+        // space here since the element in this txt does not have a '@'.
+        str = extractCheckerPackage('@' + str);
+        str = str.replaceAll("\\s", "");
         checkerPackage.add(str);
       }
     } catch (Exception e) {
       throw new RuntimeException("Could not read type-qualifiers.txt, check if it exists?");
     }
-    */
+
+    if (args.length <= 1) {
+      throw new RuntimeException(
+          "Provide at least one .java file and one or more" + ".ajava files.");
+    }
 
     // These variables are maintained throughout:
 
@@ -491,6 +522,25 @@ public class InferredAnnosCounter {
       }
       diffs.add(DiffUtils.diff(originalFile, newFile));
     }
+    /*
+    for (int i = 0; i < fileList.size(); ++i) {
+      int lineCount = 0;
+      String ajavaName = args[1] + "\\" + fileList.get(i);
+      List<String> preFile2 = quickReadAndFormat(ajavaName);
+      fileCount++;
+      List<String> inputFile2 = eachAnnotationInOneSingleLine(preFile2);
+      List<String> newFile = new ArrayList<>();
+      for (String ajavaFileLine : inputFile2) {
+        lineCount++;
+        ajavaFileLine = ignoreComment(ajavaFileLine);
+        ajavaFileLine = extractCheckerPackage(ajavaFileLine);
+        ajavaFileLine = ajavaFileLine.trim();
+        System.out.println(ajavaFileLine);
+        newFile.add(ajavaFileLine);
+      }
+      lineCount = 0;
+      diffs.add(DiffUtils.diff(originalFile, newFile));
+    }*/
 
     // Iterate over the list of diffs and process each. There must be args.length - 1 diffs, since
     // there is one diff between args[0] and each other element of args.
@@ -499,11 +549,11 @@ public class InferredAnnosCounter {
       for (AbstractDelta<String> delta : patch.getDeltas()) {
         // get the delta in string format
         String deltaInString = delta.toString();
-        String newpos = "";
         // just take the delta with annotations into consideration
         // INSERT type indicates that the annotations only appear in the computer-generated files.
         // So we don't take it into consideration.
         if (deltaInString.contains("@") && delta.getType() != DeltaType.INSERT) {
+          System.out.println(deltaInString);
           List<String> myList = delta.getSource().getLines();
           // get the position of that annotation in the delta, which is something like "5," or "6,".
           int position = delta.getSource().getPosition();
@@ -512,21 +562,24 @@ public class InferredAnnosCounter {
             if (element.contains("@")) {
               // in case there are other components in the string element other than the
               // annotation itself
-              element = "@" + getAnnos(element);
-              // to match the one in AnnoLocate
-              result = element + "_" + position;
-              // update the data of AnnoLocate
-              if (annoLocate.containsKey(result)) {
-                int value = annoLocate.get(result);
-                annoLocate.put(result, value + 1);
-              } else {
-                while (position < originalFileLineCount) {
-                  position++;
-                  result = element + "_" + position;
-                  if (annoLocate.containsKey(result)) {
-                    int value = annoLocate.get(result);
-                    annoLocate.put(result, value + 1);
-                    break;
+              List<String> annoList = extractString(element);
+              for (String anno : annoList) {
+                // to match the one in AnnoLocate
+                result = "@" + anno + "_" + position;
+                // update the data of AnnoLocate
+                if (annoLocate.containsKey(result)) {
+                  int value = annoLocate.get(result);
+                  annoLocate.put(result, value + 1);
+                } else {
+                  int tempPosition = position;
+                  while (tempPosition < originalFileLineCount) {
+                    tempPosition++;
+                    result = "@" + anno + "_" + tempPosition;
+                    if (annoLocate.containsKey(result)) {
+                      int value = annoLocate.get(result);
+                      annoLocate.put(result, value + 1);
+                      break;
+                    }
                   }
                 }
               }
@@ -539,6 +592,7 @@ public class InferredAnnosCounter {
     // Update the data of AnnoSimilar.
     for (Map.Entry<String, Integer> me : annoLocate.entrySet()) {
       String annoName = me.getKey();
+      System.out.println(annoName + "__" + me.getValue());
       /* If the number of computer-written code missing that element is less than the total number of codes written
       by computer, the at least one of those computer-written code must have gotten the annotation correct. */
       if (me.getValue() < args.length - 1) {
