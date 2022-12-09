@@ -63,9 +63,7 @@ public class InferredAnnosCounter {
     if (line.length() == 0) return false;
     String elements[] = line.split(" ");
     int n = elements.length;
-    // System.out.println(line);
     if (n > 1 && elements[n - 1].contains("@org.checkerframework")) {
-      // System.out.println("This line:" + line);
       String breaks[] = elements[n - 1].split("[.]");
       int z = breaks.length;
       if (z < 2) {
@@ -82,7 +80,7 @@ public class InferredAnnosCounter {
    * If an annotation is too long, Google Java Format will make it multi-line. This method checks if
    * a line contains the ending of those annotations.
    *
-   * <p>For example, the first line contains the beginning of MonotonicNonNull:
+   * <p>For example, the second line contains the ending of MonotonicNonNull:
    * static @org.checkerframework.checker.initialization.qual.Initialized @org.checkerframework.checker
    * .nullness.qual.MonotonicNonNull TimeZone tz2;
    *
@@ -345,7 +343,7 @@ public class InferredAnnosCounter {
    * This method trims out the parenthesized part in an annotation, for example, @Annotation(abc)
    * will be changed to @Annotation.
    *
-   * <p>This method need to be used with care. We want to use it to update the final result. This
+   * <p>This method needs to be used with care. We want to use it to update the final result. This
    * method should not be used for any list or string that will become the input of the Diff
    * algorithm. If we do that, the Diff algorithm will not be able to recognize any potential
    * difference in the parentheses between an annotation written by human and an annotation
