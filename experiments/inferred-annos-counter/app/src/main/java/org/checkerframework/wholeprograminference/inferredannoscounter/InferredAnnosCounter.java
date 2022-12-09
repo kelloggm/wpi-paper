@@ -409,17 +409,6 @@ public class InferredAnnosCounter {
     return result;
   }
 
-  public static List listFilesForFolder(final File folder) {
-    List<String> fileList = new ArrayList<>();
-    for (final File fileEntry : folder.listFiles()) {
-      if (fileEntry.isDirectory()) {
-        listFilesForFolder(fileEntry);
-      } else {
-        fileList.add(fileEntry.getName());
-      }
-    }
-    return fileList;
-  }
   /**
    * The main entry point. Running this outputs the percentage of annotations in some source file
    * that were inferred by WPI.
@@ -432,7 +421,7 @@ public class InferredAnnosCounter {
   public static void main(String[] args) {
     int fileCount = 0;
     List<String> checkerPackage = new ArrayList<String>();
-    File file1 = new File("wpi-paper/experiments/inferred-annos-counter/type-qualifiers.txt");
+    File file1 = new File("type-qualifiers.txt");
     try (FileReader fr = new FileReader(file1)) {
       BufferedReader br = new BufferedReader(fr);
       String str;
@@ -515,7 +504,6 @@ public class InferredAnnosCounter {
         ajavaFileLine = ignoreComment(ajavaFileLine);
         ajavaFileLine = extractCheckerPackage(ajavaFileLine);
         ajavaFileLine = ajavaFileLine.trim();
-        System.out.println(ajavaFileLine);
         newFile.add(ajavaFileLine);
       }
       diffs.add(DiffUtils.diff(originalFile, newFile));
@@ -570,7 +558,6 @@ public class InferredAnnosCounter {
     // Update the data of AnnoSimilar.
     for (Map.Entry<String, Integer> me : annoLocate.entrySet()) {
       String annoName = me.getKey();
-      System.out.println(annoName + "__" + me.getValue());
       /* If the number of computer-written code missing that element is less than the total number of codes written
       by computer, the at least one of those computer-written code must have gotten the annotation correct. */
       if (me.getValue() < args.length - 1) {
