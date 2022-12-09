@@ -438,19 +438,23 @@ public class InferredAnnosCounter {
     type not missed by computer-written files) */
     Map<String, Integer> annoSimilar = new HashMap<>();
     // the number of lines in the original file
-    int originalFileLineCount;
-
+    int originalFileLineCount = 0;
+    List<String> preFile = quickReadAndFormat(args[0]);
+    List<String> inputFile = eachAnnotationInOneSingleLine(preFile);
+    int originalFileLineIndex = -1;
     // Read the original file once to determine the annotations that written by the human.
-    try (BufferedReader br = new BufferedReader(new FileReader(file))) {
-      String originalFileLine;
-      int originalFileLineIndex = -1;
-      while ((originalFileLine = br.readLine()) != null) {
-        originalFileLineIndex++;
-        originalFileLine = ignoreComment(originalFileLine);
-        originalFileLine = extractCheckerPackage(originalFileLine);
-        originalFile.add(originalFileLine);
-        List<String> annoList = extractString(originalFileLine);
-        for (String anno : annoList) {
+    for (String originalFileLine : inputFile) {
+      originalFileLineIndex++;
+      originalFileLine = ignoreComment(originalFileLine);
+      originalFileLine = extractCheckerPackage(originalFileLine);
+      // since it's too difficult to keep the length of whitespace at the beginning of each line the
+      // same
+      originalFileLine = originalFileLine.trim();
+      originalFile.add(originalFileLine);
+      List<String> annoList = extractString(originalFileLine);
+      for (String anno : annoList) {
+        String specialAnno = "@" + trimParen(anno);
+        if (checkerPackage.contains(specialAnno)) {
           String annoNoPara = trimParen(anno);
           String finalAnno = "@" + annoNoPara;
           if (annoCount.containsKey(finalAnno)) {
@@ -465,27 +469,27 @@ public class InferredAnnosCounter {
         }
       }
       originalFileLineCount = originalFileLineIndex;
-    } catch (Exception e) {
-      throw new RuntimeException("Could not read file: " + args[0] + ". Check that it exists?");
     }
-
     // Iterate over the arguments from 1 to the end and diff each with the original,
     // putting the results into diffs.
     List<Patch<String>> diffs = new ArrayList<>(args.length - 1);
+    // final File folder = new File(args[1]);
+    List<String> fileList = new ArrayList<>();
+    // fileList = listFilesForFolder(folder);
+    // Iterate over the arguments from 1 to the end and diff each with the original,
+    // putting the results into diffs.
     for (int i = 1; i < args.length; ++i) {
-      File ajavaFile = new File(args[i]);
-      try (BufferedReader br = new BufferedReader(new FileReader(ajavaFile))) {
-        List<String> newFile = new ArrayList<>();
-        String ajavaFileLine;
-        while ((ajavaFileLine = br.readLine()) != null) {
-          ajavaFileLine = ignoreComment(ajavaFileLine);
-          ajavaFileLine = extractCheckerPackage(ajavaFileLine);
-          newFile.add(ajavaFileLine);
-        }
-        diffs.add(DiffUtils.diff(originalFile, newFile));
-      } catch (Exception e) {
-        throw new RuntimeException("Could not read file: " + args[i] + ". Check that it exists?");
+      List<String> preFile2 = quickReadAndFormat(args[i]);
+      List<String> inputFile2 = eachAnnotationInOneSingleLine(preFile2);
+      List<String> newFile = new ArrayList<>();
+      for (String ajavaFileLine : inputFile2) {
+        ajavaFileLine = ignoreComment(ajavaFileLine);
+        ajavaFileLine = extractCheckerPackage(ajavaFileLine);
+        ajavaFileLine = ajavaFileLine.trim();
+        System.out.println(ajavaFileLine);
+        newFile.add(ajavaFileLine);
       }
+      diffs.add(DiffUtils.diff(originalFile, newFile));
     }
 
     // Iterate over the list of diffs and process each. There must be args.length - 1 diffs, since
