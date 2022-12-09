@@ -205,7 +205,7 @@ public class InferredAnnosCounter {
     }
     return formated;
   }
-  
+
   /**
    * This method takes a line, which contains at least one annotation, and returns the first
    * annotation in that line.
