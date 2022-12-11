@@ -455,22 +455,21 @@ public class InferredAnnosCounter {
       // same
       originalFileLine = originalFileLine.trim();
       originalFile.add(originalFileLine);
-      List<String> annoList = extractString(originalFileLine);
-      for (String anno : annoList) {
-        String specialAnno = "@" + trimParen(anno);
-        if (checkerPackage.contains(specialAnno)) {
-          String annoNoPara = trimParen(anno);
-          String finalAnno = "@" + annoNoPara;
-          if (annoCount.containsKey(finalAnno)) {
-            int numberOfAnno = annoCount.get(finalAnno);
-            annoCount.put(finalAnno, numberOfAnno + 1);
-          } else {
-            annoCount.put(finalAnno, 1);
-          }
-          annoSimilar.put(finalAnno, 0);
-          // we want the keys in the map annoLocate has this following format: type_position
-          annoLocate.put("@" + anno + "_" + originalFileLineIndex, 0);
+      String specialAnno = trimParen(originalFileLine);
+      if (checkerPackage.contains(specialAnno)) {
+        if (originalFileLine.contains("(") && !originalFileLine.contains("{")) {
+          originalFileLine = originalFileLine.replace("(", "({");
+          originalFileLine = originalFileLine.replace(")", "})");
         }
+        if (annoCount.containsKey(specialAnno)) {
+          int numberOfAnno = annoCount.get(specialAnno);
+          annoCount.put(specialAnno, numberOfAnno + 1);
+        } else {
+          annoCount.put(specialAnno, 1);
+        }
+        annoSimilar.put(specialAnno, 0);
+        // we want the keys in the map annoLocate has this following format: type_position
+        annoLocate.put(originalFileLine + "_" + originalFileLineIndex, 0);
       }
       originalFileLineCount = originalFileLineIndex;
     }
