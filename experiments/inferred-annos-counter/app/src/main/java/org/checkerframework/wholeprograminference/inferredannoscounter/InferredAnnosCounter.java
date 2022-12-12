@@ -51,19 +51,17 @@ public class InferredAnnosCounter {
    * @param line a line from the input file
    * @return true if it contains the beginning of a multi-line annotation
    */
-  private static boolean dealWithGoogleFormatOpenCase(String line) {
+  private static boolean checkGoogleFormatOpenCase(String line) {
     if (line.length() == 0) return false;
     String elements[] = line.split(" ");
     int n = elements.length;
-    if (n > 1 && elements[n - 1].contains("@org.checkerframework")) {
+    if (n >= 1 && elements[n - 1].contains("@org.checkerframework")) {
       String breaks[] = elements[n - 1].split("[.]");
-      int z = breaks.length;
-      if (z < 2) {
+      int numberOfParts = breaks.length;
+      if (numberOfParts < 2) {
         throw new RuntimeException("Invalid annotation form in line: " + line);
       }
-      if (!breaks[z - 2].equals("qual")) {
-        return true;
-      }
+      return (!breaks[numberOfParts - 2].equals("qual"));
     }
     return false;
   }
@@ -79,7 +77,7 @@ public class InferredAnnosCounter {
    * @param line a line from the input file
    * @return true if it contains the ending of a multi-line annotation
    */
-  private static boolean dealWithGoogleFormatCloseCase(String line) {
+  private static boolean checkGoogleFormatCloseCase(String line) {
     if (line.length() > 0 && firstIsDot(line)) return true;
     if (line.length() > 0 && firstIsDot(line)) return true;
     return false;
@@ -95,8 +93,8 @@ public class InferredAnnosCounter {
    */
   private static String checkLine(String line) {
     // System.out.println(line);
-    if (dealWithGoogleFormatOpenCase(line)) return "Open";
-    if (dealWithGoogleFormatCloseCase(line)) return "Close";
+    if (checkGoogleFormatOpenCase(line)) return "Open";
+    if (checkGoogleFormatCloseCase(line)) return "Close";
     int openParen = 0;
     int closeParen = 0;
     for (int i = 0; i < line.length(); i++) {
@@ -116,7 +114,7 @@ public class InferredAnnosCounter {
    * @param fileName the name of the input file to be formatted
    * @return inputFiles a list containing lines of the formatted file
    */
-  private static List quickReadAndFormat(String fileName) {
+  private static List annoMultiToSingle(String fileName) {
     List<String> inputFiles = new ArrayList<String>();
     File file = new File(fileName);
     try (BufferedReader br = new BufferedReader(new FileReader(file))) {
@@ -366,8 +364,8 @@ public class InferredAnnosCounter {
       int index1 = temp.indexOf('@');
       if (index1 == -1) {
         throw new RuntimeException(
-            "The extractString method relies on the countAnnos method. Either the countAnnos method is wrong"
-                + "or it was not called properly");
+                "The extractString method relies on the countAnnos method. Either the countAnnos method is wrong"
+                        + "or it was not called properly");
       }
       String tempAnno = getAnnos(temp);
       if (checkInString(index1, temp)) {
@@ -417,7 +415,7 @@ public class InferredAnnosCounter {
 
     if (args.length <= 1) {
       throw new RuntimeException(
-          "Provide at least one .java file and one or more" + ".ajava files.");
+              "Provide at least one .java file and one or more" + ".ajava files.");
     }
 
     // These variables are maintained throughout:
@@ -435,7 +433,7 @@ public class InferredAnnosCounter {
     Map<String, Integer> annoSimilar = new HashMap<>();
     // the number of lines in the original file
     int originalFileLineCount = 0;
-    List<String> preFile = quickReadAndFormat(args[0]);
+    List<String> preFile = annoMultiToSingle(args[0]);
     List<String> inputFile = eachAnnotationInOneSingleLine(preFile);
     int originalFileLineIndex = -1;
     // Read the original file once to determine the annotations that written by the human.
@@ -468,13 +466,10 @@ public class InferredAnnosCounter {
     // Iterate over the arguments from 1 to the end and diff each with the original,
     // putting the results into diffs.
     List<Patch<String>> diffs = new ArrayList<>(args.length - 1);
-    // final File folder = new File(args[1]);
-    List<String> fileList = new ArrayList<>();
-    // fileList = listFilesForFolder(folder);
     // Iterate over the arguments from 1 to the end and diff each with the original,
     // putting the results into diffs.
     for (int i = 1; i < args.length; ++i) {
-      List<String> preFile2 = quickReadAndFormat(args[i]);
+      List<String> preFile2 = annoMultiToSingle(args[i]);
       List<String> inputFile2 = eachAnnotationInOneSingleLine(preFile2);
       List<String> newFile = new ArrayList<>();
       for (String ajavaFileLine : inputFile2) {
