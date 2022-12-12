@@ -29,6 +29,17 @@ import org.checkerframework.checker.index.qual.IndexFor;
 public class InferredAnnosCounter {
 
   /**
+   * This enum classifies input lines. It returns OPEN if a line contains the beginning of a
+   * multi-line annotation, returns CLOSE if that line contains the ending of a multi-line
+   * annotation. For other cases, it returns COMPLETE.
+   */
+  enum lineStatus {
+    OPEN,
+    COMPLETE,
+    CLOSE
+  }
+
+  /**
    * This method returns true if the first not-a-whitespace character of a line is a dot. It returns
    * false in other cases
    *
@@ -91,12 +102,12 @@ public class InferredAnnosCounter {
    * @param line a line from the input file
    * @return the status of that line
    */
-  private static String checkLine(String line) {
+  private static lineStatus checkLine(String line) {
     if (checkGoogleFormatOpenCase(line)) {
-      return "Open";
+      return lineStatus.OPEN;
     }
     if (checkGoogleFormatCloseCase(line)) {
-      return "Close";
+      return lineStatus.CLOSE;
     }
     int openParen = 0;
     int closeParen = 0;
@@ -105,9 +116,9 @@ public class InferredAnnosCounter {
       if (c == '(') openParen++;
       if (c == ')') closeParen++;
     }
-    if (openParen < closeParen) return "Close";
-    if (openParen > closeParen) return "Open";
-    return "Complete";
+    if (openParen < closeParen) return lineStatus.CLOSE;
+    if (openParen > closeParen) return lineStatus.OPEN;
+    return lineStatus.COMPLETE;
   }
 
   /**
@@ -127,7 +138,7 @@ public class InferredAnnosCounter {
       while ((originalFileLine = br.readLine()) != null) {
         originalFileLine = ignoreComment(originalFileLine);
         if (inProgress) {
-          if (checkLine(originalFileLine) == "Close") {
+          if (checkLine(originalFileLine) == lineStatus.CLOSE) {
             /*
             There are two cases that an anotation is multi-line, either by Google Java Format or by default.
             For the first case, it's easy to understand that we don't want any space in the middle of an annotation.
@@ -141,11 +152,13 @@ public class InferredAnnosCounter {
             originalFileLine = originalFileLine.trim();
             tempLine = tempLine + originalFileLine;
           }
-        } else if (checkLine(originalFileLine) == "Complete" || !originalFileLine.contains("@")) {
+        } else if (checkLine(originalFileLine) == lineStatus.COMPLETE
+            || !originalFileLine.contains("@")) {
           tempLine = tempLine + originalFileLine;
           inputFiles.add(tempLine);
           tempLine = "";
-        } else if (checkLine(originalFileLine) == "Open" && originalFileLine.contains("@")) {
+        } else if (checkLine(originalFileLine) == lineStatus.OPEN
+            && originalFileLine.contains("@")) {
           tempLine = tempLine + originalFileLine;
           inProgress = true;
         }
@@ -174,7 +187,7 @@ public class InferredAnnosCounter {
         if (element.indexOf('@') == 0 && !inProgress) {
           if (resultLine.length() > 0) formated.add(resultLine);
           resultLine = "";
-          if (checkLine(element) == "Complete") {
+          if (checkLine(element) == lineStatus.COMPLETE) {
             formated.add(element);
           } else {
             resultLine = resultLine + " " + element;
