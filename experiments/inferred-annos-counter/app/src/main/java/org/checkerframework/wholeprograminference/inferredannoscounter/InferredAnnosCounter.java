@@ -36,16 +36,8 @@ public class InferredAnnosCounter {
    * @return true of the first non-empty character of that line is a dot, false otherwise.
    */
   private static boolean firstIsDot(String line) {
-    if (line.length() > 0) {
-      char charList[] = line.toCharArray();
-      for (char element : charList) {
-        if (!Character.isWhitespace(element)) {
-          if (element == '.') return true;
-          return false;
-        }
-      }
-    }
-    return false;
+    String trimmed = line.trim();
+    return trimmed.length() == 0 ? false : trimmed.charAt(0) == '.';
   }
 
   /**
