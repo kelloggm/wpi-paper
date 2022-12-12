@@ -92,9 +92,12 @@ public class InferredAnnosCounter {
    * @return the status of that line
    */
   private static String checkLine(String line) {
-    // System.out.println(line);
-    if (checkGoogleFormatOpenCase(line)) return "Open";
-    if (checkGoogleFormatCloseCase(line)) return "Close";
+    if (checkGoogleFormatOpenCase(line)) {
+      return "Open";
+    }
+    if (checkGoogleFormatCloseCase(line)) {
+      return "Close";
+    }
     int openParen = 0;
     int closeParen = 0;
     for (int i = 0; i < line.length(); i++) {
@@ -364,8 +367,8 @@ public class InferredAnnosCounter {
       int index1 = temp.indexOf('@');
       if (index1 == -1) {
         throw new RuntimeException(
-                "The extractString method relies on the countAnnos method. Either the countAnnos method is wrong"
-                        + "or it was not called properly");
+            "The extractString method relies on the countAnnos method. Either the countAnnos method is wrong"
+                + "or it was not called properly");
       }
       String tempAnno = getAnnos(temp);
       if (checkInString(index1, temp)) {
@@ -415,7 +418,7 @@ public class InferredAnnosCounter {
 
     if (args.length <= 1) {
       throw new RuntimeException(
-              "Provide at least one .java file and one or more" + ".ajava files.");
+          "Provide at least one .java file and one or more" + ".ajava files.");
     }
 
     // These variables are maintained throughout:
