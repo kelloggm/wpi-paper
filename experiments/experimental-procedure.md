@@ -52,11 +52,12 @@ with both the original and forked url as well as the commit ID.
         i. does not run the typecheckers that it was running before, and
         ii. does runs the `org.checkerframework.common.util.count.AnnotationStatistics` processor
    c. add the `-Aannotations` and `-Anolocations` options, and make sure that you remove any `-Werror` argument to javac.
-   d. compile the program and record the output in the spreadsheet. (You should
-   create a new "sheet" in the spreadsheet for each project. Copy one that's
-   already there and delete the data in it.)
+   d. If the project is running a formatter (ex: Spotless), disable it in the build system. 
+   e. compile the program and record the output in the spreadsheet. (You should
+      create a new "sheet" in the spreadsheet for each project. Copy one that's
+      already there and delete the data in it.)
    TODO: consider writing a script for interpreting the output of AnnotationStatistics by checker?
-   e. run `git commit -am "annotation statistics configuration" ; git push origin annotation-statistics`
+   f. run `git commit -am "annotation statistics configuration" ; git push origin annotation-statistics`.
 
 7. Collect the number of lines of code:
    a. run `git checkout baseline`
