@@ -267,6 +267,7 @@ def step11():
             c. change the variable, WPI_RESULTS_DIR to the path of your project's WPI annotations wpi-annotations. 
             d. confirm that the JAVA_SRC_DIR is appropriate to your project's file tree which may look something like ./src/main/java/ and should contain your-project.java in the lowest directory, modify if needed.     
     '''
+    print("\n\nOpen 'format-mycopy.sh'.")
     print("Change the variable, WPI_RESULTS_DIR to the path of your project's WPI annotations wpi-annotations")
     print("Confirm that the JAVA_SRC_DIR is appropriate to your project's file tree which may look something like ./src/main/java/ and should contain your-project.java in the lowest directory, modify if needed.")
     pausePrg()
