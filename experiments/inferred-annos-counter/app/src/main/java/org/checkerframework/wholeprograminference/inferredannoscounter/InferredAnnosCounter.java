@@ -102,7 +102,7 @@ public class InferredAnnosCounter {
    * @param line a line from the input file
    * @return the status of that line
    */
-  private static LineStatus checkLine(String line) {
+  private static LineStatus checkLineStatus(String line) {
     if (checkGoogleFormatOpenCase(line)) {
       return LineStatus.OPEN;
     }
@@ -145,8 +145,9 @@ public class InferredAnnosCounter {
       boolean inProgress = false;
       while ((originalFileLine = br.readLine()) != null) {
         originalFileLine = ignoreComment(originalFileLine);
+        LineStatus status = checkLineStatus(originalFileLine);
         if (inProgress) {
-          if (checkLine(originalFileLine) == LineStatus.CLOSE) {
+          if (status == LineStatus.CLOSE) {
             /*
             There are two cases that an anotation is multi-line, either by Google Java Format or by default.
             For the first case, it's easy to understand that we don't want any space in the middle of an annotation.
@@ -160,13 +161,11 @@ public class InferredAnnosCounter {
             originalFileLine = originalFileLine.trim();
             tempLine = tempLine + originalFileLine;
           }
-        } else if (checkLine(originalFileLine) == LineStatus.COMPLETE
-            || !originalFileLine.contains("@")) {
+        } else if (status == LineStatus.COMPLETE || !originalFileLine.contains("@")) {
           tempLine = tempLine + originalFileLine;
           inputFiles.add(tempLine);
           tempLine = "";
-        } else if (checkLine(originalFileLine) == LineStatus.OPEN
-            && originalFileLine.contains("@")) {
+        } else if (status == LineStatus.OPEN && originalFileLine.contains("@")) {
           tempLine = tempLine + originalFileLine;
           inProgress = true;
         }
@@ -200,7 +199,7 @@ public class InferredAnnosCounter {
             element = element.substring(indexOfAnno, element.length());
           }
           resultLine = "";
-          if (checkLine(element) == LineStatus.COMPLETE) {
+          if (checkLineStatus(element) == LineStatus.COMPLETE) {
             formated.add(element);
           } else {
             resultLine = resultLine + " " + element;
