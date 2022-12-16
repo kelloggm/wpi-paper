@@ -44,7 +44,7 @@ public class InferredAnnosCounter {
    * false in other cases
    *
    * @param line a line to be analyzed
-   * @return true of the first non-empty character of that line is a dot, false otherwise.
+   * @return true of the first non-whitespace character of that line is a dot, false otherwise.
    */
   private static boolean firstIsDot(String line) {
     String trimmed = line.trim();
@@ -63,7 +63,9 @@ public class InferredAnnosCounter {
    * @return true if it contains the beginning of a multi-line annotation
    */
   private static boolean checkGoogleFormatOpenCase(String line) {
-    if (line.length() == 0) return false;
+    if (line.length() == 0) {
+      return false;
+    }
     String elements[] = line.split(" ");
     int n = elements.length;
     if (n >= 1 && elements[n - 1].contains("@org.checkerframework")) {
@@ -89,9 +91,7 @@ public class InferredAnnosCounter {
    * @return true if it contains the ending of a multi-line annotation
    */
   private static boolean checkGoogleFormatCloseCase(String line) {
-    if (line.length() > 0 && firstIsDot(line)) return true;
-    if (line.length() > 0 && firstIsDot(line)) return true;
-    return false;
+    return (line.length() > 0 && firstIsDot(line));
   }
 
   /**
@@ -113,11 +113,19 @@ public class InferredAnnosCounter {
     int closeParen = 0;
     for (int i = 0; i < line.length(); i++) {
       char c = line.charAt(i);
-      if (c == '(') openParen++;
-      if (c == ')') closeParen++;
+      if (c == '(') {
+        openParen++;
+      }
+      if (c == ')') {
+        closeParen++;
+      }
     }
-    if (openParen < closeParen) return LineStatus.CLOSE;
-    if (openParen > closeParen) return LineStatus.OPEN;
+    if (openParen < closeParen) {
+      return LineStatus.CLOSE;
+    }
+    if (openParen > closeParen) {
+      return LineStatus.OPEN;
+    }
     return LineStatus.COMPLETE;
   }
 
@@ -556,7 +564,9 @@ public class InferredAnnosCounter {
         // For example, if we have @Option_345, we will only need "@Option" since we want the
         // general type here.
         int index = annoName.indexOf("_");
-        if (index >= 0) annoName = annoName.substring(0, index);
+        if (index >= 0) {
+          annoName = annoName.substring(0, index);
+        }
         annoName = trimParen(annoName);
         int value = annoSimilar.get(annoName);
         value = value + 1;
