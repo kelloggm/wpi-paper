@@ -184,7 +184,7 @@ public class InferredAnnosCounter {
    * @return a list containing lines of the input files with each annotation in a separate line.
    */
   private static List eachAnnotationInOneSingleLine(List<String> inputFiles) {
-    List<String> formated = new ArrayList<String>();
+    List<String> formatted = new ArrayList<String>();
     for (int i = 0; i < inputFiles.size(); i++) {
       String line = inputFiles.get(i);
       String temp[] = line.split(" ");
@@ -195,12 +195,12 @@ public class InferredAnnosCounter {
         if (indexOfAnno != -1 && !inProgress) {
           if (resultLine.length() > 0) {
             // sometimes the annotation can be in the middle of a declaration
-            formated.add(resultLine + element.substring(0, indexOfAnno));
+            formatted.add(resultLine + element.substring(0, indexOfAnno));
             element = element.substring(indexOfAnno, element.length());
           }
           resultLine = "";
           if (checkLineStatus(element) == LineStatus.COMPLETE) {
-            formated.add(element);
+            formatted.add(element);
           } else {
             resultLine = resultLine + " " + element;
             inProgress = true;
@@ -208,15 +208,15 @@ public class InferredAnnosCounter {
         } else {
           resultLine = resultLine + " " + element;
           if (inProgress && element.indexOf(')') != -1) {
-            formated.add(resultLine);
+            formatted.add(resultLine);
             inProgress = false;
             resultLine = "";
           }
         }
       }
-      formated.add(" " + resultLine);
+      formatted.add(" " + resultLine);
     }
-    return formated;
+    return formatted;
   }
 
   /**
@@ -461,11 +461,12 @@ public class InferredAnnosCounter {
     Map<String, Integer> annoSimilar = new HashMap<>();
     // the number of lines in the original file
     int originalFileLineCount = 0;
-    List<String> preFile = annoMultiToSingle(args[0]);
-    List<String> inputFile = eachAnnotationInOneSingleLine(preFile);
+    List<String> inputFileWithOnlySingleLineAnno = annoMultiToSingle(args[0]);
+    List<String> inputFileWithEachAnnoOnOneLine =
+        eachAnnotationInOneSingleLine(inputFileWithOnlySingleLineAnno);
     int originalFileLineIndex = -1;
     // Read the original file once to determine the annotations that written by the human.
-    for (String originalFileLine : inputFile) {
+    for (String originalFileLine : inputFileWithEachAnnoOnOneLine) {
       originalFileLineIndex++;
       originalFileLine = ignoreComment(originalFileLine);
       originalFileLine = extractCheckerPackage(originalFileLine);
@@ -474,6 +475,8 @@ public class InferredAnnosCounter {
       originalFileLine = originalFileLine.trim();
       originalFile.add(originalFileLine);
       String specialAnno = trimParen(originalFileLine);
+      // the fact that this if statement's condition is true means that this line contains exactly
+      // one CF annotation and nothing else.
       if (checkerPackage.contains(specialAnno)) {
         if (originalFileLine.contains("(") && !originalFileLine.contains("{")) {
           originalFileLine = originalFileLine.replace("(", "({");
@@ -497,10 +500,11 @@ public class InferredAnnosCounter {
     // Iterate over the arguments from 1 to the end and diff each with the original,
     // putting the results into diffs.
     for (int i = 1; i < args.length; ++i) {
-      List<String> preFile2 = annoMultiToSingle(args[i]);
-      List<String> inputFile2 = eachAnnotationInOneSingleLine(preFile2);
+      List<String> inputFileWithOnlySingleLineAnno2 = annoMultiToSingle(args[i]);
+      List<String> inputFileWithEachAnnoOnOneLine2 =
+          eachAnnotationInOneSingleLine(inputFileWithOnlySingleLineAnno2);
       List<String> newFile = new ArrayList<>();
-      for (String ajavaFileLine : inputFile2) {
+      for (String ajavaFileLine : inputFileWithEachAnnoOnOneLine2) {
         ajavaFileLine = ignoreComment(ajavaFileLine);
         ajavaFileLine = extractCheckerPackage(ajavaFileLine);
         ajavaFileLine = ajavaFileLine.trim();
