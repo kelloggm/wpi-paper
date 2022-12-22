@@ -42,11 +42,10 @@ with both the original and forked url as well as the commit ID.
 
 4. Run `RunWPI.py` from terminal and pass the name of the project as argument. `python RunWPI.py icalavailable`
 
-5. Follow instructions of that program.
+5. Follow instructions of that program. (TODO: Restart if an error is encountered)
 
+
+TODO:
 6. Go to `wpi-paper/experiments/inferred-annos-counter/` and run inferred-annos-counter: From terminal `python RunIAC.py project-name`.
 
 7. A csv file `AnnotationStats.csv` will be generated in the `wpi-paper/experiments/inferred-annos-counter/inputExamples/project-name/`. Copy summary numbers from the project-specific spreadsheet page to the "summary" tab, and color code the project row green once it is finished.
-
-
-TODO: If an error was encountered in step 4.
