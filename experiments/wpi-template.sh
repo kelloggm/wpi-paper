@@ -8,7 +8,8 @@
 # Where should the output be placed at the end? This directory is also
 # used to store intermediate WPI results. The directory does not need to
 # exist. If it does exist when this script starts, it will be deleted.
-WPITEMPDIR=/tmp/icalavailable-wpi
+
+# WPITEMPDIR=/tmp/icalavailable-wpi
 
 # Where is WPI's output placed by the Checker Framework? This is some
 # directory ending in build/whole-program-inference. For most projects,
