@@ -68,7 +68,7 @@ public class InferredAnnosCounter {
     }
     String elements[] = line.split(" ");
     int n = elements.length;
-    if (n >= 1 && elements[n - 1].contains("@org.checkerframework")) {
+    if (n >= 1 && elements[n - 1].contains("@org")) {
       String breaks[] = elements[n - 1].split("[.]");
       int numberOfParts = breaks.length;
       if (numberOfParts < 2) {
@@ -271,7 +271,7 @@ public class InferredAnnosCounter {
    *
    * @param line a line
    * @param Index index of line
-   * @return true if Index belong to a string literal, false otherwise
+   * @return false if Index belongs to a string literal, true otherwise
    */
   private static boolean checkInString(@IndexFor("#2") int Index, String line) {
     int before = 0;
@@ -293,6 +293,64 @@ public class InferredAnnosCounter {
   }
 
   /**
+   * This method replaces a particular character at an index of a string with a new symbol.
+   *
+   * @param line a line that needs to be modified
+   * @param index a valid index of that line, which is non-negative and less than the length of line
+   * @param symbol the new character
+   * @return the line with the character at index replaced by symbol
+   */
+  private static String replaceAtIndex(String line, int index, String symbol) {
+    if (index < 0 || index > line.length()) {
+      throw new RuntimeException("The index provided for replaceAtIndex is not valid");
+    }
+    String result = line;
+    String firstPart = result.substring(0, index);
+    if (index + 1 < result.length()) {
+      String secondPart = result.substring(index + 1, result.length());
+      result = firstPart + symbol + secondPart;
+    } else // the element at index is also the last element of the string
+    {
+      result = firstPart + symbol;
+    }
+
+    return result;
+  }
+
+  /**
+   * This method is used to format annotation that contains arguments, such
+   * as @EnsuresNonNull("tz1"). This method has two parts. First, we check if the annotation
+   * contains a matrix and format the matrix if we found one. Second, we'll remove all curly braces
+   * in that annotation.
+   *
+   * @param annotation an annotation to be formatted
+   * @return formatted annotation
+   */
+  private static String formatAnnotaionsWithArguments(String annotation) {
+    String result = annotation;
+    /*
+    First, we format cases involving matrix by changing all "}, {" to "|, |"
+     */
+    int indexOfClose = result.indexOf("},");
+    while (indexOfClose != -1) {
+      int indexOfOpen = result.indexOf('{', indexOfClose);
+      if (checkInString(indexOfClose, result)) {
+        result = replaceAtIndex(result, indexOfClose, "|");
+        result = replaceAtIndex(result, indexOfOpen, "|");
+        indexOfClose = result.indexOf("},");
+      } else {
+        indexOfOpen = result.indexOf("},", indexOfClose + 1);
+      }
+    }
+    /*
+    Second, we will remove all curly braces
+     */
+    result = result.replace("{", "");
+    result = result.replace("}", "");
+    return result;
+  }
+
+  /**
    * This method trims out all the comments in a line from the input files
    *
    * @param line a line from the input files
@@ -301,13 +359,13 @@ public class InferredAnnosCounter {
   private static String ignoreComment(String line) {
     int indexComment = line.length() + 1;
     String finalLine = line;
-    int indexDash = line.indexOf("// ");
+    int indexDash = line.indexOf("//");
     int indexStar = line.indexOf("*");
     int indexDashStar = line.indexOf("/*");
     if (indexDash != -1) {
       if (indexDash == 0) {
         finalLine = line.substring(0, indexDash);
-      } else {
+      } else if (checkInString(indexDash, line)) {
         finalLine = line.substring(0, indexDash - 1);
       }
     }
@@ -473,15 +531,12 @@ public class InferredAnnosCounter {
       // since it's too difficult to keep the length of whitespace at the beginning of each line the
       // same
       originalFileLine = originalFileLine.trim();
-      originalFile.add(originalFileLine);
       String specialAnno = trimParen(originalFileLine);
       // the fact that this if statement's condition is true means that this line contains exactly
       // one CF annotation and nothing else.
       if (checkerPackage.contains(specialAnno)) {
-        if (originalFileLine.contains("(") && !originalFileLine.contains("{")) {
-          originalFileLine = originalFileLine.replace("(", "({");
-          originalFileLine = originalFileLine.replace(")", "})");
-        }
+        originalFileLine = formatAnnotaionsWithArguments(originalFileLine);
+        System.out.println(originalFileLine);
         if (annoCount.containsKey(specialAnno)) {
           int numberOfAnno = annoCount.get(specialAnno);
           annoCount.put(specialAnno, numberOfAnno + 1);
@@ -492,6 +547,7 @@ public class InferredAnnosCounter {
         // we want the keys in the map annoLocate has this following format: type_position
         annoLocate.put(originalFileLine + "_" + originalFileLineIndex, 0);
       }
+      originalFile.add(originalFileLine);
       originalFileLineCount = originalFileLineIndex;
     }
     // Iterate over the arguments from 1 to the end and diff each with the original,
@@ -506,7 +562,12 @@ public class InferredAnnosCounter {
       List<String> newFile = new ArrayList<>();
       for (String ajavaFileLine : inputFileWithEachAnnoOnOneLine2) {
         ajavaFileLine = ignoreComment(ajavaFileLine);
+        // if the condition is true, this line contains only one single annotation and nothing else.
+        if (ajavaFileLine.contains("@org")) {
+          ajavaFileLine = formatAnnotaionsWithArguments(ajavaFileLine);
+        }
         ajavaFileLine = extractCheckerPackage(ajavaFileLine);
+        System.out.println(formatAnnotaionsWithArguments(ajavaFileLine));
         ajavaFileLine = ajavaFileLine.trim();
         newFile.add(ajavaFileLine);
       }
@@ -523,6 +584,7 @@ public class InferredAnnosCounter {
         // INSERT type indicates that the annotations only appear in the computer-generated files.
         // So we don't take it into consideration.
         if (deltaInString.contains("@") && delta.getType() != DeltaType.INSERT) {
+          System.out.println(deltaInString);
           List<String> myList = delta.getSource().getLines();
           // get the position of that annotation in the delta, which is something like "5," or "6,".
           int position = delta.getSource().getPosition();
