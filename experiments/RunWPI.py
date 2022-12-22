@@ -11,6 +11,8 @@ import shutil
 project_name = str(sys.argv[1])
 print("Enter the directory of wpi-paper\n\texample: /Users/ma/Desktop/wpi-paper")
 wpidir = input("wpi-paper directory: ")
+wpidir = wpidir.strip(" ")
+
 # wpidir = '/Users/muyeedahmed/Desktop/Gitcode/wpi-paper'
 
 def pausePrg():
@@ -63,27 +65,21 @@ def readOutput():
     # print(annotationStats)
     return annotationStats
 
-def step2():
+# Get original annotation status and remove annotations
+def part1():
     '''
     Step 2:
         Create a new branch called "baseline" at that commit: 
             git checkout -b baseline ; git push origin baseline
     '''
     process = subprocess.run("git checkout -b baseline ; git push origin baseline", shell=True)
-    print("End of step 2")
-    step3()
     
-def step3():
     '''
     Step 3:
         Create a new branch called "unannotated" starting at the same commit: 
             git checkout -b unannotated
     '''
     process = subprocess.run("git checkout -b unannotated", shell=True)
-    print("End of step 3")
-    step4()
-    
-def step4():
     '''
     Step 4:
         Run the RemoveAnnotationsForInference program on the source, no ouput means it ran successfully: 
@@ -91,30 +87,20 @@ def step4():
     
     '''
     process = subprocess.run("java -cp \"$CHECKERFRAMEWORK/checker/dist/checker.jar\" org.checkerframework.framework.stub.RemoveAnnotationsForInference .", shell=True)
-    print("End of step 4")
-    step5()
-    
-def step5():
     '''
     Step 5:
         Push the unannotated code: 
             git commit -am "output of RemoveAnnotationsForInference" ; git push origin unannotated
     '''
     process = subprocess.run("git commit -am \"output of RemoveAnnotationsForInference\" ; git push origin unannotated", shell=True)
-    print("End of step 5")
-    step6_1()
-    
-def step6_1():
+
     '''
     Step 6:
         Collect the number of original annotations in the code: 
             a. run git checkout -b annotation-statistics origin/baseline
     '''
     process = subprocess.run("git checkout -b annotation-statistics origin/baseline", shell=True)
-    print("End of step 6_1")
-    step6_2()
-    
-def step6_2():
+
     '''
             b. modify the project's build file so that it 
                 i. does not run the typecheckers that it was running before, and 
@@ -131,19 +117,13 @@ def step6_2():
     print("7. Open another terminal in the same directory")
     print("8. Compile the project and save the output in 'Human-written.txt' file\n\n\texample:\n\t./gradlew build >> Human-written.txt\n")
     pausePrg()
-    print("End of step 6_2")
-    step6_3()
-    
-def step6_3():
+
     '''
             e. run 
                 git commit -am "annotation statistics configuration" ; git push origin annotation-statistics
     '''
     process = subprocess.run("git commit -am \"annotation statistics configuration\" ; git push origin annotation-statistics", shell=True)
-    print("End of step 6")
-    step7()
-    
-def step7():
+
     '''
     Step 7    
         Collect the number of lines of code: 
@@ -154,9 +134,10 @@ def step7():
     process = subprocess.run("scc .", shell=True)
     print("Record the number of non-comment, non-blanks lines of Java code(the \"Code\" column of the \"Java\" row) in the spreadsheet (in the \"LoC\" column), on the summary page\n(if you don't have scc installed, https://github.com/boyter/scc)")
     pausePrg()
-    print("End of step 7")
-    step8()
-def step8():
+    print("End of part1 (original annotation status and remove original annotations)")
+    
+#Run WPI
+def part2():
     '''
     Step 8:
         Run WPI: 
@@ -189,10 +170,6 @@ def step8():
     process = subprocess.run("./wpi.sh", shell=True)
     print("Record the number of errors issued by the typecheckers (and which typechecker issued the error)")
     pausePrg()
-    print("End of step 8")
-    step9()
-    
-def step9():
     '''
     Step 9:
         Create a branch for the code with inferred annotations 
@@ -206,10 +183,9 @@ def step9():
     process = subprocess.run("mkdir wpi-annotations", shell=True)
     process = subprocess.run("rsync -r ${WPITEMPDIR}/ wpi-annotations", shell=True)
     process = subprocess.run("git add wpi-annotations/** ; git commit -am \"WPI annotations\" ; git push origin wpi-annotations", shell=True)
-    print("End of step 9")
-    step10()
-    
-def step10():
+
+#Evaluate WPI
+def part3():
     '''
     Step 10:
         Measure the number of annotations that WPI inferred, by checker: 
@@ -238,22 +214,17 @@ def step10():
     df.to_csv(wpidir+"/experiments/inferred-annos-counter/inputExamples/"+project_name+"/AnnotationStats.csv", index=False)
 
     process = subprocess.run("git add compute-annos-inferred.sh ; git commit -m \"inference output summarization script\" ; git push origin wpi-annotations", shell=True)
-    print("End of step 10")
-    step11()
-
-def step11():
     '''
     Step 11
         Measure the percentage of hand-written annotations that WPI inferred 
             a. copy the formatter script as format-mycopy.sh found in the experiments directory into your project's top level directory.
-            
-                '''
+    '''
     
     fread = open( wpidir + "/experiments/format.sh", "r")
     fwrite = open("format-mycopy.sh", "w")
     for x in fread:
         if "GJF=" in x:
-           fwrite.write("GJF="+wpidir+"/google-java-format-1.15.0.jar") 
+           fwrite.write("GJF="+wpidir+"/google-java-format-1.15.0-all-deps.jar") 
         else:
             fwrite.write(x)
     fwrite.close()
@@ -261,8 +232,8 @@ def step11():
     '''
             b. download the google-java-format.jar. The link for it is in the script's documentation. Confirm the variable path in the script aligns with the location of your download.     
     '''
-    if os.path.exists(wpidir+"/google-java-format-1.15.0.jar") == False:
-        os.system("wget -P "+wpidir+" https://github.com/google/google-java-format/releases/download/v1.15.0/google-java-format-1.15.0.jar")
+    if os.path.exists(wpidir+"/google-java-format-1.15.0-all-deps.jar") == False:
+        os.system("wget -P "+wpidir+" https://github.com/google/google-java-format/releases/download/v1.15.0/google-java-format-1.15.0-all-deps.jar")
     '''
             c. change the variable, WPI_RESULTS_DIR to the path of your project's WPI annotations wpi-annotations. 
             d. confirm that the JAVA_SRC_DIR is appropriate to your project's file tree which may look something like ./src/main/java/ and should contain your-project.java in the lowest directory, modify if needed.     
@@ -309,8 +280,40 @@ def step11():
     '''
     ## RunIAC.py
 
+def resetAll():
+    process = subprocess.run("git checkout master", shell=True)
+    process = subprocess.run("git stash", shell=True)
+    process = subprocess.run("git branch -D annotation-statistics &> /dev/null", shell=True)
+    process = subprocess.run("git push origin --delete annotation-statistics &> /dev/null", shell=True)
+    process = subprocess.run("git branch -D unannotated", shell=True)
+    process = subprocess.run("git push origin --delete unannotated", shell=True)
+    process = subprocess.run("git branch -D baseline", shell=True)
+    process = subprocess.run("git push origin --delete baseline", shell=True)
+    process = subprocess.run("git branch -D wpi-annotations", shell=True)
+    process = subprocess.run("git push origin --delete wpi-annotations", shell=True)
+    process = subprocess.run("git branch -D wpi-enabled", shell=True)
+    process = subprocess.run("git push origin --delete wpi-enabled", shell=True)
+    
+    if os.path.exists("Human-written.txt"):
+        os.remove("Human-written.txt")
+    if os.path.exists("Generated.txt"):
+        os.remove("Generated.txt")
+    if os.path.exists("compute-annos-inferred-out.sh"):
+        os.remove("compute-annos-inferred-out.sh")
+    if os.path.exists("wpi.sh"):
+        os.remove("wpi.sh")
+    if os.path.exists("format-mycopy.sh"):
+        os.remove("format-mycopy.sh")
+    if os.path.exists("tmp"):
+        shutil.rmtree("tmp")
+    if os.path.exists("wpi-annotations"):
+        shutil.rmtree("wpi-annotations")
+        
 
-
+    
 if __name__ == "__main__":
-    step2()
+    resetAll()
+    part1()
+    part2()
+    part3()
     
