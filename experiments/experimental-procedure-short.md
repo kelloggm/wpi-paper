@@ -35,7 +35,8 @@ commit ID. Then, add a row to the "summary" sheet in the spreadsheet
 with both the original and forked url as well as the commit ID.
 
 2. Set a temporary directory for $WPITEMPDIR: 
-export WPITEMPDIR=\`pwd\`/tmp
+
+  export WPITEMPDIR=\`pwd\`/tmp
 
 3. From wpi-paper copy the `RunWPI.py` file to the project directory
 
