@@ -28,8 +28,10 @@ These example inputs should only be created for smaller projects.
 
 The procedure:
 
-1. Fork and then clone the project, and checkout the commit in the
-projects/ directory. In the file `projects.in`, record the URL (of your fork) and
+1. Fork the project, then clone your fork in the
+experiments/projects/ directory (create it if necessary).
+(TODO: why is the following step necessary?) Checkout the commit.
+In the file `projects.in`, record the URL (of your fork) and
 commit ID. Then, add a row to the "summary" sheet in the spreadsheet
 (https://docs.google.com/spreadsheets/d/1r_NhumolEp5CiOL7CmsvZaa4-FDUxCJXfswyJoKg8uM/edit?usp=sharing)
 with both the original and forked url as well as the commit ID.
@@ -40,7 +42,7 @@ with both the original and forked url as well as the commit ID.
 3. Create a new branch called "unannotated" starting at the same commit:
 `git checkout -b unannotated`
 
-4. Run the `RemoveAnnotationsForInference` program on the source, no ouput means it ran successfully:
+4. Run the `RemoveAnnotationsForInference` program on the source in the "unannotated" branch (which is currently checked out), no ouput means it ran successfully:
 `java -cp "$CHECKERFRAMEWORK/checker/dist/checker.jar" org.checkerframework.framework.stub.RemoveAnnotationsForInference .`
 
 5. Push the unannotated code:
@@ -52,12 +54,15 @@ with both the original and forked url as well as the commit ID.
         i. does not run the typecheckers that it was running before, and
         ii. does runs the `org.checkerframework.common.util.count.AnnotationStatistics` processor
    c. add the `-Aannotations` and `-Anolocations` options, and make sure that you remove any `-Werror` argument to javac.
+   d. If the build system is maven, add `<showWarnings>true</showWarnings>` to the maven-compiler-plugin `<configuration>`.
    d. If the project is running a formatter (ex: Spotless), disable it in the build system. 
-   e. compile the program and record the output in the spreadsheet. (You should
+   e. Stage your changes with `git add` (in case you missed a formatter).
+   f. compile the program and record the output in the spreadsheet. (You should
       create a new "sheet" in the spreadsheet for each project. Copy one that's
       already there and delete the data in it.)
+      TODO: All the current ones have different formats; they should be made uniform.
    TODO: consider writing a script for interpreting the output of AnnotationStatistics by checker?
-   f. run `git commit -am "annotation statistics configuration" ; git push origin annotation-statistics`.
+   g. run `git commit -am "annotation statistics configuration" ; git push origin annotation-statistics`.
 
 7. Collect the number of lines of code:
    a. run `git checkout baseline`
@@ -68,15 +73,19 @@ with both the original and forked url as well as the commit ID.
    b. choose any temporary directory for $WPITEMPDIR
    c. modify the build file to run with `-Ainfer=ajava`, `-Awarns`, '-AinferOutputOriginal', and `-Aajava=$WPITEMPDIR` (modifying the latter as appropriate for project structure, 
    Ex: '-Aajava=/path/to/temp/dir/'). Make sure that you remove any `-Werror` argument to javac, because otherwise WPI will fail.
-   d. write a short script based on the template in `wpi-template.sh`. The script should:
+   d. Copy `wpi-template.sh` to `wpi.sh` in the project directory.  Edit the first 5 variables.
+      This should achieve the following effect:
       i. copy the content of `build/whole-program-inference` into $WPITEMPDIR
       ii. compile the code 
       iii. compare `build/whole-program-inference` and $WPITEMPDIR. If they're the same, exit. Otherwise, go to step i.
-   e. add this script: `chmod +x wpi.sh ; git add wpi.sh`
+   e. make git store this script: `chmod +x wpi.sh ; git add wpi.sh`
    f. commit the script and build changes: `git commit -am "enable WPI" ; git push origin wpi-enabled`
-   g. execute the script: `./wpi.sh`
-   h. record the number of errors issued by the typecheckers (and which
-   typechecker issued the error) after the script is finished
+   g. execute the script (this may take a while): `./wpi.sh`
+      If the Checker Framework crashes, you might need to update to a newer version (on all branches).
+   h. Record, under "Warnings after WPI" in the project's tab in the spreadsheet at
+      https://docs.google.com/spreadsheets/d/1r_NhumolEp5CiOL7CmsvZaa4-FDUxCJXfswyJoKg8uM/ ,
+      the number of errors issued by the typecheckers and which 
+      typechecker issued the error.
 
 9. Create a branch for the code with inferred annotations
    a. Create a branch: `git checkout -b wpi-annotations annotation-statistics`

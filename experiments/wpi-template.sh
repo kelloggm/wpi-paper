@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # This script is a template for the WPI loop for a project with -Ainfer=ajava
 # added to its build file. Fill in the variables at the beginning of the
