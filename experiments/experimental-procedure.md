@@ -39,7 +39,7 @@ The procedure:
 
 2. Create a new branch called "baseline" at that commit:
 `git checkout -b baseline ; git push origin baseline`
-2a. Ensure that the project builds and typechecks (determine the appropriate command).
+2a. Ensure that the project builds and typechecks (determine the appropriate command and record it).
 
 3. Create a new branch called "unannotated" starting at the same commit:
 `git checkout -b unannotated`
@@ -59,7 +59,9 @@ The procedure:
    d. If the build system is maven, add `<showWarnings>true</showWarnings>` to the maven-compiler-plugin `<configuration>`.
    d. If the project is running a formatter (ex: Spotless), disable it in the build system. 
    e. Stage your changes with `git add` (in case you missed a formatter).
-   f. compile the program and record the output in the spreadsheet. (You should
+   f. compile the program and record the output in the spreadsheet.
+      TODO: What am I looking for in the voluminous output?
+      (You should
       create a new "sheet" in the spreadsheet for each project. Copy one that's
       already there and delete the data in it.)
       TODO: All the current ones have different formats; they should be made uniform.
