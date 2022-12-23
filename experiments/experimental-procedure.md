@@ -60,7 +60,7 @@ The procedure:
    d. If the project is running a formatter (ex: Spotless), disable it in the build system. 
    e. Stage your changes with `git add` (in case you missed a formatter).
    f. compile the program and record the output in the spreadsheet.
-      TODO: What am I looking for in the voluminous output?
+      TODO: What am I looking for in the voluminous output?  Often I cannot see anything.
       (You should
       create a new "sheet" in the spreadsheet for each project. Copy one that's
       already there and delete the data in it.)
