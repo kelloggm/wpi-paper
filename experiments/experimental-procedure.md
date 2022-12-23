@@ -28,13 +28,14 @@ These example inputs should only be created for smaller projects.
 
 The procedure:
 
-1. Fork the project, then clone your fork in the
-experiments/projects/ directory (create it if necessary).
-(TODO: why is the following step necessary?) Checkout the commit.
-In the file `projects.in`, record the URL (of your fork) and
-commit ID. Then, add a row to the "summary" sheet in the spreadsheet
-(https://docs.google.com/spreadsheets/d/1r_NhumolEp5CiOL7CmsvZaa4-FDUxCJXfswyJoKg8uM/edit?usp=sharing)
-with both the original and forked url as well as the commit ID.
+1. Clone the project
+   a. Fork the project
+   b. Clone your fork in the experiments/projects/ directory (create it if necessary).
+   c. (TODO: why is the following step necessary?) Checkout the commit.
+   d. In the file `projects.in`, record the URL (of your fork) and commit ID.
+   e. Add a row to the "summary" sheet in the spreadsheet
+      (https://docs.google.com/spreadsheets/d/1r_NhumolEp5CiOL7CmsvZaa4-FDUxCJXfswyJoKg8uM/)
+      with both the original and forked url as well as the commit ID.
 
 2. Create a new branch called "baseline" at that commit:
 `git checkout -b baseline ; git push origin baseline`
