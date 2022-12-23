@@ -39,6 +39,7 @@ The procedure:
 
 2. Create a new branch called "baseline" at that commit:
 `git checkout -b baseline ; git push origin baseline`
+2a. Ensure that the project builds and typechecks (determine the appropriate command).
 
 3. Create a new branch called "unannotated" starting at the same commit:
 `git checkout -b unannotated`
