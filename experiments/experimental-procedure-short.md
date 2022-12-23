@@ -1,6 +1,8 @@
 This document describes the procedure for adding a new project to the
 experiments in the WPI paper.
 
+This is a substitute of the original experimental-procedure requiring fewer steps. Step 2-7 covers the step 2-12 of the original experimental procedures.
+
 The input to the procedure is a program
 that typechecks using one or more Checker Framework typecheckers.
 
