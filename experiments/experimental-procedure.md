@@ -1,7 +1,7 @@
 This document describes the procedure for adding a new project to the
 experiments in the WPI paper.
 
-For a shorter version of experimental-procedure, open experimental-procedure-short.md.
+For a shorter version of experimental-procedure, go to experimental-procedure-short.md.
 
 The input to the procedure is a program
 that typechecks using one or more Checker Framework typecheckers.
