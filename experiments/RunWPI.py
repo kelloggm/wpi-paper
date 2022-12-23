@@ -1,3 +1,5 @@
+# Run this script by passing the name of the project as argument. 
+# Example: python RunWPI.py icalavailable
 import subprocess
 import glob
 import os
@@ -5,16 +7,12 @@ import sys
 import pandas as pd
 import shutil
 
-
-# project_name = "bcel-util"
-# project_name = "icalavailable"
 project_name = str(sys.argv[1])
 print("Enter the directory of wpi-paper\n\texample: /Users/ma/Desktop/wpi-paper")
 wpidir = input("wpi-paper directory: ")
 wpidir = wpidir.strip(" ")
 
-# wpidir = '/Users/muyeedahmed/Desktop/Gitcode/wpi-paper'
-
+# Pauses the program to allow the users make necessary changes
 def pausePrg():
     print("Enter 0 to continue")
     ext = int(input())
@@ -22,7 +20,7 @@ def pausePrg():
         print("Try again")
         ext = int(input())
         
-        
+# Returns the Human-written and wpi-generated stats as a dataframe 
 def readOutput():
     annotationStats = pd.DataFrame(columns=['Annotation', 'Original count', 'Inferred', 'Original inferred count', 'Original inferred %'])
     resultSection = False
@@ -36,7 +34,6 @@ def readOutput():
             continue
         if resultSection:
             info = x.split("\t")
-            # print(info)
             annot = info[0].replace(' ', '')
             count = info[-1].replace('\n', '')
             annotationStats.loc[-1] = [annot, count, '0', '0', '0']
@@ -44,7 +41,6 @@ def readOutput():
             annotationStats = annotationStats.sort_index()
         
     resultSection = False
-    # print(annotationStats)
     f = open("Generated.txt", "r")
     for x in f:
         if "====== COMBINED RESULTS =======" in x:
@@ -61,8 +57,6 @@ def readOutput():
             else:
                 annotationStats.loc[annotationStats["Annotation"]==annot, "Inferred"] = int(count) + int(annotationStats.loc[annotationStats["Annotation"]==annot, "Inferred"].values[0])
                       
-            # print(annot, count)
-    # print(annotationStats)
     return annotationStats
 
 # Get original annotation status and remove annotations
@@ -155,7 +149,6 @@ def part2():
     '''
     process = subprocess.run("git checkout -b wpi-enabled origin/unannotated ", shell=True)
     
-    # process = subprocess.run("export WPITEMPDIR=`pwd`/tmp", shell=True)
     os.system("mkdir tmp")
     
     print("\nNow do the following:\n1. modify the build file to run with")
@@ -285,14 +278,14 @@ def resetAll():
     process = subprocess.run("git stash", shell=True)
     process = subprocess.run("git branch -D annotation-statistics &> /dev/null", shell=True)
     process = subprocess.run("git push origin --delete annotation-statistics &> /dev/null", shell=True)
-    process = subprocess.run("git branch -D unannotated", shell=True)
-    process = subprocess.run("git push origin --delete unannotated", shell=True)
-    process = subprocess.run("git branch -D baseline", shell=True)
-    process = subprocess.run("git push origin --delete baseline", shell=True)
-    process = subprocess.run("git branch -D wpi-annotations", shell=True)
-    process = subprocess.run("git push origin --delete wpi-annotations", shell=True)
-    process = subprocess.run("git branch -D wpi-enabled", shell=True)
-    process = subprocess.run("git push origin --delete wpi-enabled", shell=True)
+    process = subprocess.run("git branch -D unannotated  &> /dev/null", shell=True)
+    process = subprocess.run("git push origin --delete unannotated  &> /dev/null", shell=True)
+    process = subprocess.run("git branch -D baseline  &> /dev/null", shell=True)
+    process = subprocess.run("git push origin --delete baseline  &> /dev/null", shell=True)
+    process = subprocess.run("git branch -D wpi-annotations  &> /dev/null", shell=True)
+    process = subprocess.run("git push origin --delete wpi-annotations  &> /dev/null", shell=True)
+    process = subprocess.run("git branch -D wpi-enabled  &> /dev/null", shell=True)
+    process = subprocess.run("git push origin --delete wpi-enabled  &> /dev/null", shell=True)
     
     if os.path.exists("Human-written.txt"):
         os.remove("Human-written.txt")
