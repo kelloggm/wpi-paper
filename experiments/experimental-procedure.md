@@ -80,7 +80,7 @@ The procedure:
 8. Run WPI:
    a. run `git checkout -b wpi-enabled origin/unannotated`
    b. choose any temporary directory for $WPITEMPDIR
-      TODO: Giving the user choices can be confusing.  Just dictate a temporary directory here, or hardcode it in the commands below.  I'm using /scratch/$USER/wpi-output
+      TODO: Giving the user choices can be confusing and requires user effort.  Just dictate a temporary directory here, or hardcode it in the commands below.  I'm personally using /scratch/$USER/wpi-output/ .
    c. modify the build file:
        i. run with `-Ainfer=ajava`, `-Awarns`, `-AinferOutputOriginal`, and `-Aajava=$WPITEMPDIR`
           (modifying the latter as appropriate for project structure, Ex: '-Aajava=/path/to/temp/dir/').
