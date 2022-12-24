@@ -29,7 +29,7 @@ These example inputs should only be created for smaller projects.
 The procedure:
 
 1. Clone the project
-   a. Fork the project
+   a. Fork the project.
    b. Clone your fork in the experiments/projects/ directory (create it if necessary).
    c. (TODO: why is the following step necessary?) Checkout the commit.
    d. In the file `projects.in`, record the URL (of your fork) and commit ID.
@@ -38,8 +38,8 @@ The procedure:
       with both the original and forked url as well as the commit ID.
 
 2. Create a new branch called "baseline" at that commit:
-`git checkout -b baseline ; git push origin baseline`
-2a. Ensure that the project builds and typechecks (determine the appropriate command and record it).
+   a. `git checkout -b baseline ; git push origin baseline`
+   b. Ensure that the project builds and typechecks (determine the appropriate command and record it in the spreadsheet).
 
 3. Create a new branch called "unannotated" starting at the same commit:
 `git checkout -b unannotated`
@@ -54,32 +54,40 @@ The procedure:
    a. run `git checkout -b annotation-statistics origin/baseline`
    b. modify the project's build file so that it
         i. does not run the typecheckers that it was running before, and
-        ii. does runs the `org.checkerframework.common.util.count.AnnotationStatistics` processor
+        ii. does run the processor org.checkerframework.common.util.count.AnnotationStatistics
    c. add the `-Aannotations` and `-Anolocations` options, and make sure that you remove any `-Werror` argument to javac.
    d. If the build system is maven, add `<showWarnings>true</showWarnings>` to the maven-compiler-plugin `<configuration>`.
    d. If the project is running a formatter (ex: Spotless), disable it in the build system. 
    e. Stage your changes with `git add` (in case you missed a formatter).
-   f. compile the program and record the output in the spreadsheet.
-      TODO: What am I looking for in the voluminous output?  Often I cannot see anything.
-      (You should
-      create a new "sheet" in the spreadsheet for each project. Copy one that's
-      already there and delete the data in it.)
-      TODO: All the current ones have different formats; they should be made uniform.
+   f. Compute annotation statistics.
+       i. Clean the program, then compile the program.
+       ii. Look in the output for "Found annotations:" or "No annotations found."
+          TODO: Make the two tags searchable via a single string or simple regex.
+       iii. Create a new "sheet" in the spreadsheet for the project, by copying an existing
+          sheet, changing its title, and deleting the data in it.
+          TODO: All the current ones have different formats; they should be made uniform.
+       iv. Record the output in the spreadsheet.
+          TODO: Record *all* output, or only org.checkerframework.* annotations?
+          TODO: sometimes there are mulitple projects, so there are multiple occurrences of "Found annotations:".  The "Found annotations:" output should indicate in which directory or project the annotations were found, or a script should combine all the tables in the output into a single table.
    TODO: consider writing a script for interpreting the output of AnnotationStatistics by checker?
-   g. run `git commit -am "annotation statistics configuration" ; git push origin annotation-statistics`.
+   g. run `git commit -m "annotation statistics configuration" ; git push origin annotation-statistics`.
 
 7. Collect the number of lines of code:
    a. run `git checkout baseline`
-   b. run `scc .` and record the number of non-comment, non-blanks lines of Java code (the "Code" column of the "Java" row) in the spreadsheet at https://docs.google.com/spreadsheets/d/1r_NhumolEp5CiOL7CmsvZaa4-FDUxCJXfswyJoKg8uM/edit#gid=0 (in the "LoC" column, on the summary page)
-   If you don't have scc installed, https://github.com/boyter/scc .
+   b. run `scc .` and record the number of non-comment, non-blanks lines of Java code (the "Code" column of the "Java" row) in the spreadsheet at https://docs.google.com/spreadsheets/d/1r_NhumolEp5CiOL7CmsvZaa4-FDUxCJXfswyJoKg8uM (in the "LoC" column, on the summary page)
+   If you don't have scc installed, see https://github.com/boyter/scc .
    
 8. Run WPI:
    a. run `git checkout -b wpi-enabled origin/unannotated`
    b. choose any temporary directory for $WPITEMPDIR
-   c. modify the build file to run with `-Ainfer=ajava`, `-Awarns`, '-AinferOutputOriginal', and `-Aajava=$WPITEMPDIR` (modifying the latter as appropriate for project structure, 
-   Ex: '-Aajava=/path/to/temp/dir/'). Make sure that you remove any `-Werror` argument to javac, because otherwise WPI will fail.
-   d. Copy `wpi-template.sh` to `wpi.sh` in the project directory.  Edit the first 5 variables.
-      This should achieve the following effect:
+      TODO: Giving the user choices can be confusing.  Just dictate a temporary directory here, or hardcode it in the commands below.  I'm using /scratch/$USER/wpi-output
+   c. modify the build file:
+       i. run with `-Ainfer=ajava`, `-Awarns`, `-AinferOutputOriginal`, and `-Aajava=$WPITEMPDIR`
+          (modifying the latter as appropriate for project structure, Ex: '-Aajava=/path/to/temp/dir/').
+       ii. Remove any `-Werror` argument to javac, because otherwise WPI will fail.
+   d. Copy `wpi-template.sh` to `wpi.sh` in the project directory.
+      Edit the first 5 variables.
+      This script should achieve the following effect:
       i. copy the content of `build/whole-program-inference` into $WPITEMPDIR
       ii. compile the code 
       iii. compare `build/whole-program-inference` and $WPITEMPDIR. If they're the same, exit. Otherwise, go to step i.
