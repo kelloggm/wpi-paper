@@ -269,8 +269,8 @@ public class InferredAnnosCounter {
    * This method checks if a particular index in a line belongs to a string literal
    *
    * @param line a line
-   * @param Index index of line
-   * @return false if Index belongs to a string literal, true otherwise
+   * @param index index of line
+   * @return false if index belongs to a string literal, true otherwise
    */
   private static boolean checkInString(int index, String line) {
     if (index >= line.length() || index < 0) {
@@ -320,10 +320,16 @@ public class InferredAnnosCounter {
   }
 
   /**
-   * This method is used to format annotation that contains arguments, such
-   * as @EnsuresNonNull("tz1"). This method has two parts. First, we check if the annotation
-   * contains a matrix and format the matrix if we found one. Second, we'll remove all curly braces
-   * in that annotation.
+   * This method formats annotations that contain arguments, such as @EnsuresNonNull("tz1").
+   * Previously, we had a problem when working with these types of annotations. The
+   * computer-generated files sometimes put an additional pair of curly braces. Initially, we
+   * approached this problem by adding a pair of curly braces to every annotation having a pair of
+   * parentheses but no curly braces. But then we might run into a problem if there are parentheses
+   * inside the arguments. This new method has two parts. First, we check if the annotation contains
+   * a matrix and format the matrix if we found one. We format it by changing all "}, {" pattern to
+   * "|, |". Second, we'll remove all curly braces in that annotation. By this way way, we make sure
+   * that we will not mess up the important curly braces, otherwise something like ({3, 4}) and
+   * ({3}, {4}) will both end up being (3,4).
    *
    * @param annotation an annotation to be formatted
    * @return formatted annotation
