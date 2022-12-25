@@ -11,7 +11,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.checkerframework.checker.index.qual.IndexFor;
 
 /**
  * The entry point for the inferred annos counter. Run this by passing arguments, with the first
@@ -273,15 +272,18 @@ public class InferredAnnosCounter {
    * @param Index index of line
    * @return false if Index belongs to a string literal, true otherwise
    */
-  private static boolean checkInString(@IndexFor("#2") int Index, String line) {
+  private static boolean checkInString(int index, String line) {
+    if (index >= line.length() || index < 0) {
+      throw new RuntimeException("The index provided for checkInString is not valid");
+    }
     int before = 0;
     int after = 0;
-    for (int i = 0; i < Index; i++) {
+    for (int i = 0; i < index; i++) {
       if (line.charAt(i) == '\"') {
         before++;
       }
     }
-    for (int i = Index + 1; i < line.length(); i++) {
+    for (int i = index + 1; i < line.length(); i++) {
       if (line.charAt(i) == '\"') {
         after++;
       }
@@ -536,7 +538,6 @@ public class InferredAnnosCounter {
       // one CF annotation and nothing else.
       if (checkerPackage.contains(specialAnno)) {
         originalFileLine = formatAnnotaionsWithArguments(originalFileLine);
-        System.out.println(originalFileLine);
         if (annoCount.containsKey(specialAnno)) {
           int numberOfAnno = annoCount.get(specialAnno);
           annoCount.put(specialAnno, numberOfAnno + 1);
@@ -567,7 +568,6 @@ public class InferredAnnosCounter {
           ajavaFileLine = formatAnnotaionsWithArguments(ajavaFileLine);
         }
         ajavaFileLine = extractCheckerPackage(ajavaFileLine);
-        System.out.println(formatAnnotaionsWithArguments(ajavaFileLine));
         ajavaFileLine = ajavaFileLine.trim();
         newFile.add(ajavaFileLine);
       }
@@ -584,7 +584,6 @@ public class InferredAnnosCounter {
         // INSERT type indicates that the annotations only appear in the computer-generated files.
         // So we don't take it into consideration.
         if (deltaInString.contains("@") && delta.getType() != DeltaType.INSERT) {
-          System.out.println(deltaInString);
           List<String> myList = delta.getSource().getLines();
           // get the position of that annotation in the delta, which is something like "5," or "6,".
           int position = delta.getSource().getPosition();
