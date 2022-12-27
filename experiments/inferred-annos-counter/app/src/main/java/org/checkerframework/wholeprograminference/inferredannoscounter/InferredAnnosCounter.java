@@ -11,6 +11,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.checkerframework.checker.index.qual.IndexFor;
+import org.checkerframework.checker.index.qual.LTLengthOf;
+
+
 
 /**
  * The entry point for the inferred annos counter. Run this by passing arguments, with the first
@@ -272,23 +276,14 @@ public class InferredAnnosCounter {
    * @param index index of line
    * @return false if index belongs to a string literal, true otherwise
    */
-  private static boolean checkInString(int index, String line) {
-    if (index >= line.length() || index < 0) {
-      throw new RuntimeException("The index provided for checkInString is not valid");
-    }
+  private static boolean checkInString(@IndexFor("#2") int index, String line) {
     int before = 0;
-    int after = 0;
     for (int i = 0; i < index; i++) {
       if (line.charAt(i) == '\"') {
         before++;
       }
     }
-    for (int i = index + 1; i < line.length(); i++) {
-      if (line.charAt(i) == '\"') {
-        after++;
-      }
-    }
-    if (before % 2 == 0 && after % 2 == 0) {
+    if (before % 2 == 0) {
       return true;
     }
     return false;
@@ -302,12 +297,9 @@ public class InferredAnnosCounter {
    * @param symbol the new character
    * @return the line with the character at index replaced by symbol
    */
-  private static String replaceAtIndex(String line, int index, String symbol) {
-    if (index < 0 || index > line.length()) {
-      throw new RuntimeException("The index provided for replaceAtIndex is not valid");
-    }
+  private static String replaceAtIndex(String line, @IndexFor("#1") int index, String symbol) {
     String result = line;
-    String firstPart = result.substring(0, index);
+    String firstPart = line.substring(0, index);
     if (index + 1 < result.length()) {
       String secondPart = result.substring(index + 1, result.length());
       result = firstPart + symbol + secondPart;
@@ -339,9 +331,15 @@ public class InferredAnnosCounter {
     /*
     First, we format cases involving matrix by changing all "}, {" to "|, |"
      */
-    int indexOfClose = result.indexOf("},");
+    @SuppressWarnings("assignment") /* This seems to be a bug with Index Checker, here is the link to the bug report: https://github.com/typetools/checker-framework/issues/5471
+    */
+    @LTLengthOf("result") int indexOfClose = result.indexOf("},");
     while (indexOfClose != -1) {
       int indexOfOpen = result.indexOf('{', indexOfClose);
+      //reaching the end of a line
+      if (indexOfOpen < 0) {
+        return result;
+      }
       if (checkInString(indexOfClose, result)) {
         result = replaceAtIndex(result, indexOfClose, "|");
         result = replaceAtIndex(result, indexOfOpen, "|");
@@ -367,7 +365,9 @@ public class InferredAnnosCounter {
   private static String ignoreComment(String line) {
     int indexComment = line.length() + 1;
     String finalLine = line;
-    int indexDash = line.indexOf("//");
+    @SuppressWarnings("assignment") /* This seems to be a bug with Index Checker, here is the link to the bug report: https://github.com/typetools/checker-framework/issues/5471
+     */
+    @LTLengthOf("line") int indexDash = line.indexOf("//");
     int indexStar = line.indexOf("*");
     int indexDashStar = line.indexOf("/*");
     if (indexDash != -1) {
@@ -458,8 +458,8 @@ public class InferredAnnosCounter {
       int index1 = temp.indexOf('@');
       if (index1 == -1) {
         throw new RuntimeException(
-            "The extractString method relies on the countAnnos method. Either the countAnnos method is wrong"
-                + "or it was not called properly");
+                "The extractString method relies on the countAnnos method. Either the countAnnos method is wrong"
+                        + "or it was not called properly");
       }
       String tempAnno = getAnnos(temp);
       if (checkInString(index1, temp)) {
@@ -509,7 +509,7 @@ public class InferredAnnosCounter {
 
     if (args.length <= 1) {
       throw new RuntimeException(
-          "Provide at least one .java file and one or more" + ".ajava files.");
+              "Provide at least one .java file and one or more" + ".ajava files.");
     }
 
     // These variables are maintained throughout:
@@ -529,7 +529,7 @@ public class InferredAnnosCounter {
     int originalFileLineCount = 0;
     List<String> inputFileWithOnlySingleLineAnno = annoMultiToSingle(args[0]);
     List<String> inputFileWithEachAnnoOnOneLine =
-        eachAnnotationInOneSingleLine(inputFileWithOnlySingleLineAnno);
+            eachAnnotationInOneSingleLine(inputFileWithOnlySingleLineAnno);
     int originalFileLineIndex = -1;
     // Read the original file once to determine the annotations that written by the human.
     for (String originalFileLine : inputFileWithEachAnnoOnOneLine) {
@@ -565,7 +565,7 @@ public class InferredAnnosCounter {
     for (int i = 1; i < args.length; ++i) {
       List<String> inputFileWithOnlySingleLineAnno2 = annoMultiToSingle(args[i]);
       List<String> inputFileWithEachAnnoOnOneLine2 =
-          eachAnnotationInOneSingleLine(inputFileWithOnlySingleLineAnno2);
+              eachAnnotationInOneSingleLine(inputFileWithOnlySingleLineAnno2);
       List<String> newFile = new ArrayList<>();
       for (String ajavaFileLine : inputFileWithEachAnnoOnOneLine2) {
         ajavaFileLine = ignoreComment(ajavaFileLine);
