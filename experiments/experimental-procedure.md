@@ -31,18 +31,17 @@ in some of the steps of the experimental procedure below.
 
 The procedure:
 
-1. Fork and then clone the project. In the file `projects.in`, record the URL (of your fork) and
-commit ID of the main/master branch. Then, add a row to the "summary" sheet in the spreadsheet
-(https://docs.google.com/spreadsheets/d/1r_NhumolEp5CiOL7CmsvZaa4-FDUxCJXfswyJoKg8uM/edit?usp=sharing)
-with both the original and forked url as well as the commit ID.
+1. Clone the project
+   a. Fork the project.
+   b. Clone your fork in the experiments/projects/ directory (create it if necessary).
+   c. In the file `projects.in`, record the URL (of your fork) and commit ID.
+   d. Add a row to the "summary" sheet in the spreadsheet
+      (https://docs.google.com/spreadsheets/d/1r_NhumolEp5CiOL7CmsvZaa4-FDUxCJXfswyJoKg8uM/)
+      with both the original and forked url as well as the commit ID.
 
 2. Create a new branch called "baseline" at that commit:
    a. `git checkout -b baseline ; git push origin baseline`
-   b. Ensure that the project compiles and typechecks. Checking this varies depending on
-   build system: on Gradle, `./gradlew compileJava`; on Maven, `./mvnw compile` or `mvn compile`;
-   on Ant `ant compile`; etc. Determine the build system and check that the appropriate command succeeds.
-   If you cannot build the project, record that in the spreadsheet by changing the row color
-   to red, and abort the process.
+   b. Ensure that the project builds and typechecks (determine the appropriate command and record it in the spreadsheet).
    c. Inspect the project's build system and determine the list of typecheckers from the Checker
    Framework that the project runs. How this is expressed also varies by build system. For example, in
    a Gradle project that uses the checkerframework-gradle-plugin, you would check the `checkers` block.
@@ -63,33 +62,53 @@ with both the original and forked url as well as the commit ID.
    a. run `git checkout -b annotation-statistics origin/baseline`
    b. modify the project's build file so that it
         i. does not run the typecheckers that it was running before, and
-        ii. does runs the `org.checkerframework.common.util.count.AnnotationStatistics` processor
+        ii. does run the processor org.checkerframework.common.util.count.AnnotationStatistics
         iii. add the `-Aannotations` and `-Anolocations` options, and make sure that you remove any `-Werror` argument to javac.
-   c. compile the program and record the output in the spreadsheet. (You should
-   create a new "sheet" in the spreadsheet for each project. Copy one that's
-   already there and delete the data in it.)
+   c. If the build system is maven, add `<showWarnings>true</showWarnings>` to the maven-compiler-plugin `<configuration>`.
+   d. If the project is running a formatter (ex: Spotless), disable it in the build system. 
+   e. Stage your changes with `git add` (in case you missed a formatter).
+   f. Compute annotation statistics.
+       i. Clean the program, then compile the program.
+       ii. Look in the output for "Found annotations:" or "No annotations found."
+          TODO: Make the two tags searchable via a single string or simple regex.
+       iii. Create a new "sheet" in the spreadsheet for the project, by copying an existing
+          sheet, changing its title, and deleting the data in it.
+          TODO: All the current ones have different formats; they should be made uniform.
+       iv. Record the output in the spreadsheet (only Checker Framework annotations need to be recorded. Checker Framework
+           annotations usually are in a package that starts with "org.checkerframework.*", but if the project uses a custom
+	   checker you will need to figure out what its annotations are.).
+          TODO: sometimes there are mulitple projects, so there are multiple occurrences of "Found annotations:".  The "Found annotations:" output should indicate in which directory or project the annotations were found, or a script should combine all the tables in the output into a single table.
    TODO: consider writing a script for interpreting the output of AnnotationStatistics by checker?
-   d. run `git commit -am "annotation statistics configuration" ; git push origin annotation-statistics`
+   g. run `git commit -m "annotation statistics configuration" ; git push origin annotation-statistics`.
 
 5. Collect the number of lines of code:
    a. run `git checkout baseline`
-   b. run `scc .` and record the number of non-comment, non-blanks lines of Java code (the "Code" column of the "Java" row) in the spreadsheet (in the "LoC" column), on the summary page (if you don't have scc installed, https://github.com/boyter/scc)
+   b. run `scc .` and record the number of non-comment, non-blanks lines of Java code (the "Code" column of the "Java" row) in the spreadsheet at https://docs.google.com/spreadsheets/d/1r_NhumolEp5CiOL7CmsvZaa4-FDUxCJXfswyJoKg8uM (in the "LoC" column, on the summary page)
+   If you don't have scc installed, see https://github.com/boyter/scc .
    
 6. Run WPI:
    a. run `git checkout -b wpi-enabled origin/unannotated`
-   b. choose any temporary directory for $WPITEMPDIR [[TODO: It's less error-prone to specify a concrete value.  That's one less thing for people to decide and remember.  Also, give a command (such as `set` or `setenv`, so that people don't have to figure out how to set it.  I'm actually curious why human interaction is needed at all here.  Why can't the script choose a value (according to some well-defined algorithm)?  Also, are there any caveats about reusing $WPITEMPDIR from experiment to experiment?  Does it need to be cleared out between different experiments reusing it?]]
-   c. modify the build file to run with `-Ainfer=ajava`, `-Awarns`, '-AinferOutputOriginal', and `-Aajava=$WPITEMPDIR` (modifying the latter as appropriate for project structure, 
-   Ex: '-Aajava=/path/to/temp/dir/'). Make sure that you remove any `-Werror` argument to javac, because otherwise WPI will fail.
-   d. write a short script named `wpi.sh` based on the template in `wpi-template.sh`. The script should:
+   b. choose any temporary directory for $WPITEMPDIR
+      TODO: Giving the user choices can be confusing and requires user effort.  Just dictate a temporary directory here, or hardcode it in the commands below.  I'm personally using /scratch/$USER/wpi-output/PROJECTNAME-wpi . (If you're reading this later and are unsure what to chose, this is a good default.)
+   c. modify the build file:
+       i. run with `-Ainfer=ajava`, `-Awarns`, and `-Aajava=$WPITEMPDIR`
+          (modifying the latter as appropriate for project structure, Ex: '-Aajava=/path/to/temp/dir/').
+       ii. Remove any `-Werror` argument to javac, because otherwise WPI will fail.
+       iii. Disable any non-Checker-Framework annotation processors (e.g., user-defined ones)
+   d. Copy `wpi-template.sh` to `wpi.sh` in the project directory.
+      Edit the first 5 variables.
+      This script should achieve the following effect:
       i. copy the content of `build/whole-program-inference` into $WPITEMPDIR
       ii. compile the code 
       iii. compare `build/whole-program-inference` and $WPITEMPDIR. If they're the same, exit. Otherwise, go to step i.
-   Rather than writing this script repeatedly (which is error-prone), could a script be created (say, in `wpi-paper/experiments`) that takes as an argument the command that compiles the code?
-   e. add this script: `chmod +x wpi.sh ; git add wpi.sh`
-   f. commit the script and buildfile changes: `git commit -am "enable WPI" ; git push origin wpi-enabled`
-   g. execute the script: `./wpi.sh`
-   h. record (in the spreadsheet, in a tab for this project; you may need to create one by copying another tab)
-   the number of errors issued by the typecheckers (and which typechecker issued the error) after the script is finished
+   e. make git store this script: `chmod +x wpi.sh ; git add wpi.sh`
+   f. commit the script and build changes: `git commit -am "enable WPI" ; git push origin wpi-enabled`
+   g. execute the script (this may take a while): `./wpi.sh`
+      If the Checker Framework crashes, you might need to update to a newer version (on all branches).
+   h. Record, under "Warnings after WPI" in the project's tab in the spreadsheet at
+      https://docs.google.com/spreadsheets/d/1r_NhumolEp5CiOL7CmsvZaa4-FDUxCJXfswyJoKg8uM/ ,
+      the number of errors issued by the typecheckers and which 
+      typechecker issued the error.
 
 7. Create a branch for the code with inferred annotations
    a. Create a branch: `git checkout -b wpi-annotations annotation-statistics`
@@ -114,6 +133,10 @@ with both the original and forked url as well as the commit ID.
     f. copy[[TODO: Here and elsewhere, instead of giving an English description of the high-level operation to perform, give a concrete command line that can be cut-and-pasted, reducing errors.]] outputs of this experimental procedure into (`/main/experiments/inferred-annos-counter/inputExamples`). This can be done by creating a directory in (`/inferred-annos-counter/inputExamples`) with the name of your project and two sub folders, `generated` and `human-written`. (This and following steps are optional. Use as input for downstream tools on small projects only).
     g. copy all of the contents in your `$WPITEMPDIR` directory used in the previous steps into the `generated` subfolder. 
     h. copy all of the human-written code (the human-annotated, i.e. original, code, but with a formatter run over it) from your project's source folder (e.g., ./src/main/java/ in a Gradle project) into the `human-written` directory that was created
-    i. Go to the working directory of InferredAnnosCounter[[TODO: What is its working directory?  Is that in the wpi-paper repo, or somewhere else?]]. Run the InferredAnnosCounter, with the first argument being the absolute path of the human-written file, and other arguments being the absolute path of the .ajava files produced by the WPI. The program assumes that a formatter has been applied[[TODO: Can it do so, rather than making the assumption?]], so it is important to do so before passing the files as input. InferredAnnosCounter only takes one human-written source file at a time[[TODO: Can it be enhanced to work on multiple files, or can a wrapper script be written?]]. So in case it is needed to run multiple human-written files with corresponding computer-generated files, InferredAnnosCounter needs to be invoked multiple times. The way to run InferredAnnosCounter is like this[[TODO: This should be the first text in this item.  It's what a person needs to know.]]: ```cd experiments\inferred-annos-counter ``` (going to the working directory) and then ``` gradle run --args = "(a path to the human-written file) (one or more paths to the computer-generated files)" | sort ```.
+    i. Run the InferredAnnosCounter.
+      i. Go to the working directory of InferredAnnosCounter (ie, ./experiments/inferred-annos-counter, where . is the root of the repository containing this document).
+      ii. Run the InferredAnnosCounter, with the first argument being the absolute path of the .java file, and other arguments being the absolute path of the .ajava files produced by the WPI. The program assumes that a formatter has been applied, so it is important to do so before passing the files as input. InferredAnnosCounter only takes one .java file at a time. So in case it is needed to run multiple .java files with corresponding .ajava files, InferredAnnosCounter needs to be invoked multiple times. [[ TODO: this should be scripted using a find/exec to locate all the Java files and then run the following command on them.. ]] The way to run InferredAnnosCounter is like this: ```cd experiments/inferred-annos-counter ``` (going to the working directory) and then ``` ./gradlew run --args="(a path to the .java file) (one or more paths to the .ajava files)" ```. The result will not be in alphabetical order.
+      iii. Record the result in project-specific tab of the speadsheet at https://docs.google.com/spreadsheets/d/1r_NhumolEp5CiOL7CmsvZaa4-FDUxCJXfswyJoKg8uM/edit#gid=0.  
     
-10. Copy summary numbers from the project-specific spreadsheet page to the "summary" tab, and color code the project row green once it is finished.
+12. Copy summary numbers from the project-specific spreadsheet page to the "summary" tab at https://docs.google.com/spreadsheets/d/1r_NhumolEp5CiOL7CmsvZaa4-FDUxCJXfswyJoKg8uM/edit#gid=0, and color code the project row green once it is finished.
+>>>>>>> 1bf9c0b507f321efde6921ad40595c6a59ecc116
