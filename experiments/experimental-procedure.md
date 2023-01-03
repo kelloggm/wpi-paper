@@ -32,10 +32,10 @@ in some of the steps of the experimental procedure below.
 The procedure:
 
 1. Clone the project
-   a. Fork the project.
-   b. Clone your fork in the experiments/projects/ directory (create it if necessary).
-   c. In the file `projects.in`, record the URL (of your fork) and commit ID.
-   d. Add a row to the "summary" sheet in the spreadsheet
+   1. Fork the project.
+   2. Clone your fork in the experiments/projects/ directory (create it if necessary).
+   3. In the file `projects.in`, record the URL (of your fork) and commit ID.
+   4. Add a row to the "summary" sheet in the spreadsheet
       (https://docs.google.com/spreadsheets/d/1r_NhumolEp5CiOL7CmsvZaa4-FDUxCJXfswyJoKg8uM/)
       with both the original and forked url as well as the commit ID.
 
