@@ -49,7 +49,7 @@ The procedure:
    "Checkers" column of the spreadsheet.
    4. Change the project build file to use the head of checkerframework. This can be done by:
       1. Pulling the latest changes to your local checkerframework instance.
-      2. Running `./gradlew publishToMavenlocal` in your local checkerframework. Generates a SNAPSHOT of the current release version + 1. (ie, 3.28.1)
+      2. Running `./gradlew publishToMavenlocal` in your local checkerframework. Generates a SNAPSHOT of the current release version + 1.
       3. Confirm the snapshot can be found in `~/.m2/repository/org/checkerframework/checker/`
       4. Modify the build file to use this snapshot. 
 
