@@ -31,7 +31,7 @@ in some of the steps of the experimental procedure below.
 
 The procedure:
 
-##### A. Clone the project
+##### A. Clone the project:
    1. Fork the project.
    2. Clone your fork in the experiments/projects/ directory (create it if necessary).
    3. In the file `projects.in`, record the URL (of your fork) and commit ID.
@@ -115,7 +115,7 @@ The procedure:
       the number of errors issued by the typecheckers and which 
       typechecker issued the error.
 
-##### G. Create a branch for the code with inferred annotations
+##### G. Create a branch for the code with inferred annotations:
    1. Create a branch: `git checkout -b wpi-annotations annotation-statistics`
    2. Create a new directory for the inferred ajava files: `mkdir wpi-annotations`
    3. copy all the ajava files: `rsync -r ${WPITEMPDIR}/ wpi-annotations`
@@ -131,7 +131,7 @@ The procedure:
       (this happens when e.g., different @RequiresQualifier annotations are inferred by different checkers)
    6. commit and push the script: `git add compute-annos-inferred.sh ; git commit -m "inference output summarization script" ; git push origin wpi-annotations`
 
-##### I. Measure the percentage of hand-written annotations that WPI inferred
+##### I. Measure the percentage of hand-written annotations that WPI inferred:
    1. copy the experiments directory's `format.sh` to `format-mycopy.sh` found in the experiments directory into your project's top level directory. 
    2. download the `google-java-format.jar`.[[TODO: I think the script should do this.]] The link for it is in the script's documentation. Confirm the variable path in the script aligns with the location of your download.
    3. change the variable, `WPI_RESULTS_DIR` to the path of your project's WPI annotations `wpi-annotations`.[[TODO: Why not make this a command-line argument, or computing it from other information that is available?]]
@@ -146,5 +146,5 @@ The procedure:
       [[ TODO: this should be scripted using a find/exec to locate all the Java files and then run the following command on them.. ]] The way to run InferredAnnosCounter is like this: ```cd experiments/inferred-annos-counter ``` (going to the working directory) and then ``` ./gradlew run --args="(a path to the .java file) (one or more paths to the .ajava files)" ```. The result will not be in alphabetical order.
       iii. Record the result in project-specific tab of the speadsheet at https://docs.google.com/spreadsheets/d/1r_NhumolEp5CiOL7CmsvZaa4-FDUxCJXfswyJoKg8uM/edit#gid=0.  
     
-##### J. 
+##### J:
    1. Copy summary numbers from the project-specific spreadsheet page to the "summary" tab at https://docs.google.com/spreadsheets/d/1r_NhumolEp5CiOL7CmsvZaa4-FDUxCJXfswyJoKg8uM/edit#gid=0, and color code the project row green once it is finished.
