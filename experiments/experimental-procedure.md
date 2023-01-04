@@ -47,11 +47,12 @@ The procedure:
    a Gradle project that uses the checkerframework-gradle-plugin, you would check the `checkers` block.
    In other build systems, look for a `-processor` argument. Record the names of the typecheckers in the
    "Checkers" column of the spreadsheet.
-   4. Change the project build file to use the head of checkerframework. This can be done by:
-      1. Pulling the latest changes to your local checkerframework instance.
-      2. Running `./gradlew publishToMavenlocal` in your local checkerframework. Generates a SNAPSHOT of the current release version + 1.
-      3. Confirm the snapshot can be found in `~/.m2/repository/org/checkerframework/checker/`
-      4. Modify the build file to use this snapshot. 
+   4. Change the project build file to use the HEAD of typetools/checkerframework. This can be done by:
+      1. Pull the latest changes to your local working copy of the checker-framework respository.
+      2. Run `./gradlew publishToMavenlocal` in your checker-framework working copy. This generates a SNAPSHOT of the current release version + 1.
+         (ie, REL 3.28.0 would generate 3.28.1-SNAPSHOT).
+      3. Modify the build file to use this snapshot. This can be project specific, find the line where checkerframeworkversion or similar is defined. You will have to 
+         replace the version that is defined (i,e For Maven, <cfversion>3.28.0<cfversion> to <cfversion>3.28.1-SNAPSHOT</cfversion>).
 
 ##### C. Create a new branch called "unannotated" from the same commit, with annotations removed:
    1. `git checkout -b unannotated`
