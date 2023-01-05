@@ -32,7 +32,10 @@ WPIOUTDIR=~/.gradle/workers/build/whole-program-inference
 BUILD_CMD="./gradlew compileJava"
 CLEAN_CMD="./gradlew clean"
 
-# Whether to run in debug mode.
+# Whether to run in debug mode. In debug mode, output is printed to the terminal
+# at the beginning of each iteration, and the diff between each pair of iterations is
+# saved in a file named iteration$count.diff, starting with iteration1.diff.
+# (Note that these files are overwritten if they already exist.)
 DEBUG=1
 
 # End of variables. You probably don't need to make changes below this line.
@@ -40,16 +43,23 @@ DEBUG=1
 rm -rf ${WPITEMPDIR}
 mkdir -p ${WPITEMPDIR}
 
+count=1
 while : ; do
     if [[ ${DEBUG} == 1 ]]; then
-	echo "entering a new iteration"
+	echo "entering iteration ${count}"
     fi
     ${BUILD_CMD}
     ${CLEAN_CMD}
     # This mkdir is needed when the project has subprojects.
     mkdir -p "${WPITEMPDIR}"
     mkdir -p "${WPIOUTDIR}"
-    [[ $(diff -r ${WPITEMPDIR} ${WPIOUTDIR}) ]] || break
+    DIFF_RESULT=$(diff -r ${WPITEMPDIR} ${WPIOUTDIR})
+    if [[ ${DEBUG} == 1 ]]; then
+	echo "putting the diff for iteration $count into $(realpath iteration$count.diff)"
+	echo ${DIFF_RESULT} > iteration$count.diff
+    fi
+    [[ "$DIFF_RESULT" != "" ]] || break
     rm -rf ${WPITEMPDIR}
     mv ${WPIOUTDIR} ${WPITEMPDIR}
+    ((count++))
 done
