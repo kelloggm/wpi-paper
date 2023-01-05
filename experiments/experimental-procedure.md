@@ -31,111 +31,123 @@ in some of the steps of the experimental procedure below.
 
 The procedure:
 
-1. Clone the project
-   a. Fork the project.
-   b. Clone your fork in the experiments/projects/ directory (create it if necessary).
-   c. In the file `projects.in`, record the URL (of your fork) and commit ID.
-   d. Add a row to the "summary" sheet in the spreadsheet
+##### A. Clone the project:
+   1. Fork the project.
+   2. Clone your fork in the experiments/projects/ directory (create it if necessary).
+   3. In the file `projects.in`, record the URL (of your fork) and commit ID.
+   4. Add a row to the "summary" sheet in the spreadsheet
       (https://docs.google.com/spreadsheets/d/1r_NhumolEp5CiOL7CmsvZaa4-FDUxCJXfswyJoKg8uM/)
       with both the original and forked url as well as the commit ID.
 
-2. Create a new branch called "baseline" at that commit:
-   a. `git checkout -b baseline ; git push origin baseline`
-   b. Ensure that the project builds and typechecks (determine the appropriate command and record it in the spreadsheet).
-   c. Inspect the project's build system and determine the list of typecheckers from the Checker
+##### B. Create a new branch called "baseline" at that commit:
+   1. `git checkout -b baseline ; git push origin baseline`
+   2. Ensure that the project builds and typechecks (determine the appropriate command and record it in the spreadsheet).
+   3. Inspect the project's build system and determine the list of typecheckers from the Checker
    Framework that the project runs. How this is expressed also varies by build system. For example, in
    a Gradle project that uses the checkerframework-gradle-plugin, you would check the `checkers` block.
    In other build systems, look for a `-processor` argument. Record the names of the typecheckers in the
    "Checkers" column of the spreadsheet.
+   4. Change the project build file to use the HEAD of typetools/checkerframework:
+      1. Pull the latest changes to your local working copy of the checker-framework respository.
+      2. Run `./gradlew publishToMavenlocal` in your checker-framework working copy. This generates a SNAPSHOT of the current release version + 1.
+         (ie, REL 3.28.0 would generate 3.28.1-SNAPSHOT).
+      3. Modify the build file to use this snapshot. This can be project specific, find the line where checkerframeworkversion or similar is defined. You will have to 
+         replace the version that is defined. 
+         1. For Maven, you may find the checker-framework version under properties, the tag may vary. Modify the line to use the generated snapshot by replacing the version with your appropriate snapshot (ie, "3.28.1-SNAPSHOT").
+         2. For Gradle, refer to the Gradle Plugin's README, https://github.com/kelloggm/checkerframework-gradle-plugin#specifying-a-checker-framework-version. 
 
-3. Create a new branch called "unannotated" from the same commit, with annotations removed:
-   a. `git checkout -b unannotated`
-   b. Run the `RemoveAnnotationsForInference` program on the source; no ouput means it ran successfully:
+##### C. Create a new branch called "unannotated" from the same commit, with annotations removed:
+   1. `git checkout -b unannotated`
+   2. Run the `RemoveAnnotationsForInference` program on the source; no ouput means it ran successfully:
       `java -cp "$CHECKERFRAMEWORK/checker/dist/checker.jar" org.checkerframework.framework.stub.RemoveAnnotationsForInference .`
-   c. Push the unannotated code:
+   3. Push the unannotated code:
       `git commit -am "output of RemoveAnnotationsForInference" ; git push origin unannotated`
-   d. Verify that, because the annotations have been removed, the program no longer typechecks. You should
+   4. Verify that, because the annotations have been removed, the program no longer typechecks. You should
    see an error from one of the Checker Framework checkers you recorded in step 2c when you re-run whatever
    command you used to run the typechecker before.
 
-4. Collect the number of original annotations in the code:
-   a. run `git checkout -b annotation-statistics origin/baseline`
-   b. modify the project's build file so that it
-        i. does not run the typecheckers that it was running before, and
-        ii. does run the processor org.checkerframework.common.util.count.AnnotationStatistics
-        iii. add the `-Aannotations` and `-Anolocations` options, and make sure that you remove any `-Werror` argument to javac.
-   c. If the build system is maven, add `<showWarnings>true</showWarnings>` to the maven-compiler-plugin `<configuration>`.
-   d. If the project is running a formatter (ex: Spotless), disable it in the build system. 
-   e. Stage your changes with `git add` (in case you missed a formatter).
-   f. Compute annotation statistics.
-       i. Clean the program, then compile the program.
-       ii. Look in the output for "Found annotations:" or "No annotations found."
-          TODO: Make the two tags searchable via a single string or simple regex.
-       iii. Create a new "sheet" in the spreadsheet for the project, by copying an existing
-          sheet, changing its title, and deleting the data in it.
-          TODO: All the current ones have different formats; they should be made uniform.
-       iv. Record the output in the spreadsheet (only Checker Framework annotations need to be recorded. Checker Framework
-           annotations usually are in a package that starts with "org.checkerframework.*", but if the project uses a custom
-	   checker you will need to figure out what its annotations are.).
-          TODO: sometimes there are mulitple projects, so there are multiple occurrences of "Found annotations:".  The "Found annotations:" output should indicate in which directory or project the annotations were found, or a script should combine all the tables in the output into a single table.
-   TODO: consider writing a script for interpreting the output of AnnotationStatistics by checker?
-   g. run `git commit -m "annotation statistics configuration" ; git push origin annotation-statistics`.
+##### D. Collect the number of original annotations in the code:
+   1. run `git checkout -b annotation-statistics origin/baseline`
+   2. modify the project's build file so that it
+        1. does not run the typecheckers that it was running before, and
+        2. does run the processor org.checkerframework.common.util.count.AnnotationStatistics
+        3. add the `-Aannotations` and `-Anolocations` options, and make sure that you remove any `-Werror` argument to javac.
+   3. If the build system is maven, add `<showWarnings>true</showWarnings>` to the maven-compiler-plugin `<configuration>`.
+   4. If the project is running a formatter (ex: Spotless), disable it in the build system. 
+   5. Stage your changes with `git add` (in case you missed a formatter).
+   6. Compute annotation statistics.
+       1. Clean the program, then compile the program.
+       2. Look in the output for "Found annotations:" or "No annotations found."
+            TODO: Make the two tags searchable via a single string or simple regex.
+       3. Create a new "sheet" in the spreadsheet for the project, by copying an existing
+            sheet, changing its title, and deleting the data in it.
+            TODO: All the current ones have different formats; they should be made uniform.
+       4. Record the output in the spreadsheet (only Checker Framework annotations need to be recorded. Checker Framework
+            annotations usually are in a package that starts with "org.checkerframework.*", but if the project uses a custom
+	         checker you will need to figure out what its annotations are.).
+         TODO: sometimes there are mulitple projects, so there are multiple occurrences of "Found annotations:".  The "Found annotations:" output should indicate in which directory or project the annotations were found, or a script should combine all the tables in the output into a single table.
+         TODO: consider writing a script for interpreting the output of AnnotationStatistics by checker?
+   7. run `git commit -m "annotation statistics configuration" ; git push origin annotation-statistics`.
 
-5. Collect the number of lines of code:
-   a. run `git checkout baseline`
-   b. run `scc .` and record the number of non-comment, non-blanks lines of Java code (the "Code" column of the "Java" row) in the spreadsheet at https://docs.google.com/spreadsheets/d/1r_NhumolEp5CiOL7CmsvZaa4-FDUxCJXfswyJoKg8uM (in the "LoC" column, on the summary page)
+##### E. Collect the number of lines of code:
+   1. run `git checkout baseline`
+   2. run `scc .` and record the number of non-comment, non-blanks lines of Java code (the "Code" column of the "Java" row) in the spreadsheet at https://docs.google.com/spreadsheets/d/1r_NhumolEp5CiOL7CmsvZaa4-FDUxCJXfswyJoKg8uM (in the "LoC" column, on the summary page)
    If you don't have scc installed, see https://github.com/boyter/scc .
    
-6. Run WPI:
-   a. run `git checkout -b wpi-enabled origin/unannotated`
-   b. choose any temporary directory for $WPITEMPDIR
+##### F. Run WPI:
+   1. run `git checkout -b wpi-enabled origin/unannotated`
+   2. choose any temporary directory for $WPITEMPDIR
       TODO: Giving the user choices can be confusing and requires user effort.  Just dictate a temporary directory here, or hardcode it in the commands below.  I'm personally using /scratch/$USER/wpi-output/PROJECTNAME-wpi . (If you're reading this later and are unsure what to chose, this is a good default.)
-   c. modify the build file:
-       i. run with `-Ainfer=ajava`, `-Awarns`, and `-Aajava=$WPITEMPDIR`
+   3. modify the build file:
+       1. run with `-Ainfer=ajava`, `-Awarns`, and `-Aajava=$WPITEMPDIR`
           (modifying the latter as appropriate for project structure, Ex: '-Aajava=/path/to/temp/dir/').
-       ii. Remove any `-Werror` argument to javac, because otherwise WPI will fail.
-       iii. Disable any non-Checker-Framework annotation processors (e.g., user-defined ones)
-   d. Copy `wpi-template.sh` to `wpi.sh` in the project directory.
+       2. Remove any `-Werror` argument to javac, because otherwise WPI will fail.
+       3. Disable any non-Checker-Framework annotation processors (e.g., user-defined ones)
+   4. Copy `wpi-template.sh` to `wpi.sh` in the project directory.
       Edit the first 5 variables.
       This script should achieve the following effect:
-      i. copy the content of `build/whole-program-inference` into $WPITEMPDIR
-      ii. compile the code 
-      iii. compare `build/whole-program-inference` and $WPITEMPDIR. If they're the same, exit. Otherwise, go to step i.
-   e. make git store this script: `chmod +x wpi.sh ; git add wpi.sh`
-   f. commit the script and build changes: `git commit -am "enable WPI" ; git push origin wpi-enabled`
-   g. execute the script (this may take a while): `./wpi.sh`
+      1. copy the content of `build/whole-program-inference` into $WPITEMPDIR
+      2. compile the code 
+      3. compare `build/whole-program-inference` and $WPITEMPDIR. If they're the same, exit. Otherwise, go to step i.
+   5. make git store this script: `chmod +x wpi.sh ; git add wpi.sh`
+   6. commit the script and build changes: `git commit -am "enable WPI" ; git push origin wpi-enabled`
+   7. execute the script (this may take a while): `./wpi.sh`
       If the Checker Framework crashes, you might need to update to a newer version (on all branches).
-   h. Record, under "Warnings after WPI" in the project's tab in the spreadsheet at
+   8. Record, under "Warnings after WPI" in the project's tab in the spreadsheet at
       https://docs.google.com/spreadsheets/d/1r_NhumolEp5CiOL7CmsvZaa4-FDUxCJXfswyJoKg8uM/ ,
       the number of errors issued by the typecheckers and which 
       typechecker issued the error.
 
-7. Create a branch for the code with inferred annotations
-   a. Create a branch: `git checkout -b wpi-annotations annotation-statistics`
-   b. Create a new directory for the inferred ajava files: `mkdir wpi-annotations`
-   c. copy all the ajava files: `rsync -r ${WPITEMPDIR}/ wpi-annotations`
-   d. commit the results: `git add wpi-annotations/** ; git commit -am "WPI annotations" ; git push origin wpi-annotations`
+##### G. Create a branch for the code with inferred annotations:
+   1. Create a branch: `git checkout -b wpi-annotations annotation-statistics`
+   2. Create a new directory for the inferred ajava files: `mkdir wpi-annotations`
+   3. copy all the ajava files: `rsync -r ${WPITEMPDIR}/ wpi-annotations`
+   4. commit the results: `git add wpi-annotations/** ; git commit -am "WPI annotations" ; git push origin wpi-annotations`
 
-8. Measure the number of annotations that WPI inferred, by checker:
-    a. switch to the `wpi-annotations` branch: `git checkout wpi-annotations`
-    b. create a copy of the script `compute-annos-inferred.sh` in the target project directory
-    c. modify the variables at the beginning of the script as appropriate for the target project[[TODO: I think it would be better to take those variables as arguments if possible, to avoid the need to make a new version of the script.  The advantage of having a concrete script is that in the future it would not be necessary to know which arguments to pass.  But the concrete script could also be just an invocation of the master `compute-annos-inferred.sh` in the paper repository.]]
-    d. run the script
-    e. transcribe the output after "====== COMBINED RESULTS =======" is printed to the spreadsheet, combining rows that mention the same annotation (this happens when e.g., different @RequiresQualifier annotations are inferred by different checkers)
-    f. commit and push the script: `git add compute-annos-inferred.sh ; git commit -m "inference output summarization script" ; git push origin wpi-annotations`
+##### H. Measure the number of annotations that WPI inferred, by checker:
+   1. switch to the `wpi-annotations` branch: `git checkout wpi-annotations`
+   2. create a copy of the script `compute-annos-inferred.sh` in the target project directory
+   3. modify the variables at the beginning of the script as appropriate for the target project
+      [[TODO: I think it would be better to take those variables as arguments if possible, to avoid the need to make a new version of the script.  The advantage of having a concrete script is that in the future it would not be necessary to know which arguments to pass.  But the concrete script could also be just an invocation of the master `compute-annos-inferred.sh` in the paper repository.]]
+   4. run the script
+   5. transcribe the output after "====== COMBINED RESULTS =======" is printed to the spreadsheet, combining rows that mention the same annotation 
+      (this happens when e.g., different @RequiresQualifier annotations are inferred by different checkers)
+   6. commit and push the script: `git add compute-annos-inferred.sh ; git commit -m "inference output summarization script" ; git push origin wpi-annotations`
 
-9. Measure the percentage of hand-written annotations that WPI inferred
-    a. copy the experiments directory's `format.sh` to `format-mycopy.sh` found in the experiments directory into your project's top level directory. 
-    b. download the `google-java-format.jar`.[[TODO: I think the script should do this.]] The link for it is in the script's documentation. Confirm the variable path in the script aligns with the location of your download.
-    c. change the variable, `WPI_RESULTS_DIR` to the path of your project's WPI annotations `wpi-annotations`.[[TODO: Why not make this a command-line argument, or computing it from other information that is available?]]
-    d. confirm that the `JAVA_SRC_DIR` is appropriate to your project's file tree which may look something like `./src/main/java/` and should contain `your-project.java` in the lowest directory, modify if needed.[[TODO: command-line argument instead?]]
-    e. run the script `./format-mycopy.sh`.
-    f. copy[[TODO: Here and elsewhere, instead of giving an English description of the high-level operation to perform, give a concrete command line that can be cut-and-pasted, reducing errors.]] outputs of this experimental procedure into (`/main/experiments/inferred-annos-counter/inputExamples`). This can be done by creating a directory in (`/inferred-annos-counter/inputExamples`) with the name of your project and two sub folders, `generated` and `human-written`. (This and following steps are optional. Use as input for downstream tools on small projects only).
-    g. copy all of the contents in your `$WPITEMPDIR` directory used in the previous steps into the `generated` subfolder. 
-    h. copy all of the human-written code (the human-annotated, i.e. original, code, but with a formatter run over it) from your project's source folder (e.g., ./src/main/java/ in a Gradle project) into the `human-written` directory that was created
-    i. Run the InferredAnnosCounter.
-      i. Go to the working directory of InferredAnnosCounter (ie, ./experiments/inferred-annos-counter, where . is the root of the repository containing this document).
-      ii. Run the InferredAnnosCounter, with the first argument being the absolute path of the .java file, and other arguments being the absolute path of the .ajava files produced by the WPI. The program assumes that a formatter has been applied, so it is important to do so before passing the files as input. InferredAnnosCounter only takes one .java file at a time. So in case it is needed to run multiple .java files with corresponding .ajava files, InferredAnnosCounter needs to be invoked multiple times. [[ TODO: this should be scripted using a find/exec to locate all the Java files and then run the following command on them.. ]] The way to run InferredAnnosCounter is like this: ```cd experiments/inferred-annos-counter ``` (going to the working directory) and then ``` ./gradlew run --args="(a path to the .java file) (one or more paths to the .ajava files)" ```. The result will not be in alphabetical order.
+##### I. Measure the percentage of hand-written annotations that WPI inferred:
+   1. copy the experiments directory's `format.sh` to `format-mycopy.sh` found in the experiments directory into your project's top level directory. 
+   2. download the `google-java-format.jar`.[[TODO: I think the script should do this.]] The link for it is in the script's documentation. Confirm the variable path in the script aligns with the location of your download.
+   3. change the variable, `WPI_RESULTS_DIR` to the path of your project's WPI annotations `wpi-annotations`.[[TODO: Why not make this a command-line argument, or computing it from other information that is available?]]
+   4. confirm that the `JAVA_SRC_DIR` is appropriate to your project's file tree which may look something like `./src/main/java/` and should contain `your-project.java` in the lowest directory, modify if needed.[[TODO: command-line argument instead?]]
+   5. run the script `./format-mycopy.sh`.
+   6. copy [[TODO: Here and elsewhere, instead of giving an English description of the high-level operation to perform, give a concrete command line that can be cut-and-pasted, reducing errors.]] outputs of this experimental procedure into (`/main/experiments/inferred-annos-counter/inputExamples`). This can be done by creating a directory in (`/inferred-annos-counter/inputExamples`) with the name of your project and two sub folders, `generated` and `human-written`. (This and following steps are optional. Use as input for downstream tools on small projects only).
+   7. copy all of the contents in your `$WPITEMPDIR` directory used in the previous steps into the `generated` subfolder. 
+   8. copy all of the human-written code (the human-annotated, i.e. original, code, but with a formatter run over it) from your project's source folder (e.g., ./src/main/java/ in a Gradle project) into the `human-written` directory that was created
+    1. Run the InferredAnnosCounter.
+      1. Go to the working directory of InferredAnnosCounter (ie, ./experiments/inferred-annos-counter, where . is the root of the repository containing this document).
+      2. Run the InferredAnnosCounter, with the first argument being the absolute path of the .java file, and other arguments being the absolute path of the .ajava files produced by the WPI. The program assumes that a formatter has been applied, so it is important to do so before passing the files as input. InferredAnnosCounter only takes one .java file at a time. So in case it is needed to run multiple .java files with corresponding .ajava files, InferredAnnosCounter needs to be invoked multiple times. 
+      [[ TODO: this should be scripted using a find/exec to locate all the Java files and then run the following command on them.. ]] The way to run InferredAnnosCounter is like this: ```cd experiments/inferred-annos-counter ``` (going to the working directory) and then ``` ./gradlew run --args="(a path to the .java file) (one or more paths to the .ajava files)" ```. The result will not be in alphabetical order.
       iii. Record the result in project-specific tab of the speadsheet at https://docs.google.com/spreadsheets/d/1r_NhumolEp5CiOL7CmsvZaa4-FDUxCJXfswyJoKg8uM/edit#gid=0.  
     
-12. Copy summary numbers from the project-specific spreadsheet page to the "summary" tab at https://docs.google.com/spreadsheets/d/1r_NhumolEp5CiOL7CmsvZaa4-FDUxCJXfswyJoKg8uM/edit#gid=0, and color code the project row green once it is finished.
+##### J:
+   1. Copy summary numbers from the project-specific spreadsheet page to the "summary" tab at https://docs.google.com/spreadsheets/d/1r_NhumolEp5CiOL7CmsvZaa4-FDUxCJXfswyJoKg8uM/edit#gid=0, and color code the project row green once it is finished.
