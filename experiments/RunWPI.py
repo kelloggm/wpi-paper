@@ -61,68 +61,73 @@ def readOutput():
 
 # Get original annotation status and remove annotations
 def part1():
-    '''
-    Step 2:
-        Create a new branch called "baseline" at that commit: 
-            git checkout -b baseline ; git push origin baseline
-    '''
-    process = subprocess.run("git checkout -b baseline ; git push origin baseline", shell=True)
     
     '''
-    Step 3:
+    Step C-1:
         Create a new branch called "unannotated" starting at the same commit: 
             git checkout -b unannotated
     '''
     process = subprocess.run("git checkout -b unannotated", shell=True)
     '''
-    Step 4:
+    Step C-2:
         Run the RemoveAnnotationsForInference program on the source, no ouput means it ran successfully: 
             java -cp "$CHECKERFRAMEWORK/checker/dist/checker.jar" org.checkerframework.framework.stub.RemoveAnnotationsForInference .
     
     '''
     process = subprocess.run("java -cp \"$CHECKERFRAMEWORK/checker/dist/checker.jar\" org.checkerframework.framework.stub.RemoveAnnotationsForInference .", shell=True)
     '''
-    Step 5:
+    Step C-3:
         Push the unannotated code: 
             git commit -am "output of RemoveAnnotationsForInference" ; git push origin unannotated
     '''
     process = subprocess.run("git commit -am \"output of RemoveAnnotationsForInference\" ; git push origin unannotated", shell=True)
-
+    
+    print("\nVerify that, because the annotations have been removed, the program no longer typechecks. You should see an error from one of the Checker Framework checkers you recorded in step 2c when you re-run whatever command you used to run the typechecker before.")
+    pausePrg()
+    
     '''
-    Step 6:
-        Collect the number of original annotations in the code: 
-            a. run git checkout -b annotation-statistics origin/baseline
+    D. Collect the number of original annotations in the code:
+        1. run git checkout -b annotation-statistics origin/baseline
     '''
     process = subprocess.run("git checkout -b annotation-statistics origin/baseline", shell=True)
 
     '''
-            b. modify the project's build file so that it 
-                i. does not run the typecheckers that it was running before, and 
-                ii. does runs the org.checkerframework.common.util.count.AnnotationStatistics processor 
-            c. add the -Aannotations and -Anolocations options, and make sure that you remove any -Werror argument to javac. 
-            d. compile the program and record the output in the spreadsheet. (You should create a new "sheet" in the spreadsheet for each project. Copy one that's already there and delete the data in it.) TODO: consider writing a script for interpreting the output of AnnotationStatistics by checker? 
+        2. modify the project's build file so that it
+            i. does not run the typecheckers that it was running before, and
+            ii. does run the processor org.checkerframework.common.util.count.AnnotationStatistics
+            iii. add the -Aannotations and -Anolocations options, and make sure that you remove any -Werror argument to javac.
+        3. If the build system is maven, add <showWarnings>true</showWarnings> to the maven-compiler-plugin <configuration>.
+        4. If the project is running a formatter (ex: Spotless), disable it in the build system.
+        5. Stage your changes with git add (in case you missed a formatter).
+        6. Compute annotation statistics.
+            i. Clean the program, then compile the program.
     '''
     print("\nNow do the following:\n1. Open build file")
-    print("2. Comment out all the checkers")
+    print("2. Comment out all the typecheckers that it was running before")
     print("3. Add the following checker:\n\n\t'org.checkerframework.common.util.count.AnnotationStatistics',\n")
     print("4. Add the following options:\n\n\t'-Aannotations',\n\t'-Anolocations',\n")
     print("5. Comment out '-Werror'")
-    print("6. If the project is running a formatter (ex: Spotless), disable it in the build system.")
-    print("7. Open another terminal in the same directory")
-    print("8. Compile the project and save the output in 'Human-written.txt' file\n\n\texample:\n\t./gradlew build >> Human-written.txt\n")
+    print("6. If the build system is maven, add <showWarnings>true</showWarnings> to the maven-compiler-plugin <configuration>.")
+    print("7. If the project is running a formatter (ex: Spotless), disable it in the build system.")
+    print("8. Open another terminal in the same directory")
+    print("9. Stage your changes with git add (in case you missed a formatter).")    
+    '''
+        6. Compute annotation statistics.
+            i. Clean the program, then compile the program.
+    '''
+    
+    print("10. Compile the project and save the output in 'Human-written.txt' file\n\n\texample:\n\t./gradlew build >> Human-written.txt\n")
     pausePrg()
 
     '''
-            e. run 
-                git commit -am "annotation statistics configuration" ; git push origin annotation-statistics
+        7. run git commit -am "annotation statistics configuration" ; git push origin annotation-statistics
     '''
     process = subprocess.run("git commit -am \"annotation statistics configuration\" ; git push origin annotation-statistics", shell=True)
 
     '''
-    Step 7    
-        Collect the number of lines of code: 
-            a. run git checkout baseline 
-            b. run scc . and record the number of non-comment, non-blanks lines of Java code (the "Code" column of the "Java" row) in the spreadsheet (in the "LoC" column), on the summary page (if you don't have scc installed, https://github.com/boyter/scc)
+    E. Collect the number of lines of code: 
+        1. run git checkout baseline 
+        2. run scc . and record the number of non-comment, non-blanks lines of Java code (the "Code" column of the "Java" row) in the spreadsheet (in the "LoC" column), on the summary page (if you don't have scc installed, https://github.com/boyter/scc)
     '''
     process = subprocess.run("git checkout baseline", shell=True)
     process = subprocess.run("scc .", shell=True)
@@ -133,19 +138,18 @@ def part1():
 #Run WPI
 def part2():
     '''
-    Step 8:
-        Run WPI: 
-            a. run git checkout -b wpi-enabled origin/unannotated 
-            b. choose any temporary directory for $WPITEMPDIR 
-            c. modify the build file to run with -Ainfer=ajava, -Awarns, '-AinferOutputOriginal', and -Aajava=$WPITEMPDIR (modifying the latter as appropriate for project structure, Ex: '-Aajava=/path/to/temp/dir/'). Make sure that you remove any -Werror argument to javac, because otherwise WPI will fail. 
-            d. write a short script based on the template in wpi-template.sh. The script should: 
-                i. copy the content of build/whole-program-inference into $WPITEMPDIR 
-                ii. compile the code 
-                iii. compare build/whole-program-inference and $WPITEMPDIR. If they're the same, exit. Otherwise, go to step i. 
-            e. add this script: chmod +x wpi.sh ; git add wpi.sh 
-            f. commit the script and build changes: git commit -am "enable WPI" ; git push origin wpi-enabled 
-            g. execute the script: ./wpi.sh 
-            h. record the number of errors issued by the typecheckers (and which typechecker issued the error) after the script is finished
+    F. Run WPI:
+        1. run git checkout -b wpi-enabled origin/unannotated 
+        2. choose any temporary directory for $WPITEMPDIR 
+        3. modify the build file to run with -Ainfer=ajava, -Awarns, '-AinferOutputOriginal', and -Aajava=$WPITEMPDIR (modifying the latter as appropriate for project structure, Ex: '-Aajava=/path/to/temp/dir/'). Make sure that you remove any -Werror argument to javac, because otherwise WPI will fail. 
+        4. write a short script based on the template in wpi-template.sh. The script should: 
+            i. copy the content of build/whole-program-inference into $WPITEMPDIR 
+            ii. compile the code 
+            iii. compare build/whole-program-inference and $WPITEMPDIR. If they're the same, exit. Otherwise, go to step i. 
+        5. add this script: chmod +x wpi.sh ; git add wpi.sh 
+        6. commit the script and build changes: git commit -am "enable WPI" ; git push origin wpi-enabled 
+        7. execute the script: ./wpi.sh 
+        8. record the number of errors issued by the typecheckers (and which typechecker issued the error) after the script is finished
     '''
     process = subprocess.run("git checkout -b wpi-enabled origin/unannotated ", shell=True)
     
@@ -157,19 +161,19 @@ def part2():
     pausePrg()    
     
     os.system("cp " + wpidir + "/experiments/wpi-template.sh wpi.sh")
-    
+    print("Open wpi.sh and edit the first 5 variables.")
+    pausePrg()
     process = subprocess.run("chmod +x wpi.sh ; git add wpi.sh", shell=True)
     process = subprocess.run("git commit -am \"enable WPI\" ; git push origin wpi-enabled ", shell=True)
     process = subprocess.run("./wpi.sh", shell=True)
-    print("Record the number of errors issued by the typecheckers (and which typechecker issued the error)")
+    print("Record, under \"Warnings after WPI\" in the project's tab in the spreadsheet, the number of errors issued by the typecheckers and which typechecker issued the error.")
     pausePrg()
     '''
-    Step 9:
-        Create a branch for the code with inferred annotations 
-            a. Create a branch: git checkout -b wpi-annotations annotation-statistics 
-            b. Create a new directory for the inferred ajava files: mkdir wpi-annotations 
-            c. copy all the ajava files: rsync -r ${WPITEMPDIR}/ wpi-annotations 
-            d. commit the results: git add wpi-annotations/** ; git commit -am "WPI annotations" ; git push origin wpi-annotations
+    G. Create a branch for the code with inferred annotations 
+         1. Create a branch: git checkout -b wpi-annotations annotation-statistics 
+         2. Create a new directory for the inferred ajava files: mkdir wpi-annotations 
+         3. copy all the ajava files: rsync -r ${WPITEMPDIR}/ wpi-annotations 
+         4. commit the results: git add wpi-annotations/** ; git commit -am "WPI annotations" ; git push origin wpi-annotations
     '''
     
     process = subprocess.run("git checkout -b wpi-annotations annotation-statistics", shell=True)
@@ -180,14 +184,13 @@ def part2():
 #Evaluate WPI
 def part3():
     '''
-    Step 10:
-        Measure the number of annotations that WPI inferred, by checker: 
-            a. switch to the wpi-annotations branch: git checkout wpi-annotations 
-            b. create a copy of the script compute-annos-inferred.sh in the target project directory 
-            c. modify the variables at the beginning of the script as appropriate for the target project 
-            d. run the script 
-            e. transcribe the output after "====== COMBINED RESULTS =======" is printed to the spreadsheet, combining rows that mention the same annotation (this happens when e.g., different @RequiresQualifier annotations are inferred by different checkers) 
-            f. commit and push the script: git add compute-annos-inferred.sh ; git commit -m "inference output summarization script" ; git push origin wpi-annotations
+    H. Measure the number of annotations that WPI inferred, by checker: 
+        1. switch to the wpi-annotations branch: git checkout wpi-annotations 
+        2. create a copy of the script compute-annos-inferred.sh in the target project directory 
+        3. modify the variables at the beginning of the script as appropriate for the target project 
+        4. run the script 
+        5. transcribe the output after "====== COMBINED RESULTS =======" is printed to the spreadsheet, combining rows that mention the same annotation (this happens when e.g., different @RequiresQualifier annotations are inferred by different checkers) 
+        6. commit and push the script: git add compute-annos-inferred.sh ; git commit -m "inference output summarization script" ; git push origin wpi-annotations
     '''
     process = subprocess.run("git checkout wpi-annotations", shell=True)
     os.system("cp " + wpidir + "/experiments/compute-annos-inferred.sh compute-annos-inferred.sh")
@@ -207,10 +210,12 @@ def part3():
     df.to_csv(wpidir+"/experiments/inferred-annos-counter/inputExamples/"+project_name+"/AnnotationStats.csv", index=False)
 
     process = subprocess.run("git add compute-annos-inferred.sh ; git commit -m \"inference output summarization script\" ; git push origin wpi-annotations", shell=True)
+
+#Measure the percentage of hand-written annotations that WPI inferred:
+def part4():
     '''
-    Step 11
-        Measure the percentage of hand-written annotations that WPI inferred 
-            a. copy the formatter script as format-mycopy.sh found in the experiments directory into your project's top level directory.
+    Measure the percentage of hand-written annotations that WPI inferred 
+        1. copy the formatter script as format-mycopy.sh found in the experiments directory into your project's top level directory.
     '''
     
     fread = open( wpidir + "/experiments/format.sh", "r")
@@ -223,27 +228,27 @@ def part3():
     fwrite.close()
     fread.close()
     '''
-            b. download the google-java-format.jar. The link for it is in the script's documentation. Confirm the variable path in the script aligns with the location of your download.     
+        2. download the google-java-format.jar. The link for it is in the script's documentation. Confirm the variable path in the script aligns with the location of your download.     
     '''
     if os.path.exists(wpidir+"/google-java-format-1.15.0-all-deps.jar") == False:
         os.system("wget -P "+wpidir+" https://github.com/google/google-java-format/releases/download/v1.15.0/google-java-format-1.15.0-all-deps.jar")
     '''
-            c. change the variable, WPI_RESULTS_DIR to the path of your project's WPI annotations wpi-annotations. 
-            d. confirm that the JAVA_SRC_DIR is appropriate to your project's file tree which may look something like ./src/main/java/ and should contain your-project.java in the lowest directory, modify if needed.     
+        3. change the variable, WPI_RESULTS_DIR to the path of your project's WPI annotations wpi-annotations. 
+        4. confirm that the JAVA_SRC_DIR is appropriate to your project's file tree which may look something like ./src/main/java/ and should contain your-project.java in the lowest directory, modify if needed.     
     '''
     print("\n\nOpen 'format-mycopy.sh'.")
     print("Change the variable, WPI_RESULTS_DIR to the path of your project's WPI annotations wpi-annotations")
     print("Confirm that the JAVA_SRC_DIR is appropriate to your project's file tree which may look something like ./src/main/java/ and should contain your-project.java in the lowest directory, modify if needed.")
     pausePrg()
     '''
-            e. run the script ./format-mycopy.sh.    
+        5. run the script ./format-mycopy.sh.    
     '''
     process = subprocess.run("chmod +x format-mycopy.sh ; git add format-mycopy.sh", shell=True)
     process = subprocess.run("./format-mycopy.sh", shell=True)
     '''
-            f. copy outputs of this experimental procedure into (/main/experiments/inferred-annos-counter/inputExamples). This can be done by creating a directory in (/inferred-annos-counter/inputExamples) with the name of your project and two sub folders, generated and human-written. (This and following steps are optional. Use as input for downstream tools on small projects only). 
-            g. copy all of the contents in your $WPITEMPDIR directory used in the previous steps into the generated subfolder. 
-            h. copy all of the human-written code (the human-annotated, i.e. original, code, but with a formatter run over it) from your project's source folder (e.g., ./src/main/java/ in a Gradle project) into the human-written directory that was created 
+        6. copy outputs of this experimental procedure into (/main/experiments/inferred-annos-counter/inputExamples). This can be done by creating a directory in (/inferred-annos-counter/inputExamples) with the name of your project and two sub folders, generated and human-written. (This and following steps are optional. Use as input for downstream tools on small projects only). 
+        7. copy all of the contents in your $WPITEMPDIR directory used in the previous steps into the generated subfolder. 
+        8. copy all of the human-written code (the human-annotated, i.e. original, code, but with a formatter run over it) from your project's source folder (e.g., ./src/main/java/ in a Gradle project) into the human-written directory that was created 
 
     '''
     if os.path.exists(wpidir + "/experiments/inferred-annos-counter/inputExamples/"+project_name+"/generated"):
@@ -265,11 +270,11 @@ def part3():
             shutil.copytree(source_dir, destination_dir)
             break
     else:
-        print("Faild to copy Human written files. Please do it manually.")
+        print("Failed to copy Human written files. Please do it manually.")
         pausePrg()
     
     '''
-            i. Go to the working directory of InferredAnnosCounter. Run the InferredAnnosCounter, with the first argument being the absolute path of the .java file, and other arguments being the absolute path of the .ajava files produced by the WPI. The program assumes that a formatter has been applied, so it is important to do so before passing the files as input. InferredAnnosCounter only takes one .java file at a time. So in case it is needed to run multiple .java files with corresponding .ajava files, InferredAnnosCounter needs to be invoked multiple times. The way to run InferredAnnosCounter is like this: cd experiments/inferred-annos-counter (going to the working directory) and then ./gradlew run --args="(a path to the .java file) (one or more paths to the .ajava files)". The result will not be in alphabetical order. If order is important, sort it before recoding the result in the speadsheet.
+        9. Go to the working directory of InferredAnnosCounter. Run the InferredAnnosCounter, with the first argument being the absolute path of the .java file, and other arguments being the absolute path of the .ajava files produced by the WPI. The program assumes that a formatter has been applied, so it is important to do so before passing the files as input. InferredAnnosCounter only takes one .java file at a time. So in case it is needed to run multiple .java files with corresponding .ajava files, InferredAnnosCounter needs to be invoked multiple times. The way to run InferredAnnosCounter is like this: cd experiments/inferred-annos-counter (going to the working directory) and then ./gradlew run --args="(a path to the .java file) (one or more paths to the .ajava files)". The result will not be in alphabetical order. If order is important, sort it before recoding the result in the speadsheet.
     '''
     ## RunIAC.py
 
@@ -309,4 +314,5 @@ if __name__ == "__main__":
     part1()
     part2()
     part3()
+    part4()
     
