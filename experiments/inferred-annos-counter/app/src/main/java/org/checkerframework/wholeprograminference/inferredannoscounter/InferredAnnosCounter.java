@@ -309,16 +309,24 @@ public class InferredAnnosCounter {
   }
 
   /**
-   * This method formats annotations that contain arguments, such as @EnsuresNonNull("tz1").
-   * Previously, we had a problem when working with these types of annotations. The
-   * computer-generated files sometimes put an additional pair of curly braces. Initially, we
-   * approached this problem by adding a pair of curly braces to every annotation having a pair of
-   * parentheses but no curly braces. But then we might run into a problem if there are parentheses
-   * inside the arguments. This new method has two parts. First, we check if the annotation contains
-   * a matrix and format the matrix if we found one. We format it by changing all "}, {" pattern to
-   * "|, |". Second, we'll remove all curly braces in that annotation. By this way way, we make sure
-   * that we will not mess up the important curly braces, otherwise something like ({3, 4}) and
-   * ({3}, {4}) will both end up being (3,4).
+   * This method formats annotations that contain arguments, such as
+   * {@literal @}EnsuresNonNull("tz1").
+   *
+   * <p>These annotations are difficult to format, because they might or might not contain an extra
+   * pair of curly braces. The computer-generated files sometimes put an additional pair of curly
+   * braces (e.g., writing {@literal @}EnsuresNonNull({"tz1"}), which is valid: the argument is
+   * technically an array, but Java permits single-value arrays to omit the curly braces).
+   * Initially, we approached this problem by adding a pair of curly braces to every annotation
+   * having a pair of parentheses but no curly braces. But then we might run into a problem if there
+   * are parentheses inside the arguments.
+   *
+   * <p>This method instead has two parts. First, it checks if the annotation contains a matrix
+   * (that is, a multi-dimensional array argument) and formats any found matrix by changing all "},
+   * {" pattern to "|, |". Second, the method removes all curly braces in each annotation. This way,
+   * we make sure that we will not mess up the important curly braces (i.e., those defining internal
+   * array structure in a matrix), otherwise something like ({3, 4}) and ({3}, {4}) will both end up
+   * being (3,4). This approach solves the problem described above by standardizing on a format with
+   * no curly braces at all.
    *
    * @param annotation an annotation to be formatted
    * @return formatted annotation
