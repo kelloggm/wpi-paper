@@ -600,7 +600,6 @@ public class InferredAnnosCounter {
       for (AbstractDelta<String> delta : patch.getDeltas()) {
         // get the delta in string format
         String deltaInString = delta.toString();
-        System.out.println(deltaInString);
         // just take the delta with annotations into consideration
         // INSERT type indicates that the annotations only appear in the computer-generated files.
         // So we don't take it into consideration.
