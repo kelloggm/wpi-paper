@@ -168,6 +168,8 @@ public class InferredAnnosCounter {
         } else if (status == LineStatus.OPEN && originalFileLine.contains("@")) {
           tempLine = tempLine + originalFileLine;
           inProgress = true;
+        } else {
+          throw new RuntimeException("unexpected line status: " + status + " for line " + originalFileLine);
         }
       }
     } catch (Exception e) {
