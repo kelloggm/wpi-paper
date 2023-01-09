@@ -270,13 +270,15 @@ public class InferredAnnosCounter {
   }
 
   /**
-   * This method checks if a particular index in a line belongs to a string literal
+   * This method checks if a particular index in a line is not inside a string literal.
+   *
+   * <p>Assumes that the beginning of {@code line} is not already inside a string literal.
    *
    * @param line a line
-   * @param index index of line
-   * @return false if index belongs to a string literal, true otherwise
+   * @param index index to check
+   * @return false if index is inside a string literal, true otherwise
    */
-  private static boolean checkInString(@IndexFor("#2") int index, String line) {
+  private static boolean notInStringLiteral(@IndexFor("#2") int index, String line) {
     int before = 0;
     for (int i = 0; i < index; i++) {
       if (line.charAt(i) == '\"') {
@@ -359,7 +361,7 @@ public class InferredAnnosCounter {
         continue;
       }
 
-      if (checkInString(indexOfClose, result)) {
+      if (notInStringLiteral(indexOfClose, result)) {
         result = replaceAtIndex(result, indexOfClose, "|");
         result = replaceAtIndex(result, indexOfOpen, "|");
         indexOfClose = result.indexOf("},");
@@ -390,7 +392,7 @@ public class InferredAnnosCounter {
     if (indexDash != -1) {
       if (indexDash == 0) {
         finalLine = line.substring(0, indexDash);
-      } else if (checkInString(indexDash, line)) {
+      } else if (notInStringLiteral(indexDash, line)) {
         finalLine = line.substring(0, indexDash - 1);
       }
     }
@@ -479,7 +481,7 @@ public class InferredAnnosCounter {
                 + "or it was not called properly");
       }
       String tempAnno = getAnnos(temp);
-      if (checkInString(index1, temp)) {
+      if (notInStringLiteral(index1, temp)) {
         if (tempAnno.contains("(")) {
           if (temp.contains(")")) {
             tempAnno = temp.substring(index1 + 1, temp.indexOf(')') + 1);
