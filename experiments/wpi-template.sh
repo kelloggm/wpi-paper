@@ -5,6 +5,12 @@
 # script with values that make sense for your project; the values there
 # now are examples.
 
+
+# The compile and clean commands for the project's build system.
+BUILD_CMD="./gradlew compileJava"
+CLEAN_CMD="./gradlew clean"
+${BUILD_CMD} # Compile the program so that WPIOUTDIR is created.
+
 # Where should the output be placed at the end? This directory is also
 # used to store intermediate WPI results. The directory does not need to
 # exist. If it does exist when this script starts, it will be deleted.
@@ -22,15 +28,9 @@ WPITEMPDIR=/tmp/icalavailable-wpi
 # The directory to use here might vary between build systems, between machines
 # (e.g., depending on your local Gradle settings), and even between projects using the
 # same build system (e.g., because of a project's settings.gradle file).
-#
-# TODO: When I use this with Gradle, wpi.sh crashes with
-#   diff: /home/mernst/.gradle/workers/build/whole-program-inference: No such file or directory
-# Does the directory need to be created first?
-WPIOUTDIR=~/.gradle/workers/build/whole-program-inference
 
-# The compile and clean commands for the project's build system.
-BUILD_CMD="./gradlew compileJava"
-CLEAN_CMD="./gradlew clean"
+# Program needs to compiled before running script so WPI creates this directory.
+WPIOUTDIR=~/.gradle/workers/build/whole-program-inference 
 
 # Whether to run in debug mode. In debug mode, output is printed to the terminal
 # at the beginning of each iteration, and the diff between each pair of iterations is
