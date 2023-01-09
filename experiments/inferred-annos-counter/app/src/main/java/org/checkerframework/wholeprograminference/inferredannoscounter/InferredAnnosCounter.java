@@ -12,9 +12,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.checkerframework.checker.index.qual.IndexFor;
-import org.checkerframework.checker.index.qual.LTLengthOf;
-
-
 
 /**
  * The entry point for the inferred annos counter. Run this by passing arguments, with the first
@@ -69,9 +66,9 @@ public class InferredAnnosCounter {
     if (line.length() == 0) {
       return false;
     }
-    String elements[] = line.split(" ");
+    String elements[] = line.trim().split(" ");
     int n = elements.length;
-    if (n >= 1 && elements[n - 1].contains("@org")) {
+    if (n >= 1 && elements[n - 1].endsWith("@org")) {
       String breaks[] = elements[n - 1].split("[.]");
       int numberOfParts = breaks.length;
       if (numberOfParts < 2) {
@@ -331,12 +328,10 @@ public class InferredAnnosCounter {
     /*
     First, we format cases involving matrix by changing all "}, {" to "|, |"
      */
-    @SuppressWarnings("assignment") /* This seems to be a bug with Index Checker, here is the link to the bug report: https://github.com/typetools/checker-framework/issues/5471
-    */
-    @LTLengthOf("result") int indexOfClose = result.indexOf("},");
+    int indexOfClose = result.indexOf("},");
     while (indexOfClose != -1) {
       int indexOfOpen = result.indexOf('{', indexOfClose);
-      //reaching the end of a line
+      // reaching the end of a line
       if (indexOfOpen < 0) {
         return result;
       }
@@ -365,9 +360,7 @@ public class InferredAnnosCounter {
   private static String ignoreComment(String line) {
     int indexComment = line.length() + 1;
     String finalLine = line;
-    @SuppressWarnings("assignment") /* This seems to be a bug with Index Checker, here is the link to the bug report: https://github.com/typetools/checker-framework/issues/5471
-     */
-    @LTLengthOf("line") int indexDash = line.indexOf("//");
+    int indexDash = line.indexOf("//");
     int indexStar = line.indexOf("*");
     int indexDashStar = line.indexOf("/*");
     if (indexDash != -1) {
@@ -458,8 +451,8 @@ public class InferredAnnosCounter {
       int index1 = temp.indexOf('@');
       if (index1 == -1) {
         throw new RuntimeException(
-                "The extractString method relies on the countAnnos method. Either the countAnnos method is wrong"
-                        + "or it was not called properly");
+            "The extractString method relies on the countAnnos method. Either the countAnnos method is wrong"
+                + "or it was not called properly");
       }
       String tempAnno = getAnnos(temp);
       if (checkInString(index1, temp)) {
@@ -509,7 +502,7 @@ public class InferredAnnosCounter {
 
     if (args.length <= 1) {
       throw new RuntimeException(
-              "Provide at least one .java file and one or more" + ".ajava files.");
+          "Provide at least one .java file and one or more" + ".ajava files.");
     }
 
     // These variables are maintained throughout:
@@ -529,7 +522,7 @@ public class InferredAnnosCounter {
     int originalFileLineCount = 0;
     List<String> inputFileWithOnlySingleLineAnno = annoMultiToSingle(args[0]);
     List<String> inputFileWithEachAnnoOnOneLine =
-            eachAnnotationInOneSingleLine(inputFileWithOnlySingleLineAnno);
+        eachAnnotationInOneSingleLine(inputFileWithOnlySingleLineAnno);
     int originalFileLineIndex = -1;
     // Read the original file once to determine the annotations that written by the human.
     for (String originalFileLine : inputFileWithEachAnnoOnOneLine) {
@@ -565,7 +558,7 @@ public class InferredAnnosCounter {
     for (int i = 1; i < args.length; ++i) {
       List<String> inputFileWithOnlySingleLineAnno2 = annoMultiToSingle(args[i]);
       List<String> inputFileWithEachAnnoOnOneLine2 =
-              eachAnnotationInOneSingleLine(inputFileWithOnlySingleLineAnno2);
+          eachAnnotationInOneSingleLine(inputFileWithOnlySingleLineAnno2);
       List<String> newFile = new ArrayList<>();
       for (String ajavaFileLine : inputFileWithEachAnnoOnOneLine2) {
         ajavaFileLine = ignoreComment(ajavaFileLine);
