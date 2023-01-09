@@ -118,7 +118,11 @@ public class InferredAnnosCounterTest {
         new String[] {
           "testCases/AnnotationWithArgument.java", "testCases/AnnotationWithArgument.ajava"
         });
-    String line1 = "@EnsuresNonNull got 1/1";
-    assertTrue(outputStreamCaptor.toString().trim().contains(line1));
+    String line1 = "@EnsuresNonNull got 1/2";
+    String line2 = "@EnsuresCalledMethods got 1/2";
+    assertTrue("Didn't find the correct number of @EnsuresNonNull annotations; expected 1/2, got: " + outputStreamCaptor,
+            outputStreamCaptor.toString().trim().contains(line1));
+    assertTrue("Didn't find the correct number of @EnsuresCalledMethods annotations; expected 1/2, got: " + outputStreamCaptor,
+            outputStreamCaptor.toString().trim().contains(line2));
   }
 }

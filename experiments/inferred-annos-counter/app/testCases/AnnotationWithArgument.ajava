@@ -1,1 +1,5 @@
 @org.checkerframework.checker.nullness.qual.EnsuresNonNull({"tz"})
+@org.checkerframework.checker.calledmethods.qual.EnsuresCalledMethods(value={"this"}, methods={"close"})
+@org.checkerframework.checker.nullness.qual.EnsuresNonNull({"tz", "f"})
+@org.checkerframework.checker.calledmethods.qual.EnsuresCalledMethods(value={"this"}, methods={"toString"})
+@org.checkerframework.framework.common.value.qual.StringVal({"},{"})

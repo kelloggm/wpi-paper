@@ -343,12 +343,21 @@ public class InferredAnnosCounter {
       if (indexOfOpen < 0) {
         return result;
       }
+      // When an annotation has multiple arguments, a }, .* { can occur
+      // because of the argument names. In those cases, just continue the
+      // loop.
+      if (result.substring(indexOfClose, indexOfOpen).chars()
+              .anyMatch(c -> !(Character.isWhitespace(c) || c == '{' || c == '}' || c == ','))) {
+        indexOfClose = result.indexOf("},", indexOfClose + 1);
+        continue;
+      }
+
       if (checkInString(indexOfClose, result)) {
         result = replaceAtIndex(result, indexOfClose, "|");
         result = replaceAtIndex(result, indexOfOpen, "|");
         indexOfClose = result.indexOf("},");
       } else {
-        indexOfOpen = result.indexOf("},", indexOfClose + 1);
+        indexOfClose = result.indexOf("},", indexOfClose + 1);
       }
     }
     /*
@@ -591,11 +600,11 @@ public class InferredAnnosCounter {
         // INSERT type indicates that the annotations only appear in the computer-generated files.
         // So we don't take it into consideration.
         if (deltaInString.contains("@") && delta.getType() != DeltaType.INSERT) {
-          List<String> myList = delta.getSource().getLines();
+          List<String> sourceLines = delta.getSource().getLines();
           // get the position of that annotation in the delta, which is something like "5," or "6,".
           int position = delta.getSource().getPosition();
           String result = "";
-          for (String element : myList) {
+          for (String element : sourceLines) {
             if (element.contains("@")) {
               // in case there are other components in the string element other than the
               // annotation itself
