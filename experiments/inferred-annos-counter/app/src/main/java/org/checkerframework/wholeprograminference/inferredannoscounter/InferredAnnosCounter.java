@@ -564,12 +564,8 @@ public class InferredAnnosCounter {
       // one CF annotation and nothing else.
       if (checkerPackage.contains(specialAnno)) {
         originalFileLine = formatAnnotaionsWithArguments(originalFileLine);
-        if (annoCount.containsKey(specialAnno)) {
-          int numberOfAnno = annoCount.get(specialAnno);
-          annoCount.put(specialAnno, numberOfAnno + 1);
-        } else {
-          annoCount.put(specialAnno, 1);
-        }
+        int numberOfAnno = annoCount.getOrDefault(specialAnno, 0);
+        annoCount.put(specialAnno, numberOfAnno + 1);
         annoSimilar.put(specialAnno, 0);
         // we want the keys in the map annoLocate has this following format: type_position
         annoLocate.put(originalFileLine + "_" + originalFileLineIndex, 0);
