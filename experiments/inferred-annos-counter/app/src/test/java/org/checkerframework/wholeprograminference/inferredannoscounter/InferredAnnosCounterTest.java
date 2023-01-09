@@ -115,7 +115,9 @@ public class InferredAnnosCounterTest {
   @Test
   public void annotationWithArgument() {
     InferredAnnosCounter.main(
-            new String[] {"testCases/AnnotationWithArgument.java", "testCases/AnnotationWithArgument.ajava"});
+        new String[] {
+          "testCases/AnnotationWithArgument.java", "testCases/AnnotationWithArgument.ajava"
+        });
     String line1 = "@EnsuresNonNull got 1/1";
     assertTrue(outputStreamCaptor.toString().trim().contains(line1));
   }
