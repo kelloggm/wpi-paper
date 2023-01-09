@@ -46,7 +46,7 @@ public class InferredAnnosCounterTest {
   }
 
   @Test
-  public void MatchThreeAnnotations() {
+  public void matchThreeAnnotations() {
     InferredAnnosCounter.main(
         new String[] {
           "testCases/MatchThreeAnnotations.java", "testCases/MatchThreeAnnotations.ajava"
@@ -74,7 +74,7 @@ public class InferredAnnosCounterTest {
   }
 
   @Test
-  public void CommentInMiddle() {
+  public void commentInMiddle() {
     InferredAnnosCounter.main(
         new String[] {"testCases/CommentInMiddle.java", "testCases/CommentInMiddle.ajava"});
     String line1 = "@Pure got 1/1";
@@ -86,7 +86,7 @@ public class InferredAnnosCounterTest {
   }
 
   @Test
-  public void AnnotationInString() {
+  public void annotationInString() {
     InferredAnnosCounter.main(
         new String[] {"testCases/AnnotationInString.java", "testCases/AnnotationInString.ajava"});
     String line1 = "@Pure got 1/1";
@@ -98,7 +98,7 @@ public class InferredAnnosCounterTest {
   }
 
   @Test
-  public void AnnotaionInMiddleOfADeclaration() {
+  public void annotationInMiddleOfADeclaration() {
     InferredAnnosCounter.main(
         new String[] {
           "testCases/AnnotationInMiddleOfADeclaration.java",
@@ -110,5 +110,13 @@ public class InferredAnnosCounterTest {
     assertTrue(outputStreamCaptor.toString().trim().contains(line1));
     assertTrue(outputStreamCaptor.toString().trim().contains(line2));
     assertTrue(outputStreamCaptor.toString().trim().contains(line3));
+  }
+
+  @Test
+  public void annotationWithArgument() {
+    InferredAnnosCounter.main(
+            new String[] {"testCases/AnnotationWithArgument.java", "testCases/AnnotationWithArgument.ajava"});
+    String line1 = "@EnsuresNonNull got 1/1";
+    assertTrue(outputStreamCaptor.toString().trim().contains(line1));
   }
 }
