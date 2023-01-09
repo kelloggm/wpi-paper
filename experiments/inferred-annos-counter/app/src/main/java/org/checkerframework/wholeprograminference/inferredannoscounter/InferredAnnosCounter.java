@@ -346,8 +346,10 @@ public class InferredAnnosCounter {
       // When an annotation has multiple arguments, a }, .* { can occur
       // because of the argument names. In those cases, just continue the
       // loop.
-      if (result.substring(indexOfClose, indexOfOpen).chars()
-              .anyMatch(c -> !(Character.isWhitespace(c) || c == '{' || c == '}' || c == ','))) {
+      if (result
+          .substring(indexOfClose, indexOfOpen)
+          .chars()
+          .anyMatch(c -> !(Character.isWhitespace(c) || c == '{' || c == '}' || c == ','))) {
         indexOfClose = result.indexOf("},", indexOfClose + 1);
         continue;
       }

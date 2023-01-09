@@ -120,9 +120,13 @@ public class InferredAnnosCounterTest {
         });
     String line1 = "@EnsuresNonNull got 1/2";
     String line2 = "@EnsuresCalledMethods got 1/2";
-    assertTrue("Didn't find the correct number of @EnsuresNonNull annotations; expected 1/2, got: " + outputStreamCaptor,
-            outputStreamCaptor.toString().trim().contains(line1));
-    assertTrue("Didn't find the correct number of @EnsuresCalledMethods annotations; expected 1/2, got: " + outputStreamCaptor,
-            outputStreamCaptor.toString().trim().contains(line2));
+    assertTrue(
+        "Didn't find the correct number of @EnsuresNonNull annotations; expected 1/2, got: "
+            + outputStreamCaptor,
+        outputStreamCaptor.toString().trim().contains(line1));
+    assertTrue(
+        "Didn't find the correct number of @EnsuresCalledMethods annotations; expected 1/2, got: "
+            + outputStreamCaptor,
+        outputStreamCaptor.toString().trim().contains(line2));
   }
 }
