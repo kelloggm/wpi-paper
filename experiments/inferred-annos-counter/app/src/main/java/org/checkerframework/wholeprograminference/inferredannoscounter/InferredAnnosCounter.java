@@ -464,7 +464,8 @@ public class InferredAnnosCounter {
   }
 
   /**
-   * This method returns a List containing all the annotations belonging to a line.
+   * This method returns a List containing all the annotations belonging to a line (with the
+   * {@literal @} symbol stripped off each annotation).
    *
    * @param str a line
    * @return a Linked List containing all annotations of str.
