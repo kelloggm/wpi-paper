@@ -66,10 +66,10 @@ public class InferredAnnosCounter {
     if (line.length() == 0) {
       return false;
     }
-    String elements[] = line.trim().split(" ");
+    String[] elements = line.trim().split(" ");
     int n = elements.length;
-    if (n >= 1 && elements[n - 1].endsWith("@org")) {
-      String breaks[] = elements[n - 1].split("[.]");
+    if (n >= 1 && elements[n - 1].contains("@org")) {
+      String[] breaks = elements[n - 1].split("[.]");
       int numberOfParts = breaks.length;
       if (numberOfParts < 2) {
         throw new RuntimeException("Invalid annotation form in line: " + line);
@@ -95,7 +95,7 @@ public class InferredAnnosCounter {
   }
 
   /**
-   * This method checks the status of a line. If that line is the openning of a multi-line
+   * This method checks the status of a line. If that line is the opening of a multi-line
    * annotation, we call it "Open". If the line is the closing of a multi-line annotation, we call
    * it "Close". And if the line does not contain any multi-line annotation, we call it "Complete".
    *
@@ -136,8 +136,8 @@ public class InferredAnnosCounter {
    * @param fileName the name of the input file to be formatted
    * @return inputFiles a list containing lines of the formatted file
    */
-  private static List annoMultiToSingle(String fileName) {
-    List<String> inputFiles = new ArrayList<String>();
+  private static List<String> annoMultiToSingle(String fileName) {
+    List<String> inputFiles = new ArrayList<>();
     File file = new File(fileName);
     try (BufferedReader br = new BufferedReader(new FileReader(file))) {
       String originalFileLine;
@@ -196,7 +196,7 @@ public class InferredAnnosCounter {
           if (resultLine.length() > 0) {
             // sometimes the annotation can be in the middle of a declaration
             formatted.add(resultLine + element.substring(0, indexOfAnno));
-            element = element.substring(indexOfAnno, element.length());
+            element = element.substring(indexOfAnno);
           }
           resultLine = "";
           if (checkLineStatus(element) == LineStatus.COMPLETE) {
@@ -600,6 +600,7 @@ public class InferredAnnosCounter {
       for (AbstractDelta<String> delta : patch.getDeltas()) {
         // get the delta in string format
         String deltaInString = delta.toString();
+        System.out.println(deltaInString);
         // just take the delta with annotations into consideration
         // INSERT type indicates that the annotations only appear in the computer-generated files.
         // So we don't take it into consideration.

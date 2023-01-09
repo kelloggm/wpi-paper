@@ -140,4 +140,20 @@ public class InferredAnnosCounterTest {
             + outputStreamCaptor,
         outputStreamCaptor.toString().trim().contains(line1));
   }
+
+  @Test
+  public void gJFMultiLine() {
+    InferredAnnosCounter.main(
+            new String[] {"testCases/GJFMultiLine.java", "testCases/GJFMultiLine.ajava"});
+    String line1 = "@CalledMethods got 1/1";
+    String line2 = "@NonNull got 1/1";
+    assertTrue(
+            "Didn't find the correct number of @CalledMethods annotations; expected 1/1, got: "
+                    + outputStreamCaptor,
+            outputStreamCaptor.toString().trim().contains(line1));
+    assertTrue(
+            "Didn't find the correct number of @NonNull annotations; expected 1/1, got: "
+                    + outputStreamCaptor,
+            outputStreamCaptor.toString().trim().contains(line2));
+  }
 }
