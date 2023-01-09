@@ -129,4 +129,15 @@ public class InferredAnnosCounterTest {
             + outputStreamCaptor,
         outputStreamCaptor.toString().trim().contains(line2));
   }
+
+  @Test
+  public void multiLineAnnotation() {
+    InferredAnnosCounter.main(
+        new String[] {"testCases/MultiLineAnnotation.java", "testCases/MultiLineAnnotation.ajava"});
+    String line1 = "@EnsuresCalledMethods got 1/1";
+    assertTrue(
+        "Didn't find the correct number of @EnsuresCalledMethods annotations; expected 1/1, got: "
+            + outputStreamCaptor,
+        outputStreamCaptor.toString().trim().contains(line1));
+  }
 }

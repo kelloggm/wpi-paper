@@ -332,7 +332,9 @@ public class InferredAnnosCounter {
    * @return formatted annotation
    */
   private static String formatAnnotaionsWithArguments(String annotation) {
-    String result = annotation;
+    // remove all whitespace inside of annotations with arguments, to prevent
+    // whitespace-based diffs from producing incorrect results later
+    String result = annotation.replaceAll("\\s+", "");
     /*
     First, we format cases involving matrix by changing all "}, {" to "|, |"
      */
@@ -349,7 +351,7 @@ public class InferredAnnosCounter {
       if (result
           .substring(indexOfClose, indexOfOpen)
           .chars()
-          .anyMatch(c -> !(Character.isWhitespace(c) || c == '{' || c == '}' || c == ','))) {
+          .anyMatch(c -> !(c == '{' || c == '}' || c == ','))) {
         indexOfClose = result.indexOf("},", indexOfClose + 1);
         continue;
       }
@@ -479,14 +481,14 @@ public class InferredAnnosCounter {
           if (temp.contains(")")) {
             tempAnno = temp.substring(index1 + 1, temp.indexOf(')') + 1);
           } else {
-            tempAnno = temp.substring(index1 + 1, temp.length());
+            tempAnno = temp.substring(index1 + 1);
           }
           result.add(tempAnno);
         } else {
           result.add(tempAnno);
         }
       }
-      temp = temp.substring(index1 + 1, temp.length());
+      temp = temp.substring(index1 + 1);
     }
     return result;
   }
