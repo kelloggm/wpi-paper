@@ -560,9 +560,7 @@ public class InferredAnnosCounter {
       // the fact that this if statement's condition is true means that this line contains exactly
       // one CF annotation and nothing else.
       if (checkerPackage.contains(specialAnno)) {
-        originalFileLine = formatAnnotaionsWith
-        
-        Arguments(originalFileLine);
+        originalFileLine = formatAnnotaionsWithArguments(originalFileLine);
         if (annoCount.containsKey(specialAnno)) {
           int numberOfAnno = annoCount.get(specialAnno);
           annoCount.put(specialAnno, numberOfAnno + 1);
