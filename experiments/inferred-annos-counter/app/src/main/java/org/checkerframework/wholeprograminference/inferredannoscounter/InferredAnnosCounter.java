@@ -298,7 +298,7 @@ public class InferredAnnosCounter {
     String result = line;
     String firstPart = line.substring(0, index);
     if (index + 1 < result.length()) {
-      String secondPart = result.substring(index + 1, result.length());
+      String secondPart = result.substring(index + 1);
       result = firstPart + symbol + secondPart;
     } else {
       // the element at index is also the last element of the string
