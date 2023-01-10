@@ -279,7 +279,7 @@ def part4():
     ## RunIAC.py
 
 def resetAll():
-    process = subprocess.run("git checkout master", shell=True)
+    process = subprocess.run("git checkout baseline", shell=True)
     process = subprocess.run("git stash", shell=True)
     process = subprocess.run("git branch -D annotation-statistics &> /dev/null", shell=True)
     process = subprocess.run("git push origin --delete annotation-statistics &> /dev/null", shell=True)
