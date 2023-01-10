@@ -150,6 +150,8 @@ def part2():
         6. commit the script and build changes: git commit -am "enable WPI" ; git push origin wpi-enabled 
         7. execute the script: ./wpi.sh 
         8. record the number of errors issued by the typecheckers (and which typechecker issued the error) after the script is finished
+        9. Save the output of WPI (i.e., the warnings it produces) to the file `typecheck.out` in the project's top-level directory.
+        10. Add `typecheck.out` to git and then commit to the `wpi-enabled` branch: `git add typecheck.out ; git commit -m "results of typechecking" ; git push origin wpi-enabled`
     '''
     process = subprocess.run("git checkout -b wpi-enabled origin/unannotated ", shell=True)
     
@@ -165,8 +167,9 @@ def part2():
     pausePrg()
     process = subprocess.run("chmod +x wpi.sh ; git add wpi.sh", shell=True)
     process = subprocess.run("git commit -am \"enable WPI\" ; git push origin wpi-enabled ", shell=True)
-    process = subprocess.run("./wpi.sh", shell=True)
-    print("Record, under \"Warnings after WPI\" in the project's tab in the spreadsheet, the number of errors issued by the typecheckers and which typechecker issued the error.")
+    process = subprocess.run("./wpi.sh &> typecheck.out", shell=True)
+    process = subprocess.run("git add typecheck.out ; git commit -m \"results of typechecking\" ; git push origin wpi-enabled", shell=True)
+    print("Record, under \"Warnings after WPI\" in the project's tab in the spreadsheet, the number of errors issued by the typecheckers and which typechecker issued the error. The output of WPI is in the file typecheck.out.")
     pausePrg()
     '''
     G. Create a branch for the code with inferred annotations 
