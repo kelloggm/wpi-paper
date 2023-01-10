@@ -14,8 +14,7 @@ ROOT_IAC_DIR="${1}"
 # this runs the IAC, passing a single java file and then the list of ajava files as the arguments
 run_iac () {
     pushd ${ROOT_IAC_DIR}
-#    eval "./gradlew run --args=\"$@\""
-    echo "./gradlew run --args=\"$@\""
+    eval "./gradlew run --args=\"$@\""
     popd
 }
 
