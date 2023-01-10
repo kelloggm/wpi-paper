@@ -59,6 +59,9 @@ The procedure:
          1. For Maven, you may find the checker-framework version under properties, the tag may vary. Modify the line to use the generated snapshot by replacing the version with your appropriate snapshot (ie, "3.28.1-SNAPSHOT").
          2. For Gradle, refer to the Gradle Plugin's README, https://github.com/kelloggm/checkerframework-gradle-plugin#specifying-a-checker-framework-version. 
          3. Confirm that the version of checker-qual is also using the your appropriate snapshot.
+    5. verify that the project still builds using the newest Checker Framework (try to fix any problems you encounter caused by updating the Checker Framework, but you may have to discard the project at this step if e.g. the project requires a Java version <= 7, which worked with some older versions of the CF but not with modern versions)
+    6. commit the result to the `baseline` branch: `git commit -am "run with modern Checker Framework" ; git push origin baseline`
+
 
 ##### C. Create a new branch called "unannotated" from the same commit, with annotations removed:
    1. `git checkout -b unannotated`
