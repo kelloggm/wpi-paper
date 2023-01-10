@@ -2,65 +2,229 @@ package org.checkerframework.wholeprograminference.inferredannoscounter;
 
 import com.github.difflib.DiffUtils;
 import com.github.difflib.patch.AbstractDelta;
+import com.github.difflib.patch.DeltaType;
 import com.github.difflib.patch.Patch;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import org.checkerframework.checker.index.qual.IndexFor;
-import org.checkerframework.checker.index.qual.NonNegative;
-import org.checkerframework.common.value.qual.MinLen;
 
 /**
- * The entry point for the inferred annos counter. Pass it a list of files, as detailed in README.md
- * at the top-level of this source tree.
+ * The entry point for the inferred annos counter. Run this by passing arguments, with the first
+ * being the path of the human-written file, and other arguments being the path of the .ajava files
+ * produced by the WPI. The path here should be relative to "experiments\inferred-annos-counter."
+ * The program assumes that a formatter has been applied, so it is important to run the script
+ * format.sh in the directory "experiments" beforehand. InferredAnnosCounter only takes one
+ * human-written source file at a time. So in case it is needed to run multiple human-written files
+ * with corresponding computer-generated files, InferredAnnosCounter needs to be invoked multiple
+ * times. The way to run InferredAnnosCounter is like this: cd experiments\inferred-annos-counter
+ * (going to the working directory) and then gradle run --args = "(a path to the human-written file)
+ * (one or more paths to the computer-generated files)". The result will not be in alphabetical
+ * order.
  */
 public class InferredAnnosCounter {
-  private static String checkerFramworkPackage =
-      "A2F A2FReducer AbstractAnalysis AbstractAnalysis.Worklist AbstractAtmComboVisitor AbstractCFGVisualizer AbstractCFGVisualizer.VisualizeWhere AbstractMostlySingleton AbstractMostlySingleton.State AbstractNodeVisitor AbstractQualifierPolymorphism AbstractTypeProcessor AbstractValue Acceleration AccumulationAnnotatedTypeFactory AccumulationChecker AccumulationChecker.AliasAnalysis AccumulationTransfer AccumulationVisitor AddAnnotatedFor AFConstraint AFReducer AggregateChecker AliasingAnnotatedTypeFactory AliasingChecker AliasingTransfer AliasingVisitor AlwaysSafe Analysis Analysis.BeforeOrAfter Analysis.Direction AnalysisResult Angle AnnotatedFor AnnotatedTypeCombiner AnnotatedTypeCopier AnnotatedTypeCopierWithReplacement AnnotatedTypeCopierWithReplacement.Visitor AnnotatedTypeFactory AnnotatedTypeFactory.ParameterizedExecutableType AnnotatedTypeFormatter AnnotatedTypeMirror AnnotatedTypeMirror.AnnotatedArrayType AnnotatedTypeMirror.AnnotatedDeclaredType AnnotatedTypeMirror.AnnotatedExecutableType AnnotatedTypeMirror.AnnotatedIntersectionType AnnotatedTypeMirror.AnnotatedNoType AnnotatedTypeMirror.AnnotatedNullType AnnotatedTypeMirror.AnnotatedPrimitiveType AnnotatedTypeMirror.AnnotatedTypeVariable AnnotatedTypeMirror.AnnotatedUnionType AnnotatedTypeMirror.AnnotatedWildcardType AnnotatedTypeParameterBounds AnnotatedTypeReplacer AnnotatedTypes AnnotatedTypeScanner AnnotatedTypeScanner.Reduce AnnotatedTypeVisitor AnnotationBuilder AnnotationClassLoader AnnotationConverter AnnotationEqualityVisitor AnnotationFileElementTypes AnnotationFileParser AnnotationFileParser.AnnotationFileAnnotations AnnotationFileParser.AnnotationFileParserException AnnotationFileParser.RecordComponentStub AnnotationFileParser.RecordStub AnnotationFileResource AnnotationFileStore AnnotationFileUtil AnnotationFileUtil.AnnotationFileType AnnotationFormatter AnnotationMirrorMap AnnotationMirrorSet AnnotationMirrorToAnnotationExprConversion AnnotationProvider AnnotationStatistics AnnotationTransferVisitor AnnotationUtils Area ArrayAccess ArrayAccessNode ArrayCreation ArrayCreationNode ArrayLen ArrayLenRange ArrayTypeNode ArrayWithoutPackage ASceneWrapper AssertionErrorNode AssertNonNullIfNonNull AssignmentNode AsSuperVisitor AtmCombo AtmComboVisitor AutoValueSupport AwtAlphaCompositingRule AwtColorSpace AwtCursorType AwtFlowLayout BackwardAnalysis BackwardAnalysisImpl BackwardTransferFunction BaseAnnotatedTypeFactory BaseAnnotatedTypeFactoryForIndexChecker BaseTypeChecker BaseTypeValidator BaseTypeVisitor BasicAnnotationProvider BasicTypeProcessor BinaryName BinaryNameOrPrimitiveType BinaryNameWithoutPackage BinaryOperation BinaryOperationNode BitwiseAndNode BitwiseComplementNode BitwiseOrNode BitwiseXorNode Block Block.BlockType BlockImpl BooleanLiteralNode BoolVal Bottom BottomThis BottomVal BoundsInitializer BugInCF BuilderFrameworkSupport BuilderFrameworkSupportUtils ByteMath C CalledMethods CalledMethods CalledMethodsAnalysis CalledMethodsAnnotatedTypeFactory CalledMethodsBottom CalledMethodsChecker CalledMethodsPredicate CalledMethodsTransfer CalledMethodsVisitor CanonicalName CanonicalNameAndBinaryName CanonicalNameOrEmpty CanonicalNameOrPrimitiveType CaseNode cd CFAbstractAnalysis CFAbstractAnalysis.FieldInitialValue CFAbstractStore CFAbstractTransfer CFAbstractValue CFAnalysis CFCFGBuilder CFCFGBuilder.CFCFGTranslationPhaseOne CFComment CFGBuilder CFGProcessor CFGProcessor.CFGProcessResult CFGTranslationPhaseOne CFGTranslationPhaseThree CFGTranslationPhaseThree.PredecessorHolder CFGTranslationPhaseTwo CFGVisualizeLauncher CFGVisualizer CFStore CFTransfer CFTreeBuilder CFValue CharacterLiteralNode CheckerMain ClassBound ClassDeclarationNode ClassGetName ClassGetSimpleName ClassName ClassNameNode ClassTypeParamApplier ClassVal ClassValAnnotatedTypeFactory ClassValBottom ClassValChecker ClassValVisitor CollectionToArrayHeuristics CollectionUtils CompareToMethod CompilerMessageKey CompilerMessageKeyBottom CompilerMessagesAnnotatedTypeFactory CompilerMessagesChecker ConditionalAndNode ConditionalBlock ConditionalBlockImpl ConditionalJump ConditionalNotNode ConditionalOrNode ConditionalPostconditionAnnotation ConditionalTransferResult Constant Constant.Type ConstantPropagationPlayground ConstantPropagationStore ConstantPropagationTransfer ConstraintMap ConstraintMapBuilder Contract Contract.ConditionalPostcondition Contract.Kind Contract.Postcondition Contract.Precondition ContractsFromMethod ControlFlowGraph ConversionCategory Covariant CreatesMustCallFor CreatesMustCallFor.List CreatesMustCallForElementSupplier CreatesMustCallForToJavaExpression Current DebugListTreeAnnotator DeclarationsIntoElements Default DefaultAnnotatedTypeFormatter DefaultAnnotatedTypeFormatter.FormattingVisitor DefaultAnnotationFormatter DefaultFor DefaultForTypeAnnotator DefaultInferredTypesApplier DefaultJointVisitor DefaultQualifier DefaultQualifier.List DefaultQualifierForUse DefaultQualifierForUseTypeAnnotator DefaultQualifierInHierarchy DefaultQualifierKindHierarchy DefaultQualifierKindHierarchy.DefaultQualifierKind DefaultQualifierPolymorphism DefaultReflectionResolver DefaultTypeArgumentInference DefaultTypeHierarchy degrees DependentTypesError DependentTypesHelper DependentTypesTreeAnnotator DetachedVarSymbol Deterministic DiagMessage DoNothingChecker DOTCFGVisualizer DotSeparatedIdentifiers DotSeparatedIdentifiersOrPrimitiveType DoubleAnnotatedTypeScanner DoubleJavaParserVisitor DoubleLiteralNode DoubleMath DoubleVal Effect Effect.EffectRange ElementAnnotationApplier ElementAnnotationUtil ElementAnnotationUtil.ErrorTypeKindException ElementAnnotationUtil.UnexpectedAnnotationLocationException ElementQualifierHierarchy ElementUtils EmptyProcessor EnsuresCalledMethods EnsuresCalledMethodsIf EnsuresCalledMethodsIf.List EnsuresCalledMethodsVarArgs EnsuresInitializedFields EnsuresInitializedFields.List EnsuresKeyFor EnsuresKeyFor.List EnsuresKeyForIf EnsuresKeyForIf.List EnsuresLockHeld EnsuresLockHeld.List EnsuresLockHeldIf EnsuresLockHeldIf.List EnsuresLTLengthOf EnsuresLTLengthOf.List EnsuresLTLengthOfIf EnsuresLTLengthOfIf.List EnsuresMinLenIf EnsuresMinLenIf.List EnsuresNonNull EnsuresNonNull.List EnsuresNonNullIf EnsuresNonNullIf.List EnsuresQualifier EnsuresQualifier.List EnsuresQualifierIf EnsuresQualifierIf.List EnumVal EqualitiesSolver EqualityAtmComparer EqualsMethod EqualToNode EquivalentAtmComboScanner ExceptionBlock ExceptionBlockImpl ExecUtil ExecUtil.Redirection ExpectedTreesVisitor ExplicitThisNode ExtendedNode ExtendedNode.ExtendedNodeType F2A F2AReducer FBCBottom Fenum FenumAnnotatedTypeFactory FenumBottom FenumChecker FenumTop FenumUnqualified FenumVisitor FieldAccess FieldAccessNode FieldDescriptor FieldDescriptorForPrimitive FieldDescriptorWithoutPackage FieldInvariant FieldInvariants FileAnnotationFileResource FindDistinct FIsA FIsAReducer FloatingDivisionNode FloatingRemainderNode FloatLiteralNode FloatMath FluentAPIGenerator Force FormalParameter Format FormatBottom FormatMethod FormatMethod FormatterAnnotatedTypeFactory FormatterChecker FormatterTransfer FormatterTreeUtil FormatterTreeUtil.InvocationType FormatterTreeUtil.Result FormatterVisitor FormatUtil FormatUtil.ExcessiveOrMissingFormatArgumentException FormatUtil.IllegalFormatConversionCategoryException ForName ForwardAnalysis ForwardAnalysisImpl ForwardTransferFunction FqBinaryName FromByteCode FromStubFile FullyQualifiedName FunctionalInterfaceNode g GenericAnnotatedTypeFactory GenericAnnotatedTypeFactory.ScanState GetClass GetConstructor GetMethod GlbUtil GreaterThanNode GreaterThanOrEqualNode GTENegativeOne GuardedBy GuardedByBottom GuardedByUnknown GuardSatisfied GuiEffectChecker GuiEffectTypeFactory GuiEffectVisitor h HashcodeAtmVisitor HasQualifierParameter HasSubsequence Heuristics Heuristics.Matcher Heuristics.OfKind Heuristics.OrMatcher Heuristics.PreceededBy Heuristics.Within Heuristics.WithinTrueBranch Holding I18nAnnotatedTypeFactory I18nChecker I18nChecksFormat I18nConversionCategory I18nFormat I18nFormatBottom I18nFormatFor I18nFormatterAnnotatedTypeFactory I18nFormatterChecker I18nFormatterTransfer I18nFormatterTreeUtil I18nFormatterTreeUtil.FormatType I18nFormatterVisitor I18nFormatUtil I18nInvalidFormat I18nMakeFormat I18nSubchecker I18nUnknownFormat I18nValidFormat Identifier IdentifierOrPrimitiveType IdentityMostlySingleton IgnoreInWholeProgramInference ImplicitThisNode IndexAbstractTransfer IndexChecker IndexFor IndexMethodIdentifier IndexOrHigh IndexOrLow IndexRefinementInfo IndexUtil InferenceResult InferredValue InferredValue.InferredTarget InferredValue.InferredType InheritableMustCall InheritedAnnotation InitializationAnnotatedTypeFactory InitializationChecker InitializationStore InitializationTransfer InitializationVisitor Initialized InitializedFields InitializedFieldsAnnotatedTypeFactory InitializedFieldsBottom InitializedFieldsChecker InitializedFieldsTransfer InsertAjavaAnnotations InstanceOfNode IntegerDivisionNode IntegerLiteralNode IntegerMath IntegerRemainderNode InternalForm InternalUtils Interned InternedDistinct InterningAnnotatedTypeFactory InterningChecker InterningVisitor InternMethod IntRange IntRangeFromGTENegativeOne IntRangeFromNonNegative IntRangeFromPositive IntVal InvalidFormat InvisibleQualifier Invoke IrrelevantTypeAnnotator JarEntryAnnotationFileResource JavaCodeStatistics JavaExpression JavaExpression JavaExpressionConverter JavaExpressionOptimizer JavaExpressionParseUtil JavaExpressionParseUtil.JavaExpressionParseException JavaExpressionScanner JavaExpressionVisitor JavaParserUtil JavaParserUtil.StringLiteralConcatenateVisitor JavaStubifier JointJavacJavaParserVisitor JointVisitorWithDefaultAction K KeyFor KeyForAnalysis KeyForAnnotatedTypeFactory KeyForAnnotatedTypeFactory.KeyForTypeHierarchy KeyForBottom KeyForPropagationTreeAnnotator KeyForPropagator KeyForPropagator.PropagationDirection KeyForStore KeyForSubchecker KeyForTransfer KeyForValue kg km km2 km3 kmPERh kN Label LambdaResultExpressionNode LeakedToResult LeftShiftNode Length LengthOf LessThan LessThanAnnotatedTypeFactory LessThanBottom LessThanChecker LessThanNode LessThanOrEqualNode LessThanTransfer LessThanUnknown LessThanVisitor ListTreeAnnotator ListTypeAnnotator LiteralKind LiteralTreeAnnotator LiveVariablePlayground LiveVarStore LiveVarTransfer LiveVarValue LocalizableKey LocalizableKeyAnnotatedTypeFactory LocalizableKeyBottom LocalizableKeyChecker Localized LocalVariable LocalVariableNode LockAnalysis LockAnnotatedTypeFactory LockChecker LockHeld LockingFree LockPossiblyHeld LockStore LockTransfer LockTreeAnnotator LockVisitor LombokSupport LongLiteralNode LongMath LowerBoundAnnotatedTypeFactory LowerBoundBottom LowerBoundChecker LowerBoundTransfer LowerBoundUnknown LowerBoundVisitor LTEqLengthOf LTLengthOf LTOMLengthOf Luminance m m2 m3 MarkerNode Mass MatchesRegex MaybeAliased MaybeLeaked MaybePresent MayReleaseLocks MethodAccessNode MethodApplier MethodCall MethodDescriptor MethodInvocationNode MethodTypeParamApplier MethodVal MethodValAnnotatedTypeFactory MethodValBottom MethodValChecker MethodValVisitor min MinLen MinLenFieldInvariant MixedUnits mm mm2 mm3 mol MonotonicNonNull MonotonicQualifier MostlyNoElementQualifierHierarchy MostlySingleton mPERs mPERs2 MustCall MustCallAlias MustCallAnnotatedTypeFactory MustCallChecker MustCallInferenceLogic MustCallNoCreatesMustCallForChecker MustCallTransfer MustCallTypeAnnotator MustCallUnknown MustCallVisitor N NarrowingConversionNode NegativeIndexFor NewInstance NewObject Node NoDefaultQualifierForUse NodeUtils NodeVisitor NoElementQualifierHierarchy NonLeaked NonNegative NonNull NoQualifierParameter NotCalledMethods NotEqualNode NotOnlyInitialized NotOwning Nullable NullChkNode NullLiteralNode NullnessAnalysis NullnessAnnotatedTypeFactory NullnessAnnotatedTypeFactory.NullnessPropagationTreeAnnotator NullnessAnnotatedTypeFormatter NullnessAnnotatedTypeFormatter.NullnessFormattingVisitor NullnessChecker NullnessStore NullnessTransfer NullnessUtil NullnessValue NullnessVisitor NumberMath NumberUtils NumericalAdditionNode NumericalMinusNode NumericalMultiplicationNode NumericalPlusNode NumericalSubtractionNode ObjectCreationNode OffsetDependentTypesHelper OffsetEquation Opt OptionalBottom OptionalChecker OptionalVisitor OptionConfiguration Owning PackageNameNode Pair ParamApplier ParameterizedTypeNode PartialRegex PhaseOneResult PolyFenum PolyIndex PolyInitializedFields PolyInterned PolyKeyFor PolyLength PolyLowerBound PolymorphicQualifier PolyMustCall PolyNull PolyPresent PolyRegex PolySameLen PolySignature PolySigned PolyTainted PolyUI PolyUIEffect PolyUIType PolyUnit PolyUpperBound PolyValue Positive PostconditionAnnotation PreconditionAnnotation Prefix Present PrimitiveType PrimitiveTypeNode PropagationTreeAnnotator PropagationTypeAnnotator PropertyKey PropertyKeyAnnotatedTypeFactory PropertyKeyBottom PropertyKeyChecker Pure Pure Pure.Kind PurityAnnotatedTypeFactory PurityChecker PurityChecker PurityChecker.PurityCheckerHelper PurityChecker.PurityResult PurityUnqualified PurityUtils QualifierArgument QualifierDefaults QualifierDefaults.BoundType QualifierForLiterals QualifierHierarchy QualifierKind QualifierKindHierarchy QualifierPolymorphism QualifierUpperBounds radians Range ReflectionResolver ReflectiveEvaluator Regex RegexAnnotatedTypeFactory RegexBottom RegexChecker RegexTransfer RegexUtil RegexUtil.CheckedPatternSyntaxException RegexVisitor RegularBlock RegularBlockImpl RegularTransferResult ReleasesNoLocks RelevantJavaTypes RemoveAnnotationsForInference ReportCall ReportChecker ReportCreation ReportInherit ReportOverride ReportReadWrite ReportUnqualified ReportUse ReportVisitor ReportWrite RequiresCalledMethods RequiresCalledMethods.List RequiresNonNull RequiresNonNull.List RequiresQualifier RequiresQualifier.List Resolver ResourceLeakAnalysis ResourceLeakAnnotatedTypeFactory ResourceLeakChecker ResourceLeakTransfer ResourceLeakVisitor ReturnNode ReturnsFormat ReturnsReceiver ReturnsReceiverAnnotatedTypeFactory ReturnsReceiverChecker ReturnsReceiverVisitor s SafeEffect SafeType SameLen SameLenAnnotatedTypeFactory SameLenBottom SameLenChecker SameLenTransfer SameLenUnknown SameLenVisitor SceneToStubWriter SearchIndexAnnotatedTypeFactory SearchIndexBottom SearchIndexChecker SearchIndexFor SearchIndexTransfer SearchIndexUnknown ShortLiteralNode ShortMath SideEffectFree SignatureAnnotatedTypeFactory SignatureBottom SignatureChecker SignaturePrinter SignatureTransfer SignatureUnknown Signed SignednessAnnotatedTypeFactory SignednessBottom SignednessChecker SignednessGlb SignednessUtil SignednessUtilExtra SignednessVisitor SignedPositive SignedPositiveFromUnsigned SignedRightShiftNode SimpleAnnotatedTypeScanner SimpleAnnotatedTypeScanner.DefaultAction SimpleAnnotatedTypeVisitor SingleSuccessorBlock SingleSuccessorBlockImpl SourceChecker SourceVisitor SpecialBlock SpecialBlock.SpecialBlockType SpecialBlockImpl Speed StaticallyExecutable Store Store.FlowRule Store.Kind StringCFGVisualizer StringConcatenateAssignmentNode StringConcatenateNode StringConversionNode StringLiteralNode StringToJavaExpression StringVal StructuralEqualityComparer StructuralEqualityVisitHistory StubFiles StubGenerator Subsequence Substance SubstringIndexAnnotatedTypeFactory SubstringIndexBottom SubstringIndexChecker SubstringIndexFor SubstringIndexUnknown SubtypeIsSubsetQualifierHierarchy SubtypeIsSupersetQualifierHierarchy SubtypeOf SubtypesSolver SubtypeVisitHistory SubtypingAnnotatedTypeFactory SubtypingAnnotationClassLoader SubtypingChecker SuperNode SuperTypeApplier SupertypesSolver SupportedLintOptions SupportedOptions SuppressWarningsPrefix SwingBoxOrientation SwingCompassDirection SwingElementOrientation SwingHorizontalOrientation SwingSplitPaneOrientation SwingTextOrientation SwingTitleJustification SwingTitlePosition SwingVerticalOrientation SwitchExpressionNode SwitchExpressionScanner SwitchExpressionScanner.FunctionalSwitchExpressionScanner SynchronizedNode SyntheticArrays SystemGetPropertyHandler SystemUtil t Tainted TaintingChecker TaintingVisitor TargetConstraints TargetConstraints.Equalities TargetConstraints.Subtypes TargetConstraints.Supertypes TargetLocations Temperature TerminatesExecution TernaryExpressionNode This ThisNode ThisReference ThrowNode Time TIsU ToIndexFileConverter TransferFunction TransferInput TransferResult TreeAnnotator TreeBuilder TreeDebug TreeDebug.Visitor TreeParser TreePathCacher TreePathUtil TreePrinter TreeScannerWithDefaults TreeUtils TSubU TSuperU TUConstraint TypeAnnotationMover TypeAnnotationUtils TypeAnnotator TypeArgInferenceUtil TypeArgumentInference TypeArgumentMapper TypeCastNode TypeDeclarationApplier TypeHierarchy TypeKind TypeKindUtils TypeKindUtils.PrimitiveConversionKind TypeOutputtingChecker TypeOutputtingChecker.GeneralAnnotatedTypeFactory TypeOutputtingChecker.Visitor TypesIntoElements TypesUtils TypeSystemError TypeUseLocation TypeValidator TypeVariableSubstitutor TypeVarUseApplier TypeVisualizer UBQualifier UBQualifier.LessThanLengthOf UBQualifier.UpperBoundLiteralQualifier UBQualifier.UpperBoundUnknownQualifier UI UIEffect UIPackage UIType UnaryOperation UnaryOperationNode UnderInitialization UnderlyingAST UnderlyingAST.CFGLambda UnderlyingAST.CFGMethod UnderlyingAST.CFGStatement UnderlyingAST.Kind Unique UnitsAnnotatedTypeFactory UnitsAnnotatedTypeFactory.UnitsQualifierKindHierarchy UnitsAnnotatedTypeFormatter UnitsAnnotatedTypeFormatter.UnitsAnnotationFormatter UnitsAnnotatedTypeFormatter.UnitsFormattingVisitor UnitsAnnotationClassLoader UnitsBottom UnitsChecker UnitsMultiple UnitsRelations UnitsRelations UnitsRelationsDefault UnitsRelationsTools UnitsTools UnitsVisitor Unknown UnknownClass UnknownCompilerMessageKey UnknownFormat UnknownInitialization UnknownInterned UnknownKeyFor UnknownLocalizableKey UnknownLocalized UnknownMethod UnknownPropertyKey UnknownRegex UnknownSignedness UnknownThis UnknownUnits UnknownVal UnmodifiableIdentityHashMap Unqualified Unsigned UnsignedRightShiftNode Untainted Unused UpperBoundAnnotatedTypeFactory UpperBoundBottom UpperBoundChecker UpperBoundFor UpperBoundLiteral UpperBoundTransfer UpperBoundUnknown UpperBoundVisitor UserError UsesObjectEquals ValueAnnotatedTypeFactory ValueChecker ValueCheckerUtils ValueLiteral ValueLiteralNode ValueTransfer ValueVisitor VariableApplier VariableDeclarationNode ViewpointAdaptJavaExpression VoidVisitorWithDefaultAction Volume WholeProgramInference WholeProgramInference.OutputFormat WholeProgramInferenceImplementation WholeProgramInferenceJavaParserStorage WholeProgramInferenceScenesStorage WholeProgramInferenceScenesStorage.AnnotationsInContexts WholeProgramInferenceStorage WideningConversionNode";
 
   /**
-   * For example, if we have @Annotation] coming from the diff algorithm, we will extract
-   * the @Annotation part.
-   *
-   * <p>
-   *
-   * @param anno an annotation with length greater than 2, might contain "]" at the end or not.
-   * @return the annotation itself without no "]"
+   * This enum classifies input lines. A line is OPEN if it contains the beginning of a multi-line
+   * annotation, CLOSE if it contains the ending of a multi-line annotation. For other cases, it is
+   * considered COMPLETE.
    */
-  private static String TrimAnnotation(@MinLen(2) String anno) {
-    String result = anno;
-    @SuppressWarnings(
-        "index:assignment") // This method should only be called on strings that contain an "@"
-    @NonNegative int index1 = result.indexOf('@');
-    /* if apart from the '@' symbol, the anno contains only alphabetical elements (for example: @NulLable), we will take
-    the whole string. Otherwise, for cases such as @Nullable], we will ignore the last element of the anno.
-    */
-    int indexConsider = result.indexOf("]");
-    if (indexConsider == -1) {
-      result = result.substring(index1, result.length());
-    } else {
-      result = result.substring(index1, indexConsider);
-      int indexConsider2 = result.indexOf(',');
-      if (indexConsider2 == -1) {
-        result = result.substring(index1, result.length());
-      } else {
-        result = result.substring(index1, indexConsider2);
-      }
-    }
-    return result;
+  enum LineStatus {
+    OPEN,
+    COMPLETE,
+    CLOSE
   }
 
   /**
-   * This method will take a line, which contains at least one annotation, and return the first
-   * annotation in that line.
+   * This method returns true if the first not-a-whitespace character of a line is a dot. It returns
+   * false in other cases
    *
-   * <p>
+   * @param line a line to be analyzed
+   * @return true of the first non-whitespace character of that line is a dot, false otherwise.
+   */
+  private static boolean firstIsDot(String line) {
+    String trimmed = line.trim();
+    return trimmed.length() == 0 ? false : trimmed.charAt(0) == '.';
+  }
+
+  /**
+   * If an annotation is too long, Google Java Format will make it multi-line. This method checks if
+   * a line contains the beginning of those annotations.
+   *
+   * <p>For example, the first line contains the beginning of MonotonicNonNull:
+   * static @org.checkerframework.checker.initialization.qual.Initialized @org.checkerframework.checker
+   * .nullness.qual.MonotonicNonNull TimeZone tz2;
+   *
+   * @param line a line from the input file
+   * @return true if it contains the beginning of a multi-line annotation
+   */
+  private static boolean checkGoogleFormatOpenCase(String line) {
+    if (line.length() == 0) {
+      return false;
+    }
+    String[] elements = line.trim().split(" ");
+    int n = elements.length;
+    if (n >= 1 && elements[n - 1].contains("@org")) {
+      String[] breaks = elements[n - 1].split("[.]");
+      int numberOfParts = breaks.length;
+      if (numberOfParts < 2) {
+        throw new RuntimeException("Invalid annotation form in line: " + line);
+      }
+      return (!breaks[numberOfParts - 2].equals("qual"));
+    }
+    return false;
+  }
+
+  /**
+   * If an annotation is too long, Google Java Format will make it multi-line. This method checks if
+   * a line contains the ending of those annotations.
+   *
+   * <p>For example, the second line contains the ending of MonotonicNonNull:
+   * static @org.checkerframework.checker.initialization.qual.Initialized @org.checkerframework.checker
+   * .nullness.qual.MonotonicNonNull TimeZone tz2;
+   *
+   * @param line a line from the input file
+   * @return true if it contains the ending of a multi-line annotation
+   */
+  private static boolean checkGoogleFormatCloseCase(String line) {
+    return (line.length() > 0 && firstIsDot(line));
+  }
+
+  /**
+   * This method checks the status of a line. If that line is the opening of a multi-line
+   * annotation, we call it "Open". If the line is the closing of a multi-line annotation, we call
+   * it "Close". And if the line does not contain any multi-line annotation, we call it "Complete".
+   *
+   * @param line a line from the input file
+   * @return the status of that line
+   */
+  private static LineStatus checkLineStatus(String line) {
+    if (checkGoogleFormatOpenCase(line)) {
+      return LineStatus.OPEN;
+    }
+    if (checkGoogleFormatCloseCase(line)) {
+      return LineStatus.CLOSE;
+    }
+    int openParen = 0;
+    int closeParen = 0;
+    for (int i = 0; i < line.length(); i++) {
+      char c = line.charAt(i);
+      if (c == '(') {
+        openParen++;
+      }
+      if (c == ')') {
+        closeParen++;
+      }
+    }
+    if (openParen < closeParen) {
+      return LineStatus.CLOSE;
+    }
+    if (openParen > closeParen) {
+      return LineStatus.OPEN;
+    }
+    return LineStatus.COMPLETE;
+  }
+
+  /**
+   * This method reads the input files, and changes all the multi-line annotations into a single
+   * line. This method returns a list, each element of that list is a line of the formatted file.
+   *
+   * @param fileName the name of the input file to be formatted
+   * @return inputFiles a list containing lines of the formatted file
+   */
+  private static List<String> annoMultiToSingle(String fileName) {
+    List<String> inputFiles = new ArrayList<>();
+    File file = new File(fileName);
+    try (BufferedReader br = new BufferedReader(new FileReader(file))) {
+      String originalFileLine;
+      String tempLine = "";
+      boolean inProgress = false;
+      while ((originalFileLine = br.readLine()) != null) {
+        originalFileLine = ignoreComment(originalFileLine);
+        LineStatus status = checkLineStatus(originalFileLine);
+        if (inProgress) {
+          if (status == LineStatus.CLOSE) {
+            /*
+            There are two cases that an anotation is multi-line, either by Google Java Format or by default.
+            For the first case, it's easy to understand that we don't want any space in the middle of an annotation.
+            For the second case, it will be easier for the Diff Algorithm if there's no space in the bracket.
+             */
+            tempLine = tempLine + originalFileLine.trim();
+            inputFiles.add(tempLine);
+            inProgress = false;
+            tempLine = "";
+          } else {
+            originalFileLine = originalFileLine.trim();
+            tempLine = tempLine + originalFileLine;
+          }
+        } else if (status == LineStatus.COMPLETE || !originalFileLine.contains("@")) {
+          tempLine = tempLine + originalFileLine;
+          inputFiles.add(tempLine);
+          tempLine = "";
+        } else if (status == LineStatus.OPEN && originalFileLine.contains("@")) {
+          tempLine = tempLine + originalFileLine;
+          inProgress = true;
+        } else {
+          throw new RuntimeException(
+              "unexpected line status: " + status + " for line " + originalFileLine);
+        }
+      }
+    } catch (Exception e) {
+      throw new RuntimeException("Could not read file: " + fileName + ". Check that it exists?");
+    }
+    return inputFiles;
+  }
+
+  /**
+   * This method will put each annotation in a separate line.
+   *
+   * @param inputFiles a list containing lines of the input file after going through
+   *     quickReadAndFormat
+   * @return a list containing lines of the input files with each annotation in a separate line.
+   */
+  private static List eachAnnotationInOneSingleLine(List<String> inputFiles) {
+    List<String> formatted = new ArrayList<String>();
+    for (int i = 0; i < inputFiles.size(); i++) {
+      String line = inputFiles.get(i);
+      String temp[] = line.split(" ");
+      String resultLine = "";
+      boolean inProgress = false;
+      for (String element : temp) {
+        int indexOfAnno = element.indexOf('@');
+        if (indexOfAnno != -1 && !inProgress) {
+          if (resultLine.length() > 0) {
+            // sometimes the annotation can be in the middle of a declaration
+            formatted.add(resultLine + element.substring(0, indexOfAnno));
+            element = element.substring(indexOfAnno);
+          }
+          resultLine = "";
+          if (checkLineStatus(element) == LineStatus.COMPLETE) {
+            formatted.add(element);
+          } else {
+            resultLine = resultLine + " " + element;
+            inProgress = true;
+          }
+        } else {
+          resultLine = resultLine + " " + element;
+          if (inProgress && element.indexOf(')') != -1) {
+            formatted.add(resultLine);
+            inProgress = false;
+            resultLine = "";
+          }
+        }
+      }
+      formatted.add(" " + resultLine);
+    }
+    return formatted;
+  }
+
+  /**
+   * This method takes a line, which contains at least one annotation, and return the first
+   * annotation in that line.
    *
    * @param line a non-empty line containing at least one annotation
    * @return the annotation which the line begins with
@@ -70,8 +234,10 @@ public class InferredAnnosCounter {
     String result = "";
     for (String word : temp) {
       if (word.length() >= 1) {
-        if (word.charAt(0) == '@') {
-          result = word.substring(1, word.length());
+        int indexOfAnno = word.indexOf('@');
+        if (indexOfAnno != -1) {
+          int begin = indexOfAnno + 1;
+          result = word.substring(begin, word.length());
           break;
         }
       }
@@ -80,9 +246,7 @@ public class InferredAnnosCounter {
   }
 
   /**
-   * This method is to count the number of annotations in a line
-   *
-   * <p>
+   * This method counts the number of annotations in a line
    *
    * @param line a line
    * @return the number of annotations in that line
@@ -106,40 +270,117 @@ public class InferredAnnosCounter {
   }
 
   /**
-   * This method is to check if a particular index in a line belong to a string literal or not
+   * This method checks if a particular index in a line is not inside a string literal.
    *
-   * <p>
+   * <p>Assumes that the beginning of {@code line} is not already inside a string literal.
    *
    * @param line a line
-   * @param Index index of line
-   * @return true if Index belong to a string literal, false otherwise
+   * @param index index to check
+   * @return false if index is inside a string literal, true otherwise
    */
-  private static boolean checkInString(@IndexFor("#2") int Index, String line) {
+  private static boolean notInStringLiteral(@IndexFor("#2") int index, String line) {
     int before = 0;
-    int after = 0;
-    for (int i = 0; i < Index; i++) {
+    for (int i = 0; i < index; i++) {
       if (line.charAt(i) == '\"') {
         before++;
       }
     }
-    for (int i = Index + 1; i < line.length(); i++) {
-      if (line.charAt(i) == '\"') {
-        after++;
-      }
-    }
-    if (before % 2 == 0 && after % 2 == 0) {
+    if (before % 2 == 0) {
       return true;
     }
     return false;
   }
 
   /**
-   * This method is to trim out all the comments in a human-written or computer-generated line
-   * before passing the line to the Diff algorithm.
+   * This method replaces a particular character at an index of a string with a new symbol.
    *
-   * <p>
+   * @param line a line that needs to be modified
+   * @param index a valid index of that line, which is non-negative and less than the length of line
+   * @param symbol the new character
+   * @return the line with the character at index replaced by symbol
+   */
+  private static String replaceAtIndex(String line, @IndexFor("#1") int index, String symbol) {
+    String result = line;
+    String firstPart = line.substring(0, index);
+    if (index + 1 < result.length()) {
+      String secondPart = result.substring(index + 1);
+      result = firstPart + symbol + secondPart;
+    } else {
+      // the element at index is also the last element of the string
+      result = firstPart + symbol;
+    }
+
+    return result;
+  }
+
+  /**
+   * This method formats annotations that contain arguments, such as
+   * {@literal @}EnsuresNonNull("tz1").
    *
-   * @param line a line with or without a comment section
+   * <p>These annotations are difficult to format, because they might or might not contain an extra
+   * pair of curly braces. The computer-generated files sometimes put an additional pair of curly
+   * braces (e.g., writing {@literal @}EnsuresNonNull({"tz1"}), which is valid: the argument is
+   * technically an array, but Java permits single-value arrays to omit the curly braces).
+   * Initially, we approached this problem by adding a pair of curly braces to every annotation
+   * having a pair of parentheses but no curly braces. But then we might run into a problem if there
+   * are parentheses inside the arguments.
+   *
+   * <p>This method instead has two parts. First, it checks if the annotation contains a matrix
+   * (that is, a multi-dimensional array argument) and formats any found matrix by changing all "},
+   * {" pattern to "|, |". Second, the method removes all curly braces in each annotation. This way,
+   * we make sure that we will not mess up the important curly braces (i.e., those defining internal
+   * array structure in a matrix), otherwise something like ({3, 4}) and ({3}, {4}) will both end up
+   * being (3,4). This approach solves the problem described above by standardizing on a format with
+   * no curly braces at all.
+   *
+   * @param annotation an annotation to be formatted
+   * @return formatted annotation
+   */
+  private static String formatAnnotaionsWithArguments(String annotation) {
+    // remove all whitespace inside of annotations with arguments, to prevent
+    // whitespace-based diffs from producing incorrect results later
+    String result = annotation.replaceAll("\\s+", "");
+    /*
+    First, we format cases involving matrix by changing all "}, {" to "|, |"
+     */
+    int indexOfClose = result.indexOf("},");
+    while (indexOfClose != -1) {
+      int indexOfOpen = result.indexOf('{', indexOfClose);
+      // reaching the end of a line
+      if (indexOfOpen < 0) {
+        return result;
+      }
+      // When an annotation has multiple arguments, a }, .* { can occur
+      // because of the argument names. In those cases, just continue the
+      // loop.
+      if (result
+          .substring(indexOfClose, indexOfOpen)
+          .chars()
+          .anyMatch(c -> !(c == '{' || c == '}' || c == ','))) {
+        indexOfClose = result.indexOf("},", indexOfClose + 1);
+        continue;
+      }
+
+      if (notInStringLiteral(indexOfClose, result)) {
+        result = replaceAtIndex(result, indexOfClose, "|");
+        result = replaceAtIndex(result, indexOfOpen, "|");
+        indexOfClose = result.indexOf("},");
+      } else {
+        indexOfClose = result.indexOf("},", indexOfClose + 1);
+      }
+    }
+    /*
+    Second, we will remove all curly braces
+     */
+    result = result.replace("{", "");
+    result = result.replace("}", "");
+    return result;
+  }
+
+  /**
+   * This method trims out all the comments in a line from the input files
+   *
+   * @param line a line from the input files
    * @return that line without any comment
    */
   private static String ignoreComment(String line) {
@@ -151,7 +392,7 @@ public class InferredAnnosCounter {
     if (indexDash != -1) {
       if (indexDash == 0) {
         finalLine = line.substring(0, indexDash);
-      } else {
+      } else if (notInStringLiteral(indexDash, line)) {
         finalLine = line.substring(0, indexDash - 1);
       }
     }
@@ -165,30 +406,36 @@ public class InferredAnnosCounter {
   }
 
   /**
-   * This method is to format a line that may or may not contain fully-qualified annotation before
-   * passing it to the Diff algorithm. The way this method format that line is to change all
-   * annotaions written in the fully-qualified format to the short-name format.
-   *
-   * <p>
+   * This method formats a line that may or may not contain fully-qualified annotation. The way this
+   * method formats that line is to change all annotations written in the fully-qualified format to
+   * the simple format. For example, changing "@org.checkerframework.dataflow.qual.Pure" to "@Pure."
+   * This method should be applied before passing a line to the Diff algorithm.
    *
    * @param line a line that belongs to the input files
-   * @return the same line with all the annotations being changed to the human-written format.
+   * @return the same line with all the annotations being changed to the simple format.
    */
   private static String extractCheckerPackage(String line) {
     String[] temp = line.split(" ");
     String result = line;
     if (line.length() != 0) {
       for (String word : temp) {
-        if (word.contains("@org.checkerframework")) {
-          String[] tempo = word.split("[.]");
-          String tempResult = "@" + tempo[tempo.length - 1];
-          @SuppressWarnings("index:assignment")
-          @NonNegative int begin = result.indexOf(word);
-          @SuppressWarnings("index:assignment")
-          int end = begin + word.length();
-          String firstPart = result.substring(0, begin);
-          String secondPart = result.substring(end, result.length());
-          result = firstPart + tempResult + secondPart;
+        int indexOfPackage = word.indexOf("org.");
+        if (indexOfPackage != -1) {
+          int indexOfParen = word.indexOf('(');
+          if (indexOfParen != -1) {
+            String insideParen = word.substring(indexOfParen + 1, word.length());
+            if (insideParen.contains("org.")) {
+              String newInsideParen = extractCheckerPackage(insideParen);
+              String newWord = word.replace(insideParen, newInsideParen);
+              result = result.replace(word, newWord);
+              word = newWord;
+            }
+          }
+          String originalPart = word.substring(indexOfPackage, word.length());
+          String[] tempo = originalPart.split("[.]");
+          String tempResult = tempo[tempo.length - 1];
+          String newWord = word.replace(originalPart, tempResult);
+          result = result.replace(word, newWord);
         }
       }
     }
@@ -196,21 +443,19 @@ public class InferredAnnosCounter {
   }
 
   /**
-   * This method is to trim out the paranthese part in an algorithm, for example, @Annotation(abc)
+   * This method trims out the parenthesized part in an annotation, for example, @Annotation(abc)
    * will be changed to @Annotation.
    *
-   * <p>This method need to be used with care. We want to use it to update the final result. This
+   * <p>This method needs to be used with care. We want to use it to update the final result. This
    * method should not be used for any list or string that will become the input of the Diff
    * algorithm. If we do that, the Diff algorithm will not be able to recognize any potential
-   * difference in the parantheses between an annotation written by human and an annotation
+   * difference in the parentheses between an annotation written by human and an annotation
    * generated by the computer anymore.
    *
-   * <p>
-   *
    * @param anno the annotation which will be trimmed
-   * @return that annotation without the paranthese part
+   * @return that annotation without the parenthesized part
    */
-  private static String trimPathen(String anno) {
+  private static String trimParen(String anno) {
     int para = anno.indexOf("(");
     if (para == -1) {
       return anno;
@@ -219,42 +464,41 @@ public class InferredAnnosCounter {
   }
 
   /**
-   * This method is to print out all the annotations belong to a line.
-   *
-   * <p>
+   * This method returns a List containing all the annotations belonging to a line (with the
+   * {@literal @} symbol stripped off each annotation).
    *
    * @param str a line
    * @return a Linked List containing all annotations of str.
    */
-  private static LinkedList<String> extractString(String str) {
-    LinkedList<String> result = new LinkedList<String>();
+  private static List extractString(String str) {
+    List<String> result = new ArrayList<String>();
     int countAnno = countAnnos(str);
     String temp = str;
     for (int i = 0; i < countAnno; i++) {
       int index1 = temp.indexOf('@');
       if (index1 == -1) {
         throw new RuntimeException(
-            "This method relies on the countAnnos method. Either the countAnnos method is wrong"
+            "The extractString method relies on the countAnnos method. Either the countAnnos method is wrong"
                 + "or it was not called properly");
       }
       String tempAnno = getAnnos(temp);
-      if (checkInString(index1, temp) && checkerFramworkPackage.contains(tempAnno)) {
+      if (notInStringLiteral(index1, temp)) {
         if (tempAnno.contains("(")) {
           if (temp.contains(")")) {
-            tempAnno = temp.substring(index1, temp.indexOf(')') + 1);
+            tempAnno = temp.substring(index1 + 1, temp.indexOf(')') + 1);
           } else {
-            tempAnno = temp.substring(index1, temp.length());
+            tempAnno = temp.substring(index1 + 1);
           }
-          result.add("@" + tempAnno);
+          result.add(tempAnno);
         } else {
-          System.out.println(tempAnno);
-          result.add("@" + tempAnno);
+          result.add(tempAnno);
         }
       }
-      temp = temp.substring(index1 + 1, temp.length());
+      temp = temp.substring(index1 + 1);
     }
     return result;
   }
+
   /**
    * The main entry point. Running this outputs the percentage of annotations in some source file
    * that were inferred by WPI.
@@ -262,105 +506,130 @@ public class InferredAnnosCounter {
    * <p>-param args the files. The first element is the original source file. All remaining elements
    * should be corresponding .ajava files produced by WPI. This program assumes that all inputs have
    * been converted to some unified formatting style to eliminate unnecessary changes (e.g., by
-   * running gjf on each input).
+   * running google java format on each input).
    */
   public static void main(String[] args) {
+    int fileCount = 0;
+    List<String> checkerPackage = new ArrayList<String>();
+    File file1 = new File("type-qualifiers.txt");
+    try (FileReader fr = new FileReader(file1)) {
+      BufferedReader br = new BufferedReader(fr);
+      String str;
+      while ((str = br.readLine()) != null) {
+        // the extractCheckerPackage will keep the char element of the string, such as '@' or '"'.
+        // So we need to add a
+        // space here since the element in this txt does not have a '@'.
+        str = extractCheckerPackage('@' + str);
+        str = str.replaceAll("\\s", "");
+        checkerPackage.add(str);
+      }
+    } catch (Exception e) {
+      throw new RuntimeException("Could not read type-qualifiers.txt, check if it exists?");
+    }
+
     if (args.length <= 1) {
       throw new RuntimeException(
           "Provide at least one .java file and one or more" + ".ajava files.");
     }
-    List<String> originalFile = new ArrayList<String>();
+
+    // These variables are maintained throughout:
+
+    // The original file, reformatted to remove comments and clean up annotation names (i.e., remove
+    // package names),
+    // etc.
+    List<String> originalFile = new ArrayList<>();
     // specific annotations and the number of computer-written files missing them
-    Map<String, Integer> AnnoLocate = new HashMap<String, Integer>();
+    Map<String, Integer> annoLocate = new HashMap<>();
     // the name of the types of annotation and their numbers in the human-written file
-    Map<String, Integer> AnnoCount = new HashMap<String, Integer>();
+    Map<String, Integer> annoCount = new HashMap<>();
     /* the name of the types of annotations and their "correct" numbers (meaning the number of annotations of that
     type not missed by computer-written files) */
-    Map<String, Integer> AnnoSimilar = new HashMap<String, Integer>();
-    int pos;
-    File file = new File(args[0]);
-    try (FileReader fr = new FileReader(file)) {
-      BufferedReader br = new BufferedReader(fr);
-      String str;
-      pos = -1;
-      LinkedList<String> annoList = new LinkedList<String>();
-      while ((str = br.readLine()) != null) {
-        pos++;
-        str = ignoreComment(str);
-        str = extractCheckerPackage(str);
-        originalFile.add(str);
-        annoList = extractString(str);
-        for (String anno : annoList) {
-          String annoNoPara = trimPathen(anno);
-          if (AnnoCount.containsKey(annoNoPara)) {
-            int numberOfAnno = AnnoCount.get(annoNoPara);
-            AnnoCount.put(annoNoPara, numberOfAnno + 1);
-          } else {
-            AnnoCount.put(annoNoPara, new Integer(1));
-          }
-          AnnoSimilar.put(annoNoPara, new Integer(0));
-          // we want the keys in the map AnnoLocate has this following format: type_position
-          String posi = String.valueOf(pos);
-          AnnoLocate.put(anno + "_" + posi, new Integer(0));
-        }
+    Map<String, Integer> annoSimilar = new HashMap<>();
+    // the number of lines in the original file
+    int originalFileLineCount = 0;
+    List<String> inputFileWithOnlySingleLineAnno = annoMultiToSingle(args[0]);
+    List<String> inputFileWithEachAnnoOnOneLine =
+        eachAnnotationInOneSingleLine(inputFileWithOnlySingleLineAnno);
+    int originalFileLineIndex = -1;
+    // Read the original file once to determine the annotations that written by the human.
+    for (String originalFileLine : inputFileWithEachAnnoOnOneLine) {
+      originalFileLineIndex++;
+      originalFileLine = ignoreComment(originalFileLine);
+      originalFileLine = extractCheckerPackage(originalFileLine);
+      // since it's too difficult to keep the length of whitespace at the beginning of each line the
+      // same
+      originalFileLine = originalFileLine.trim();
+      String specialAnno = trimParen(originalFileLine);
+      // the fact that this if statement's condition is true means that this line contains exactly
+      // one CF annotation and nothing else.
+      if (checkerPackage.contains(specialAnno)) {
+        originalFileLine = formatAnnotaionsWithArguments(originalFileLine);
+        int numberOfAnno = annoCount.getOrDefault(specialAnno, 0);
+        annoCount.put(specialAnno, numberOfAnno + 1);
+        annoSimilar.put(specialAnno, 0);
+        // we want the keys in the map annoLocate has this following format: type_position
+        annoLocate.put(originalFileLine + "_" + originalFileLineIndex, 0);
       }
-      fr.close();
-    } catch (Exception e) {
-      throw new RuntimeException("Could not read file: " + args[0] + ". Check that it exists?");
+      originalFile.add(originalFileLine);
+      originalFileLineCount = originalFileLineIndex;
     }
+    // Iterate over the arguments from 1 to the end and diff each with the original,
+    // putting the results into diffs.
     List<Patch<String>> diffs = new ArrayList<>(args.length - 1);
+    // Iterate over the arguments from 1 to the end and diff each with the original,
+    // putting the results into diffs.
     for (int i = 1; i < args.length; ++i) {
-      file = new File(args[i]);
-      try (FileReader fr = new FileReader(file)) {
-        List<String> newFile = new ArrayList<String>();
-        BufferedReader br = new BufferedReader(fr);
-        String str;
-        LinkedList<String> annoList = new LinkedList<String>();
-        while ((str = br.readLine()) != null) {
-          str = ignoreComment(str);
-          str = extractCheckerPackage(str);
-          newFile.add(str);
+      List<String> inputFileWithOnlySingleLineAnno2 = annoMultiToSingle(args[i]);
+      List<String> inputFileWithEachAnnoOnOneLine2 =
+          eachAnnotationInOneSingleLine(inputFileWithOnlySingleLineAnno2);
+      List<String> newFile = new ArrayList<>();
+      for (String ajavaFileLine : inputFileWithEachAnnoOnOneLine2) {
+        ajavaFileLine = ignoreComment(ajavaFileLine);
+        // if the condition is true, this line contains only one single annotation and nothing else.
+        if (ajavaFileLine.contains("@org")) {
+          ajavaFileLine = formatAnnotaionsWithArguments(ajavaFileLine);
         }
-        diffs.add(DiffUtils.diff(originalFile, newFile));
-      } catch (Exception e) {
-        throw new RuntimeException("Could not read file: " + args[i] + ". Check that it exists?");
+        ajavaFileLine = extractCheckerPackage(ajavaFileLine);
+        ajavaFileLine = ajavaFileLine.trim();
+        newFile.add(ajavaFileLine);
       }
+      diffs.add(DiffUtils.diff(originalFile, newFile));
     }
+    // Iterate over the list of diffs and process each. There must be args.length - 1 diffs, since
+    // there is one diff between args[0] and each other element of args.
     for (int i = 0; i < args.length - 1; i++) {
       Patch<String> patch = diffs.get(i);
       for (AbstractDelta<String> delta : patch.getDeltas()) {
         // get the delta in string format
         String deltaInString = delta.toString();
-        String newpos = "";
-        // we change the delta output to a string, then break that string into different parts
-        List<String> myList = new ArrayList<String>(Arrays.asList(deltaInString.split(" ")));
         // just take the delta with annotations into consideration
-        if (deltaInString.contains("@")) {
+        // INSERT type indicates that the annotations only appear in the computer-generated files.
+        // So we don't take it into consideration.
+        if (deltaInString.contains("@") && delta.getType() != DeltaType.INSERT) {
+          List<String> sourceLines = delta.getSource().getLines();
           // get the position of that annotation in the delta, which is something like "5," or "6,".
-          String posi = myList.get(2);
-          // take the "," out
-          if (posi.length() > 1) {
-            newpos = posi.substring(0, posi.length() - 1);
-          }
+          int position = delta.getSource().getPosition();
           String result = "";
-          for (String element : myList) {
+          for (String element : sourceLines) {
             if (element.contains("@")) {
-              if (element.length() > 2) {
-                element = TrimAnnotation(element);
-                int currLine = Integer.parseInt(newpos);
+              // in case there are other components in the string element other than the
+              // annotation itself
+              List<String> annoList = extractString(element);
+              for (String anno : annoList) {
                 // to match the one in AnnoLocate
-                result = element + "_" + newpos;
+                result = "@" + anno + "_" + position;
                 // update the data of AnnoLocate
-                if (AnnoLocate.containsKey(result)) {
-                  int value = AnnoLocate.get(result);
-                  AnnoLocate.put(result, value + 1);
+                if (annoLocate.containsKey(result)) {
+                  int value = annoLocate.get(result);
+                  annoLocate.put(result, value + 1);
                 } else {
-                  while (currLine < pos) {
-                    currLine++;
-                    result = element + "_" + currLine;
-                    if (AnnoLocate.containsKey(result)) {
-                      int value = AnnoLocate.get(result);
-                      AnnoLocate.put(result, value + 1);
+                  int tempPosition = position;
+                  while (tempPosition < originalFileLineCount) {
+                    tempPosition++;
+                    result = "@" + anno + "_" + tempPosition;
+                    if (annoLocate.containsKey(result)) {
+                      int value = annoLocate.get(result);
+                      annoLocate.put(result, value + 1);
                       break;
                     }
                   }
@@ -371,29 +640,33 @@ public class InferredAnnosCounter {
         }
       }
     }
-    // update the data of AnnoSimilar
-    for (Map.Entry<String, Integer> me : AnnoLocate.entrySet()) {
+
+    // Update the data of AnnoSimilar.
+    for (Map.Entry<String, Integer> me : annoLocate.entrySet()) {
       String annoName = me.getKey();
-      /*if the number of computer-written code missing that element is less than the total number of codes written
-      by computer, the at least one of those computer-written code must have gotten the annotation correct*/
+      /* If the number of computer-written code missing that element is less than the total number of codes written
+      by computer, the at least one of those computer-written code must have gotten the annotation correct. */
       if (me.getValue() < args.length - 1) {
-        // for example, if we have @Option_345, we will only need "@Option" since we want the
-        // general type here
+        // For example, if we have @Option_345, we will only need "@Option" since we want the
+        // general type here.
         int index = annoName.indexOf("_");
-        if (index >= 0) annoName = annoName.substring(0, index);
-        annoName = trimPathen(annoName);
-        int value = AnnoSimilar.get(annoName);
+        if (index >= 0) {
+          annoName = annoName.substring(0, index);
+        }
+        annoName = trimParen(annoName);
+        int value = annoSimilar.get(annoName);
         value = value + 1;
-        AnnoSimilar.put(annoName, value);
+        annoSimilar.put(annoName, value);
       }
     }
+
+    // Output the results.
     System.out.println();
-    for (Map.Entry<String, Integer> e : AnnoCount.entrySet()) {
+    for (Map.Entry<String, Integer> e : annoCount.entrySet()) {
       int totalCount = e.getValue();
       String value = e.getKey();
-      int correctCount = AnnoSimilar.get(value);
+      int correctCount = annoSimilar.get(value);
       System.out.println(value + " got " + correctCount + "/" + totalCount);
     }
-    System.out.println();
   }
 }
