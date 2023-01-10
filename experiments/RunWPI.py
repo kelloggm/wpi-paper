@@ -285,8 +285,6 @@ def resetAll():
     process = subprocess.run("git push origin --delete annotation-statistics &> /dev/null", shell=True)
     process = subprocess.run("git branch -D unannotated  &> /dev/null", shell=True)
     process = subprocess.run("git push origin --delete unannotated  &> /dev/null", shell=True)
-    process = subprocess.run("git branch -D baseline  &> /dev/null", shell=True)
-    process = subprocess.run("git push origin --delete baseline  &> /dev/null", shell=True)
     process = subprocess.run("git branch -D wpi-annotations  &> /dev/null", shell=True)
     process = subprocess.run("git push origin --delete wpi-annotations  &> /dev/null", shell=True)
     process = subprocess.run("git branch -D wpi-enabled  &> /dev/null", shell=True)
