@@ -13,19 +13,19 @@ ROOT_IAC_DIR="${1}"
 
 # this runs the IAC, passing a single java file and then the list of ajava files as the arguments
 run_iac () {
-    pushd ${ROOT_IAC_DIR}
-    eval "./gradlew run --args=\"$@\""
-    popd
+    pushd "${ROOT_IAC_DIR}" || exit
+    ./gradlew run --args="$*"
+    popd || exit
 }
 
 JAVA_FILES=$(find "${2}" -name "*.java")
 
-for file in "${JAVA_FILES}"; do
+for file in ${JAVA_FILES}; do
     echo "${file}:"
     filenodirname="${file##*/}"
     filebasename="${filenodirname%.*}"
     AJAVA_FILES=$(find "${3}" -name "*${filebasename}-*.ajava")
-    AJAVA_SPACE=$(echo ${AJAVA_FILES} | tr "\n" " ")
+    AJAVA_SPACE=$(echo "${AJAVA_FILES}" | tr "\n" " ")
     run_iac "${file}" "${AJAVA_SPACE}"
 done
 
