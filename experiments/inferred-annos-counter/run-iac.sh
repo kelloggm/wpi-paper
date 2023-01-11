@@ -5,11 +5,10 @@
 # directories.
 
 # inputs:
-# $1: the absolute path the directory containing the inferred annos counter's root
-# $2: the absolute path to the root source directory of the Java files
-# $3: the absolute path to the root source directory of the generated ajava files
+# $1: the absolute path to the root source directory of the Java files
+# $2: the absolute path to the root source directory of the generated ajava files
 
-ROOT_IAC_DIR="${1}"
+ROOT_IAC_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 
 # this runs the IAC, passing a single java file and then the list of ajava files as the arguments
 run_iac () {
@@ -18,13 +17,13 @@ run_iac () {
     popd || exit
 }
 
-JAVA_FILES=$(find "${2}" -name "*.java")
+JAVA_FILES=$(find "${1}" -name "*.java")
 
 for file in ${JAVA_FILES}; do
     echo "${file}:"
     filenodirname="${file##*/}"
     filebasename="${filenodirname%.*}"
-    AJAVA_FILES=$(find "${3}" -name "*${filebasename}-*.ajava")
+    AJAVA_FILES=$(find "${2}" -name "*${filebasename}-*.ajava")
     AJAVA_SPACE=$(echo "${AJAVA_FILES}" | tr "\n" " ")
     run_iac "${file}" "${AJAVA_SPACE}"
 done
