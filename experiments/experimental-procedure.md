@@ -76,7 +76,7 @@ The procedure:
    4. If the project is running a formatter (ex: Spotless), disable it in the build system. 
    5. Stage your changes with `git add` (in case you missed a formatter).
    6. Compute annotation statistics. 
-      [Maven currently has an issue that swallows the ouput of Annotation Statistics, the current solution for that is to run java manually by using the command produced by Maven and setting the value of `BUILD_CMD` to that line. Utilize the extraJavaArgs.sh script to extract the command with arguments to a .txt file, this may work for some projects but not for others.]
+      [Maven currently has an issue that swallows the ouput of Annotation Statistics, the current solution for that is to run java manually by using the command produced by Maven and setting the value of `BUILD_CMD` to that line. Utilize the extraJavaArgsc.sh script to extract the command with arguments to JavacRaw.txt file, this may work for some projects but not for others.]
        1. Clean the program, then compile the program.
        2. Look in the output for "Found annotations:" or "No annotations found."
             TODO: Make the two tags searchable via a single string or simple regex.
@@ -130,7 +130,7 @@ The procedure:
    2. create a copy of the script `compute-annos-inferred.sh` in the target project directory
    3. modify the variables at the beginning of the script as appropriate for the target project
       [[TODO: I think it would be better to take those variables as arguments if possible, to avoid the need to make a new version of the script.  The advantage of having a concrete script is that in the future it would not be necessary to know which arguments to pass.  But the concrete script could also be just an invocation of the master `compute-annos-inferred.sh` in the paper repository.]]
-      [Maven currently has an issue that swallows the ouput of Annotation Statistics, the current solution for that is to run java manually by using the command produced by Maven and setting the value of `RUN_ANNO_STATS` to that line. Utilize the extraJavaArgs.sh script to extract the command with arguments to a JavacRaw.txt file, this may work for some projects but not for others. The output of compute-annos-inferred can be found in the most recent inferred-out file.]
+      [Maven currently has an issue that swallows the ouput of Annotation Statistics, the current solution for that is to run java manually by using the command produced by Maven and setting the value of `RUN_ANNO_STATS` to that line. Utilize the extraJavacArgs.sh script to extract the command with arguments to JavacRaw.txt file, this may work for some projects but not for others. The output of compute-annos-inferred.sh can be found in the most recent inferred-out file.]
    4. run the script
    5. transcribe the output after "====== COMBINED RESULTS =======" is printed to the spreadsheet, combining rows that mention the same annotation 
       (this happens when e.g., different @RequiresQualifier annotations are inferred by different checkers)
