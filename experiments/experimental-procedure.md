@@ -1,6 +1,10 @@
 This document describes the experimental procedure for adding a new project to the
 experiments in the WPI paper.
 
+For a shorter version of experimental-procedure, go to experimental-procedure-short.md.
+The shorter version is more automated, but might be unreliable when working with complex
+projects, so if you choose to use it you might need to fall back to this document if it fails.
+
 The input to the procedure is a program
 that typechecks using one or more Checker Framework typecheckers.
 
@@ -51,10 +55,13 @@ The procedure:
       1. Pull the latest changes to your local working copy of the checker-framework respository.
       2. Run `./gradlew publishToMavenlocal` in your checker-framework working copy. This generates a SNAPSHOT of the current release version + 1.
          (ie, REL 3.28.0 would generate 3.28.1-SNAPSHOT).
-      3. Modify the build file to use this snapshot. This can be project specific, find the line where checkerframeworkversion or similar is defined. You will have to 
-         replace the version that is defined. 
+      3. Modify the build file to use this snapshot. This can be project specific, find the line where checkerframeworkversion or similar is defined. You will have to replace the version that is defined. 
          1. For Maven, you may find the checker-framework version under properties, the tag may vary. Modify the line to use the generated snapshot by replacing the version with your appropriate snapshot (ie, "3.28.1-SNAPSHOT").
          2. For Gradle, refer to the Gradle Plugin's README, https://github.com/kelloggm/checkerframework-gradle-plugin#specifying-a-checker-framework-version. 
+         3. Confirm that the version of checker-qual is also using the appropriate snapshot.
+    5. verify that the project still builds using the newest Checker Framework (try to fix any problems you encounter caused by updating the Checker Framework, but you may have to discard the project at this step if e.g. the project requires a Java version <= 7, which worked with some older versions of the CF but not with modern versions)
+    6. commit the result to the `baseline` branch: `git commit -am "run with modern Checker Framework" ; git push origin baseline`
+
 
 ##### C. Create a new branch called "unannotated" from the same commit, with annotations removed:
    1. `git checkout -b unannotated`
