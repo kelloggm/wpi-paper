@@ -124,6 +124,8 @@ The procedure:
       https://docs.google.com/spreadsheets/d/1r_NhumolEp5CiOL7CmsvZaa4-FDUxCJXfswyJoKg8uM/ ,
       the number of errors issued by the typecheckers and which 
       typechecker issued the error.
+   9. Save the output of WPI (i.e., the warnings it produces) to the file `typecheck.out` in the project's top-level directory.
+   10. Add `typecheck.out` to git and then commit to the `wpi-enabled` branch: `git add typecheck.out ; git commit -m "results of typechecking" ; git push origin wpi-enabled`
 
 ##### G. Create a branch for the code with inferred annotations:
    1. Create a branch: `git checkout -b wpi-annotations annotation-statistics`
