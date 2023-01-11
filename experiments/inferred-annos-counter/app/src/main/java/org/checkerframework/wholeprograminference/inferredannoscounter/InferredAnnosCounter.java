@@ -180,8 +180,12 @@ public class InferredAnnosCounter {
         }
       }
     } catch (IOException e) {
-      throw new RuntimeException("Could not read file: " + fileName + ". Check that it exists?" +
-              "\nActual exception: " + e);
+      throw new RuntimeException(
+          "Could not read file: "
+              + fileName
+              + ". Check that it exists?"
+              + "\nActual exception: "
+              + e);
     }
     return inputFiles;
   }
