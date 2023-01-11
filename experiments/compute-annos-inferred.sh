@@ -17,15 +17,6 @@ JAVA_SRC_DIR=./src/main/java/
 # the command to run AnnotationStatistics (should be the same command
 # that is used to compile the target program)
 RUN_ANNO_STATS="./gradlew compileJava"
-MAVEN=0; # Maven swallows output of AnnoStats; This is a minor solution to it;
-# The inferred annotation statistics can be found in the most recent compute-annos-inferred-out
-if [ ${MAVEN} == 1 ]; then
-    MVN_COMPILE="mvn -X clean compile"
-    ${MVN_COMPILE} > compile-out.txt
-    echo -n '$JAVA_HOME/bin/javac' > JavacRaw.txt
-    grep -E '\s-d .*$' compile-out.txt | cut -c 8- >> JavacRaw.txt
-    RUN_ANNO_STATS=$(cat JavacRaw.txt)
-fi
 
 ### no need to make changes below this line, usually
 
