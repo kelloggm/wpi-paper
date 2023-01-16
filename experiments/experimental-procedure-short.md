@@ -70,8 +70,6 @@ The procedure:
 
 5. Follow instructions of that program. (TODO: Restart if an error is encountered)
 
-
-TODO:
 6. Go to `wpi-paper/experiments/inferred-annos-counter/` and run inferred-annos-counter: From terminal `python RunIAC.py project-name`.
 
 7. A csv file `AnnotationStats.csv` will be generated in the `wpi-paper/experiments/inferred-annos-counter/inputExamples/project-name/`. Copy summary numbers from the project-specific spreadsheet page to the "summary" tab, and color code the project row green once it is finished.
