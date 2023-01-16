@@ -7,6 +7,7 @@ import com.github.difflib.patch.Patch;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -168,13 +169,23 @@ public class InferredAnnosCounter {
         } else if (status == LineStatus.OPEN && originalFileLine.contains("@")) {
           tempLine = tempLine + originalFileLine;
           inProgress = true;
+        } else if (status == LineStatus.CLOSE) {
+          // This line is irrelevant: it contains an entire annotation and also
+          // happens to have unbalanced parentheses. This is fine and happens all
+          // the time, but doesn't matter for our purposes.
+          continue;
         } else {
           throw new RuntimeException(
               "unexpected line status: " + status + " for line " + originalFileLine);
         }
       }
-    } catch (Exception e) {
-      throw new RuntimeException("Could not read file: " + fileName + ". Check that it exists?");
+    } catch (IOException e) {
+      throw new RuntimeException(
+          "Could not read file: "
+              + fileName
+              + ". Check that it exists?"
+              + "\nActual exception: "
+              + e);
     }
     return inputFiles;
   }
