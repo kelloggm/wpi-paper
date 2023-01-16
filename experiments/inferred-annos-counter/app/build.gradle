@@ -48,7 +48,7 @@ spotless {
 
 application {
     // Define the main class for the application.
-    mainClass = 'org.checkerframework.wholeprograminference.inferredannoscounter.App'
+    mainClass = 'org.checkerframework.wholeprograminference.inferredannoscounter.InferredAnnosCounter'
 }
 
 test {
