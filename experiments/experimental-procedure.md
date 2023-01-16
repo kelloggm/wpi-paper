@@ -35,6 +35,10 @@ in some of the steps of the experimental procedure below.
 
 The procedure:
 
+##### Choose a project
+   1. Choose a project from https://docs.google.com/spreadsheets/d/1GavNOnEVl3n9SQ4q6OrDfRqmgHPeMIRHAhAWUzQsMPY/edit#gid=1441132849
+   2. Put your name in column D.
+
 ##### A. Clone the project:
    1. Fork the project.
    2. Clone your fork in the experiments/projects/ directory (create it if necessary).
@@ -45,12 +49,12 @@ The procedure:
 
 ##### B. Create a new branch called "baseline" at that commit:
    1. `git checkout -b baseline ; git push origin baseline`
-   2. Ensure that the project builds and typechecks (determine the appropriate command and record it in the spreadsheet).
+   2. Ensure that the project builds and typechecks (determine the appropriate command and record it in the spreadsheet).  You may need to update some @SuppressWarnings, for example, or possibly add new ones.
    3. Inspect the project's build system and determine the list of typecheckers from the Checker
    Framework that the project runs. How this is expressed also varies by build system. For example, in
    a Gradle project that uses the checkerframework-gradle-plugin, you would check the `checkers` block.
    In other build systems, look for a `-processor` argument. Record the names of the typecheckers in the
-   "Checkers" column of the spreadsheet.
+   "Checkers" column of the spreadsheet at https://docs.google.com/spreadsheets/d/1r_NhumolEp5CiOL7CmsvZaa4-FDUxCJXfswyJoKg8uM/ .
    4. Change the project build file to use the HEAD of typetools/checkerframework:
       1. Pull the latest changes to your local working copy of the checker-framework respository.
       2. Run `./gradlew publishToMavenlocal` in your checker-framework working copy. This generates a SNAPSHOT of the current release version + 1.
@@ -63,7 +67,7 @@ The procedure:
     6. commit the result to the `baseline` branch: `git commit -am "run with modern Checker Framework" ; git push origin baseline`
 
 
-##### C. Create a new branch called "unannotated" from the same commit, with annotations removed:
+##### C. Create a new branch called "unannotated" from the new `baseline` commit, with annotations removed:
    1. `git checkout -b unannotated`
    2. Run the `RemoveAnnotationsForInference` program on the source; no ouput means it ran successfully:
       `java -cp "$CHECKERFRAMEWORK/checker/dist/checker.jar" org.checkerframework.framework.stub.RemoveAnnotationsForInference .`
