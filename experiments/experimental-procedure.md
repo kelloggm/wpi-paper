@@ -157,10 +157,9 @@ The procedure:
    7. copy all of the contents in your `$WPITEMPDIR` directory used in the previous steps into the `generated` subfolder. 
    8. copy all of the human-written code (the human-annotated, i.e. original, code, but with a formatter run over it) from your project's source folder (e.g., ./src/main/java/ in a Gradle project) into the `human-written` directory that was created
     1. Run the InferredAnnosCounter.
-      1. Go to the working directory of InferredAnnosCounter (ie, ./experiments/inferred-annos-counter, where . is the root of the repository containing this document).
-      2. Run the InferredAnnosCounter, with the first argument being the absolute path of the .java file, and other arguments being the absolute path of the .ajava files produced by the WPI. The program assumes that a formatter has been applied, so it is important to do so before passing the files as input. InferredAnnosCounter only takes one .java file at a time. So in case it is needed to run multiple .java files with corresponding .ajava files, InferredAnnosCounter needs to be invoked multiple times. 
-      [[ TODO: this should be scripted using a find/exec to locate all the Java files and then run the following command on them.. ]] The way to run InferredAnnosCounter is like this: ```cd experiments/inferred-annos-counter ``` (going to the working directory) and then ``` ./gradlew run --args="(a path to the .java file) (one or more paths to the .ajava files)" ```. The result will not be in alphabetical order.
-      iii. Record the result in project-specific tab of the speadsheet at https://docs.google.com/spreadsheets/d/1r_NhumolEp5CiOL7CmsvZaa4-FDUxCJXfswyJoKg8uM/edit#gid=0.  
+      1. Run the following command, modifying the paths as appropriate: `bash /path/to/run-iac.sh absolute/path/to/java/source/tree/src/main/java /absolute/path/to/generated/ajava/files/wpi-annotations`
+      2. Compute summary numbers by adding the results for each annotation (TODO: automate this step in the run-iac.sh script)
+      3. Record the result in project-specific tab of the speadsheet at https://docs.google.com/spreadsheets/d/1r_NhumolEp5CiOL7CmsvZaa4-FDUxCJXfswyJoKg8uM/edit#gid=0.  
     
 ##### J:
    1. Copy summary numbers from the project-specific spreadsheet page to the "summary" tab at https://docs.google.com/spreadsheets/d/1r_NhumolEp5CiOL7CmsvZaa4-FDUxCJXfswyJoKg8uM/edit#gid=0, and color code the project row green once it is finished.
