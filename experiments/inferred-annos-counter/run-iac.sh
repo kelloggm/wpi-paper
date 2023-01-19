@@ -10,10 +10,19 @@
 
 ROOT_IAC_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 
+# make pushd/popd quiet
+pushd () {
+    command pushd "$@" > /dev/null
+}
+
+popd () {
+    command popd "$@" > /dev/null
+}
+
 # this runs the IAC, passing a single java file and then the list of ajava files as the arguments
 run_iac () {
     pushd "${ROOT_IAC_DIR}" || exit
-    ./gradlew run --args="$*"
+    ./gradlew -q run --args="$*"
     popd || exit
 }
 
