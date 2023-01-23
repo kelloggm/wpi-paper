@@ -387,7 +387,7 @@ public class InferredAnnosCounter {
     result = result.replace("}", "");
     return result;
   }
-
+  
   /**
    * This method trims out all the comments in a line from the input files
    *
@@ -395,23 +395,14 @@ public class InferredAnnosCounter {
    * @return that line without any comment
    */
   private static String ignoreComment(String line) {
-    int indexComment = line.length() + 1;
     String finalLine = line;
-    int indexDash = line.indexOf("//");
-    int indexStar = line.indexOf("*");
-    int indexDashStar = line.indexOf("/*");
-    if (indexDash != -1) {
-      if (indexDash == 0) {
-        finalLine = line.substring(0, indexDash);
-      } else if (notInStringLiteral(indexDash, line)) {
-        finalLine = line.substring(0, indexDash - 1);
-      }
+    int indexOfDash = line.indexOf("/");
+    int indexOfStar = line.indexOf("*");
+    if (indexOfDash != -1 && notInStringLiteral(indexOfDash, line)) {
+      finalLine = line.substring(0, indexOfDash);
     }
-    if (indexDashStar != -1) {
-      finalLine = line.substring(0, indexDashStar);
-    }
-    if (indexStar != -1) {
-      finalLine = line.substring(0, indexStar);
+    if (indexOfStar != -1 && notInStringLiteral(indexOfStar, line)) {
+      finalLine = line.substring(0, indexOfStar);
     }
     return finalLine;
   }
