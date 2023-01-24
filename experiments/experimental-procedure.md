@@ -74,7 +74,7 @@ The procedure:
    3. Push the unannotated code:
       `git commit -am "output of RemoveAnnotationsForInference" ; git push origin unannotated`
    4. Verify that, because the annotations have been removed, the program no longer typechecks. You should
-   see an error from one of the Checker Framework checkers you recorded in step 2c when you re-run whatever
+   see an error from one of the Checker Framework checkers you recorded in step B3 when you re-run whatever
    command you used to run the typechecker before.
 
 ##### D. Collect the number of original annotations in the code:
