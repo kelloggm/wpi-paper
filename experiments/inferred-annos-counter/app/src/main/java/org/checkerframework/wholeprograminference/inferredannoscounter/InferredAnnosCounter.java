@@ -176,16 +176,16 @@ public class InferredAnnosCounter {
           continue;
         } else {
           throw new RuntimeException(
-                  "unexpected line status: " + status + " for line " + originalFileLine);
+              "unexpected line status: " + status + " for line " + originalFileLine);
         }
       }
     } catch (IOException e) {
       throw new RuntimeException(
-              "Could not read file: "
-                      + fileName
-                      + ". Check that it exists?"
-                      + "\nActual exception: "
-                      + e);
+          "Could not read file: "
+              + fileName
+              + ". Check that it exists?"
+              + "\nActual exception: "
+              + e);
     }
     return inputFiles;
   }
@@ -365,9 +365,9 @@ public class InferredAnnosCounter {
       // because of the argument names. In those cases, just continue the
       // loop.
       if (result
-              .substring(indexOfClose, indexOfOpen)
-              .chars()
-              .anyMatch(c -> !(c == '{' || c == '}' || c == ','))) {
+          .substring(indexOfClose, indexOfOpen)
+          .chars()
+          .anyMatch(c -> !(c == '{' || c == '}' || c == ','))) {
         indexOfClose = result.indexOf("},", indexOfClose + 1);
         continue;
       }
@@ -480,8 +480,8 @@ public class InferredAnnosCounter {
       int index1 = temp.indexOf('@');
       if (index1 == -1) {
         throw new RuntimeException(
-                "The extractString method relies on the countAnnos method. Either the countAnnos method is wrong"
-                        + "or it was not called properly");
+            "The extractString method relies on the countAnnos method. Either the countAnnos method is wrong"
+                + "or it was not called properly");
       }
       String tempAnno = getAnnos(temp);
       if (notInStringLiteral(index1, temp)) {
@@ -531,7 +531,7 @@ public class InferredAnnosCounter {
 
     if (args.length <= 1) {
       throw new RuntimeException(
-              "Provide at least one .java file and one or more" + ".ajava files.");
+          "Provide at least one .java file and one or more" + ".ajava files.");
     }
 
     // These variables are maintained throughout:
@@ -551,7 +551,7 @@ public class InferredAnnosCounter {
     int originalFileLineCount = 0;
     List<String> inputFileWithOnlySingleLineAnno = annoMultiToSingle(args[0]);
     List<String> inputFileWithEachAnnoOnOneLine =
-            eachAnnotationInOneSingleLine(inputFileWithOnlySingleLineAnno);
+        eachAnnotationInOneSingleLine(inputFileWithOnlySingleLineAnno);
     int originalFileLineIndex = -1;
     // Read the original file once to determine the annotations that written by the human.
     for (String originalFileLine : inputFileWithEachAnnoOnOneLine) {
@@ -583,7 +583,7 @@ public class InferredAnnosCounter {
     for (int i = 1; i < args.length; ++i) {
       List<String> inputFileWithOnlySingleLineAnno2 = annoMultiToSingle(args[i]);
       List<String> inputFileWithEachAnnoOnOneLine2 =
-              eachAnnotationInOneSingleLine(inputFileWithOnlySingleLineAnno2);
+          eachAnnotationInOneSingleLine(inputFileWithOnlySingleLineAnno2);
       List<String> newFile = new ArrayList<>();
       for (String ajavaFileLine : inputFileWithEachAnnoOnOneLine2) {
         ajavaFileLine = ignoreComment(ajavaFileLine);
