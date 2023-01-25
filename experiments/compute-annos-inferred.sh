@@ -1,4 +1,5 @@
 #!/bin/sh
+set -e
 
 # This script uses runs the AnnotationStatistics utility of the Checker
 # Framework on the results of WPI on each checker for which annotations
@@ -38,7 +39,7 @@ do
     tmp=${ajava_filename##*-};
     CHECKER_LIST="${CHECKER_LIST} ${tmp%.ajava}"
 done
-CHECKER_LIST=$(echo "${CHECKER_LIST}" | sort | uniq)
+CHECKER_LIST=$(echo "${CHECKER_LIST}" | tr " " "\n" | sort | uniq)
 
 JAVA_FILES=$(cd ${JAVA_SRC_DIR} && find . -name "*.java")
 
