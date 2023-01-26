@@ -98,7 +98,8 @@ The procedure:
 	         checker you will need to figure out what its annotations are.).
          TODO: sometimes there are mulitple projects, so there are multiple occurrences of "Found annotations:".  The "Found annotations:" output should indicate in which directory or project the annotations were found, or a script should combine all the tables in the output into a single table.
          TODO: consider writing a script for interpreting the output of AnnotationStatistics by checker?
-   7. run `git commit -m "annotation statistics configuration" ; git push origin annotation-statistics`.
+   7. If the build system is Maven and no AnnotationStatistics output was produced in step 6, you'll need to use an alternative strategy to count the annotations. There are some notes on how to do so in the file `maven.md` in this directory.
+   8. run `git commit -m "annotation statistics configuration" ; git push origin annotation-statistics`.
 
 ##### E. Collect the number of lines of code:
    1. run `git checkout baseline`
