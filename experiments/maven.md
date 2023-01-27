@@ -13,7 +13,7 @@ work). Follow these steps (after enabling AnnotationStatistics in the build syst
 3. locate the arguments passed to javac in `out`. Maven prints "Command line options:" right before it prints
 this list, so I recommend searching for that. Warning: in multi-project builds, there might be more than one
 of these in the output, so you should check all of them.
-4. copy the options passed to javac into a new shell script, and precede them with `javac`.
+4. copy the options passed to javac into a new shell script and precede them with `javac`. If the project requires $JAVA_HOME set with the project specific version of java, you will need to precede the arguments with `$JAVA_HOME/bin/javac`.
 5. run this script. You should get output from AnnotationStatistics.
 
 ### Applying alternative to compute-annos-inferred.sh
