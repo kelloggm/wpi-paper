@@ -13,8 +13,13 @@ work). Follow these steps (after enabling AnnotationStatistics in the build syst
 3. locate the arguments passed to javac in `out`. Maven prints "Command line options:" right before it prints
 this list, so I recommend searching for that. Warning: in multi-project builds, there might be more than one
 of these in the output, so you should check all of them.
-4. copy the options passed to javac into a new shell script, and precede them with `javac`
+4. copy the options passed to javac into a new shell script, and precede them with `javac`.
 5. run this script. You should get output from AnnotationStatistics.
+
+### Applying alternative to compute-annos-inferred.sh
+1. the above method will also need to be used when running compute-annos-inferred.sh, follow steps 1-3.  
+2. replace the RUN_ANNO_STATS variable in compute-annos-inferred.sh with the javac line extracted from the debug output.
+3. run commpute-anno-inferred.sh, if successful, the output should be found in the most recent compute-annos-out file. 
 
 ### Alternative 2: count by hand
 
