@@ -26,12 +26,12 @@ public class ICalAvailableTest {
 
   private final String EXPECTED_OUTPUT =
       "@Pure got 1/1\n"
-          + "    @RequiresNonNull got 2/2\n"
-          + "    @Nullable got 0/2\n"
-          + "    @NonNull got 0/2\n"
-          + "    @MonotonicNonNull got 1/1\n"
-          + "    @Regex got 1/1\n"
-          + "    @EnsuresNonNull got 1/1";
+          + "@RequiresNonNull got 2/2\n"
+          + "@Nullable got 0/2\n"
+          + "@NonNull got 0/2\n"
+          + "@MonotonicNonNull got 1/1\n"
+          + "@Regex got 1/1\n"
+          + "@EnsuresNonNull got 1/1";
 
   @Test
   public void iCalAvailableTest() {
