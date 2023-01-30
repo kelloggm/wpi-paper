@@ -28,8 +28,20 @@ If that doesn't work, the easiest way is to count annotations by hand. To do thi
 visit their manual sections in the Checker Framework [manual](checkerframework.org/manual). Each manual
 section lists the relevant annotations for the checker.
 2. place these annotations, one per line, in a text file. Call this file `annos.txt`.
-3. then run something like the following: for anno in `cat annos.txt`; do rg $anno *; done
-4. count the results by hand
+3. add the following annotations to `annos.txt` (these are inferred by all checkers):
+   ```@Pure
+   @SideEffectFree
+   @Deterministic
+   @RequiresQualifier
+   @EnsuresQualifer
+   @RequiresQualifierIf
+   @EnsuresQualiferIf```
+4. then run something like the following: for anno in `cat annos.txt`; do rg $anno *; done
+   * `rg` is [ripgrep](https://github.com/BurntSushi/ripgrep). `grep` is also fine (but much slower).
+5. count the results by hand. You might be tempted to use the `--count-matches` argument to `rg`.
+Be sure to run at least once without it to make sure the output looks correct, though: this is
+an error-prone and approximate counting method, and you should expect to have to deal with special
+cases: this isn't fully automatable.
 
 TODO: improve the second method: it's fine for dealing with hand-annotated projects, but doesn't
 scale to ajava files. Needs to be automated.
