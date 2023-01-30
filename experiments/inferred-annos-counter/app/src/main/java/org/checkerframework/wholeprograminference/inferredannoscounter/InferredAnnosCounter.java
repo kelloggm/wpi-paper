@@ -561,10 +561,9 @@ public class InferredAnnosCounter {
     List<String> inputFileWithOnlySingleLineAnno = annoMultiToSingle(args[0]);
     List<String> inputFileWithEachAnnoOnOneLine =
         eachAnnotationInOneSingleLine(inputFileWithOnlySingleLineAnno);
-    int originalFileLineIndex = -1;
+    int originalFileLineIndex = 0;
     // Read the original file once to determine the annotations that written by the human.
     for (String originalFileLine : inputFileWithEachAnnoOnOneLine) {
-      originalFileLineIndex++;
       originalFileLine = ignoreComment(originalFileLine);
       originalFileLine = extractCheckerPackage(originalFileLine);
       // since it's too difficult to keep the length of whitespace at the beginning of each line the
@@ -581,7 +580,10 @@ public class InferredAnnosCounter {
         // we want the keys in the map annoLocate has this following format: type_position
         annoLocate.put(originalFileLine + "_" + originalFileLineIndex, 0);
       }
-      originalFile.add(originalFileLine);
+      if (originalFileLine.length() != 0) {
+        originalFile.add(originalFileLine);
+        originalFileLineIndex++;
+      }
       originalFileLineCount = originalFileLineIndex;
     }
     // Iterate over the arguments from 1 to the end and diff each with the original,
@@ -602,7 +604,9 @@ public class InferredAnnosCounter {
         }
         ajavaFileLine = extractCheckerPackage(ajavaFileLine);
         ajavaFileLine = ajavaFileLine.trim();
-        newFile.add(ajavaFileLine);
+        if (ajavaFileLine.length() != 0) {
+          newFile.add(ajavaFileLine);
+        }
       }
       diffs.add(DiffUtils.diff(originalFile, newFile));
     }
@@ -618,32 +622,23 @@ public class InferredAnnosCounter {
         // So we don't take it into consideration.
         if (deltaInString.contains("@") && delta.getType() != DeltaType.INSERT) {
           List<String> sourceLines = delta.getSource().getLines();
-          // get the position of that annotation in the delta, which is something like "5," or "6,".
+          // get the position of the first line entry in the delta
           int position = delta.getSource().getPosition();
           String result = "";
-          for (String element : sourceLines) {
+          for (int j = 0; j < sourceLines.size(); j++) {
+            String element = sourceLines.get(j);
             if (element.contains("@")) {
               // in case there are other components in the string element other than the
               // annotation itself
               List<String> annoList = extractString(element);
               for (String anno : annoList) {
-                // to match the one in AnnoLocate
-                result = "@" + anno + "_" + position;
+                // this is the position of the current line entry
+                int localPosition = position + j;
+                result = "@" + anno + "_" + localPosition;
                 // update the data of AnnoLocate
                 if (annoLocate.containsKey(result)) {
                   int value = annoLocate.get(result);
                   annoLocate.put(result, value + 1);
-                } else {
-                  int tempPosition = position;
-                  while (tempPosition < originalFileLineCount) {
-                    tempPosition++;
-                    result = "@" + anno + "_" + tempPosition;
-                    if (annoLocate.containsKey(result)) {
-                      int value = annoLocate.get(result);
-                      annoLocate.put(result, value + 1);
-                      break;
-                    }
-                  }
                 }
               }
             }
