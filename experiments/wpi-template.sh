@@ -14,7 +14,7 @@ ${BUILD_CMD} # Compile the program so that WPIOUTDIR is created.
 # Where should the output be placed at the end? This directory is also
 # used to store intermediate WPI results. The directory does not need to
 # exist. If it does exist when this script starts, it will be deleted.
-WPITEMPDIR=/tmp
+WPITEMPDIR=tmp
 # Where is WPI's output placed by the Checker Framework? This is some
 # directory ending in build/whole-program-inference. For most projects,
 # this directory is just ./build/whole-program-inference .

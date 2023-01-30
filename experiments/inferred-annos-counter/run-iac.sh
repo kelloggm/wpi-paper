@@ -32,7 +32,7 @@ for file in ${JAVA_FILES}; do
     echo "${file}:"
     filenodirname="${file##*/}"
     filebasename="${filenodirname%.*}"
-    AJAVA_FILES=$(find "${2}" -name "*${filebasename}-*.ajava")
+    AJAVA_FILES=$(find "${2}" -name "${filebasename}-*.ajava")
     AJAVA_SPACE=$(echo "${AJAVA_FILES}" | tr "\n" " ")
     run_iac "${file}" "${AJAVA_SPACE}"
 done

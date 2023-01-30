@@ -74,7 +74,7 @@ The procedure:
    3. Push the unannotated code:
       `git commit -am "output of RemoveAnnotationsForInference" ; git push origin unannotated`
    4. Verify that, because the annotations have been removed, the program no longer typechecks. You should
-   see an error from one of the Checker Framework checkers you recorded in step 2c when you re-run whatever
+   see an error from one of the Checker Framework checkers you recorded in step B3 when you re-run whatever
    command you used to run the typechecker before.
 
 ##### D. Collect the number of original annotations in the code:
@@ -98,7 +98,8 @@ The procedure:
 	         checker you will need to figure out what its annotations are.).
          TODO: sometimes there are mulitple projects, so there are multiple occurrences of "Found annotations:".  The "Found annotations:" output should indicate in which directory or project the annotations were found, or a script should combine all the tables in the output into a single table.
          TODO: consider writing a script for interpreting the output of AnnotationStatistics by checker?
-   7. run `git commit -m "annotation statistics configuration" ; git push origin annotation-statistics`.
+   7. If the build system is Maven and no AnnotationStatistics output was produced in step 6, you'll need to use an alternative strategy to count the annotations. There are some notes on how to do so in the file `maven.md` in this directory.
+   8. run `git commit -m "annotation statistics configuration" ; git push origin annotation-statistics`.
 
 ##### E. Collect the number of lines of code:
    1. run `git checkout baseline`
@@ -142,6 +143,7 @@ The procedure:
    2. create a copy of the script `compute-annos-inferred.sh` in the target project directory
    3. modify the variables at the beginning of the script as appropriate for the target project
       [[TODO: I think it would be better to take those variables as arguments if possible, to avoid the need to make a new version of the script.  The advantage of having a concrete script is that in the future it would not be necessary to know which arguments to pass.  But the concrete script could also be just an invocation of the master `compute-annos-inferred.sh` in the paper repository.]]
+    7. If the build system is Maven and no AnnotationStatistics output was produce, you'll need to use an alternative strategy to count the 	 annotations. There are some notes on how to do so in the file `maven.md` in this directory.
    4. run the script
    5. transcribe the output after "====== COMBINED RESULTS =======" is printed to the spreadsheet, combining rows that mention the same annotation 
       (this happens when e.g., different @RequiresQualifier annotations are inferred by different checkers)
