@@ -116,7 +116,7 @@ public class InferredAnnosCounterTest {
   @Test
   public void dotInParathense() {
     InferredAnnosCounter.main(
-        new String[] {"testCases/dotInParathense.java", "testCases/dotinParathense.ajava"});
+        new String[] {"testCases/dotInParathense.java", "testCases/dotInParathense.ajava"});
     String line = "@EnsuresCalledMethods got 1/1";
     assertTrue(
         "Didn't find the correct number of @EnsuresCalledMethods annotations; expected 1/1, got: "
