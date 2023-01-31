@@ -125,6 +125,17 @@ public class InferredAnnosCounterTest {
   }
 
   @Test
+  public void dotInParathense() {
+    InferredAnnosCounter.main(
+        new String[] {"testCases/dotInParathense.java", "testCases/dotInParathense.ajava"});
+    String line = "@EnsuresCalledMethods got 1/1";
+    assertTrue(
+        "Didn't find the correct number of @EnsuresCalledMethods annotations; expected 1/1, got: "
+            + outputStreamCaptor,
+        outputStreamCaptor.toString().trim().contains(line));
+  }
+
+  @Test
   public void multiLineAnnotation() {
     InferredAnnosCounter.main(
         new String[] {"testCases/MultiLineAnnotation.java", "testCases/MultiLineAnnotation.ajava"});
