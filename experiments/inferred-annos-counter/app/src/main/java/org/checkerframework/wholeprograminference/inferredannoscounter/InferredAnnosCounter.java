@@ -71,7 +71,6 @@ public class InferredAnnosCounter {
     int n = elements.length;
     if (n >= 1 && elements[n - 1].contains("@org")) {
       String annotation = elements[n - 1];
-      annotation = trimParen(annotation);
       String[] breaks = annotation.split("[.]");
       int numberOfParts = breaks.length;
       if (numberOfParts < 2) {
