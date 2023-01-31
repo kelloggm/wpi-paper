@@ -70,8 +70,7 @@ public class InferredAnnosCounter {
     String[] elements = line.trim().split(" ");
     int n = elements.length;
     if (n >= 1 && elements[n - 1].contains("@org")) {
-      String annotation = elements[n - 1];
-      String[] breaks = annotation.split("[.]");
+      String[] breaks = elements[n - 1].split("[.]");
       int numberOfParts = breaks.length;
       if (numberOfParts < 2) {
         throw new RuntimeException("Invalid annotation form in line: " + line);
