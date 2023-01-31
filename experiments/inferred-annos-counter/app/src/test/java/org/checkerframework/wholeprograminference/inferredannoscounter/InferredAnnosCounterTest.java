@@ -60,20 +60,6 @@ public class InferredAnnosCounterTest {
   }
 
   @Test
-  public void ignoreOneAnnoInCommentOfComputer() {
-    InferredAnnosCounter.main(
-        new String[] {
-          "testCases/ignoreOneAnnoInComment.java", "testCases/ignoreOneAnnoInComment.ajava"
-        });
-    String line1 = "@Pure got 1/1";
-    String line2 = "@NonNull got 1/1";
-    String line3 = "@SideEffectFree got 1/1";
-    assertTrue(outputStreamCaptor.toString().trim().contains(line1));
-    assertTrue(!outputStreamCaptor.toString().trim().contains(line2));
-    assertTrue(outputStreamCaptor.toString().trim().contains(line3));
-  }
-
-  @Test
   public void commentInMiddle() {
     InferredAnnosCounter.main(
         new String[] {"testCases/CommentInMiddle.java", "testCases/CommentInMiddle.ajava"});
@@ -128,6 +114,57 @@ public class InferredAnnosCounterTest {
         "Didn't find the correct number of @EnsuresCalledMethods annotations; expected 1/2, got: "
             + outputStreamCaptor,
         outputStreamCaptor.toString().trim().contains(line2));
+  }
+
+  @Test
+  public void dotInParathense() {
+    InferredAnnosCounter.main(
+            new String[] {
+                    "testCases/dotInParathense.java", "testCases/dotinParathense.ajava"
+            });
+    String line = "@EnsuresCalledMethods got 1/1";
+    assertTrue(
+            "Didn't find the correct number of @EnsuresCalledMethods annotations; expected 1/1, got: "
+                    + outputStreamCaptor,
+            outputStreamCaptor.toString().trim().contains(line));
+  }
+
+  @Test
+  public void commentWithDashStar() {
+    InferredAnnosCounter.main(
+        new String[] {"testCases/CommentWithDashStar.java", "testCases/CommentWithDashStar.ajava"});
+    String line1 = "@Pure got 1/1";
+    String line2 = "@NonNull got 1/1";
+    String line3 = "@SideEffectFree got 1/1";
+    assertTrue(outputStreamCaptor.toString().trim().contains(line1));
+    assertTrue(!outputStreamCaptor.toString().trim().contains(line2));
+    assertTrue(outputStreamCaptor.toString().trim().contains(line3));
+  }
+
+  @Test
+  public void commentWithDoubleDash() {
+    InferredAnnosCounter.main(
+        new String[] {
+          "testCases/CommentWithDoubleDash.java", "testCases/CommentWithDoubleDash.ajava"
+        });
+    String line1 = "@Pure got 1/1";
+    String line2 = "@NonNull got 1/1";
+    String line3 = "@SideEffectFree got 1/1";
+    assertTrue(outputStreamCaptor.toString().trim().contains(line1));
+    assertTrue(!outputStreamCaptor.toString().trim().contains(line2));
+    assertTrue(outputStreamCaptor.toString().trim().contains(line3));
+  }
+
+  @Test
+  public void commentWithStar() {
+    InferredAnnosCounter.main(
+        new String[] {"testCases/CommentWithStar.java", "testCases/CommentWithStar.ajava"});
+    String line1 = "@Pure got 1/1";
+    String line2 = "@NonNull got 1/1";
+    String line3 = "@SideEffectFree got 1/1";
+    assertTrue(outputStreamCaptor.toString().trim().contains(line1));
+    assertTrue(!outputStreamCaptor.toString().trim().contains(line2));
+    assertTrue(outputStreamCaptor.toString().trim().contains(line3));
   }
 
   @Test
