@@ -116,7 +116,7 @@ def part1():
             i. Clean the program, then compile the program.
     '''
     
-    print("10. Compile the project and save the output in 'Human-written.txt' file\n\n\texample:\n\t./gradlew build >> Human-written.txt\n")
+    print("10. Compile the project and save the output in 'Human-written.txt' file\n\n\texample:\n\t./gradlew build >> Human-written.txt\nIf the build system is Maven and no AnnotationStatistics output was produced, you'll need to use an alternative strategy to count the annotations. There are some notes on how to do so in the file `maven.md`.")
     pausePrg()
 
     '''
