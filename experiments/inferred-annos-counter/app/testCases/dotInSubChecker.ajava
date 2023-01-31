@@ -1,0 +1,2 @@
+  @org.checkerframework.framework.qual.AnnotatedFor("org.checkerframework.checker.resourceleak.ResourceLeakChecker")
+  @org.checkerframework.dataflow.qual.Pure
