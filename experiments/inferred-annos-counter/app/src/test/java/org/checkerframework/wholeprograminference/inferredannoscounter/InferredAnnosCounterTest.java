@@ -114,6 +114,17 @@ public class InferredAnnosCounterTest {
   }
 
   @Test
+  public void dotInSubChecker() {
+    InferredAnnosCounter.main(
+        new String[] {"testCases/dotInSubChecker.java", "testCases/dotInSubChecker.ajava"});
+    String line = "@Pure got 1/1";
+    assertTrue(
+        "Didn't find the correct number of @Pure annotations; expected 1/1, got: "
+            + outputStreamCaptor,
+        outputStreamCaptor.toString().trim().contains(line));
+  }
+
+  @Test
   public void dotInParathense() {
     InferredAnnosCounter.main(
         new String[] {"testCases/dotInParathense.java", "testCases/dotInParathense.ajava"});
