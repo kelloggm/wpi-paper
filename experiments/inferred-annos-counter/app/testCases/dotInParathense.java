@@ -1,0 +1,1 @@
+  @EnsuresCalledMethods(value = { "this.sock" }, methods = { "close" })
