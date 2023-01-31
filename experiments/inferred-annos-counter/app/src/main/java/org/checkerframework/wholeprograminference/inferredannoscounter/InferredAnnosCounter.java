@@ -443,6 +443,7 @@ public class InferredAnnosCounter {
             }
           }
           String originalPart = word.substring(indexOfPackage, word.length());
+          originalPart = trimParen(originalPart);
           String[] tempo = originalPart.split("[.]");
           String tempResult = tempo[tempo.length - 1];
           String newWord = word.replace(originalPart, tempResult);
