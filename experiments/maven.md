@@ -42,7 +42,8 @@ section lists the relevant annotations for the checker.
    @RequiresQualifier
    @EnsuresQualifer
    @RequiresQualifierIf
-   @EnsuresQualiferIf```
+   @EnsuresQualiferIf
+   ```
 4. then run something like the following: for anno in `cat annos.txt`; do rg $anno *; done
    * `rg` is [ripgrep](https://github.com/BurntSushi/ripgrep). `grep` is also fine (but much slower).
 5. count the results by hand. You might be tempted to use the `--count-matches` argument to `rg`.
