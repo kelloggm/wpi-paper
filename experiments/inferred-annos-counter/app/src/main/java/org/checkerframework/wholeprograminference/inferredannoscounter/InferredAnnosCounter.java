@@ -397,23 +397,35 @@ public class InferredAnnosCounter {
    * @return that line without any comment
    */
   private static String ignoreComment(String line) {
-    int indexComment = line.length() + 1;
     String finalLine = line;
-    int indexDash = line.indexOf("//");
-    int indexStar = line.indexOf("*");
-    int indexDashStar = line.indexOf("/*");
-    if (indexDash != -1) {
-      if (indexDash == 0) {
-        finalLine = line.substring(0, indexDash);
-      } else if (notInStringLiteral(indexDash, line)) {
-        finalLine = line.substring(0, indexDash - 1);
+    int indexOfDashStar = finalLine.indexOf("/*");
+    // this loop is to deal with all possible blocks of comment in the line
+    while (indexOfDashStar != -1) {
+      int indexOfStarDash = finalLine.indexOf("*/", indexOfDashStar + 1);
+      if (indexOfStarDash == -1) {
+        finalLine = finalLine.substring(0, indexOfDashStar);
+        break;
+      } else {
+        String beforeBlock = "";
+        if (indexOfDashStar > 0) {
+          beforeBlock = finalLine.substring(0, indexOfDashStar - 1);
+        }
+        String afterBlock = finalLine.substring(indexOfStarDash + 2, finalLine.length());
+        finalLine = beforeBlock + afterBlock;
+      }
+      indexOfDashStar = finalLine.indexOf("/*");
+    }
+    int indexOfDash = finalLine.indexOf("//");
+    int indexOfStar = finalLine.indexOf("*");
+    if (indexOfDash != -1) {
+      if (notInStringLiteral(indexOfDash, finalLine)) {
+        finalLine = finalLine.substring(0, indexOfDash);
       }
     }
-    if (indexDashStar != -1) {
-      finalLine = line.substring(0, indexDashStar);
-    }
-    if (indexStar != -1) {
-      finalLine = line.substring(0, indexStar);
+    if (indexOfStar != -1) {
+      if (notInStringLiteral(indexOfStar, finalLine)) {
+        finalLine = finalLine.substring(0, indexOfStar);
+      }
     }
     return finalLine;
   }
