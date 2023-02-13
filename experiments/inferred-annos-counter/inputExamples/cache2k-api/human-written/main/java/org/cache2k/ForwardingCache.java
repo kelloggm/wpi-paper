@@ -9,9 +9,9 @@ package org.cache2k;
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -20,17 +20,16 @@ package org.cache2k;
  * #L%
  */
 
-import org.cache2k.annotation.NonNull;
-import org.cache2k.annotation.Nullable;
-import org.cache2k.processor.EntryMutator;
-import org.cache2k.processor.EntryProcessingResult;
-import org.cache2k.processor.EntryProcessor;
-
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentMap;
 import java.util.function.Function;
+import org.cache2k.annotation.NonNull;
+import org.cache2k.annotation.Nullable;
+import org.cache2k.processor.EntryMutator;
+import org.cache2k.processor.EntryProcessingResult;
+import org.cache2k.processor.EntryProcessor;
 
 /**
  * Wrapper class that forwards all method calls to a delegate. Can be used to implement extensions
@@ -40,10 +39,7 @@ import java.util.function.Function;
  */
 public abstract class ForwardingCache<K, V> implements Cache<K, V> {
 
-  /**
-   * Subclasses need to implement this method which specifies the delegation
-   * target.
-   */
+  /** Subclasses need to implement this method which specifies the delegation target. */
   protected abstract @NonNull Cache<K, V> delegate();
 
   @Override
@@ -164,7 +160,7 @@ public abstract class ForwardingCache<K, V> implements Cache<K, V> {
 
   @Override
   public <@Nullable R> Map<K, EntryProcessingResult<R>> invokeAll(
-    Iterable<? extends K> keys, EntryProcessor<K, V, R> entryProcessor) {
+      Iterable<? extends K> keys, EntryProcessor<K, V, R> entryProcessor) {
     return delegate().invokeAll(keys, entryProcessor);
   }
 
@@ -233,12 +229,9 @@ public abstract class ForwardingCache<K, V> implements Cache<K, V> {
     return delegate().asMap();
   }
 
-  /**
-   * Forwards to delegate but adds the simple class name to the output.
-   */
+  /** Forwards to delegate but adds the simple class name to the output. */
   @Override
   public String toString() {
     return this.getClass().getSimpleName() + "!" + delegate();
   }
-
 }

@@ -9,9 +9,9 @@ package org.cache2k.config;
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -20,23 +20,22 @@ package org.cache2k.config;
  * #L%
  */
 
-import org.cache2k.annotation.Nullable;
-
 import java.util.AbstractCollection;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import org.cache2k.annotation.Nullable;
 
 /**
- * Container for configuration objects. The container preserves the order of the sections
- * and checks that one type is only added once.
+ * Container for configuration objects. The container preserves the order of the sections and checks
+ * that one type is only added once.
  *
  * @author Jens Wilke
  * @see ConfigWithSections
  */
 public class SectionContainer extends AbstractCollection<ConfigSection<?, ?>>
-  implements Collection<ConfigSection<?, ?>> {
+    implements Collection<ConfigSection<?, ?>> {
 
   @SuppressWarnings("rawtypes")
   private final Map<Class, ConfigSection<?, ?>> class2section = new HashMap<>();
@@ -50,17 +49,15 @@ public class SectionContainer extends AbstractCollection<ConfigSection<?, ?>>
   @SuppressWarnings("unchecked")
   @Override
   public boolean add(ConfigSection<?, ?> section) {
-    if (getSection(section.getClass()) !=  null) {
+    if (getSection(section.getClass()) != null) {
       throw new IllegalArgumentException(
-        "Section of same type already inserted: " + section.getClass().getName());
+          "Section of same type already inserted: " + section.getClass().getName());
     }
     class2section.put(section.getClass(), section);
     return true;
   }
 
-  /**
-   * Retrieve a single section from the container.
-   */
+  /** Retrieve a single section from the container. */
   public <T extends ConfigSection<T, ?>> T getSection(Class<T> sectionType, T defaultFallback) {
     ConfigSection<?, ?> section = class2section.get(sectionType);
     return section != null ? sectionType.cast(section) : defaultFallback;
@@ -84,6 +81,4 @@ public class SectionContainer extends AbstractCollection<ConfigSection<?, ?>>
   public String toString() {
     return getClass().getSimpleName() + class2section.values();
   }
-
 }
-

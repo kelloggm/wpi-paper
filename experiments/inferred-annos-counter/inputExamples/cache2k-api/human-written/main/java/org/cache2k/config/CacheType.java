@@ -9,9 +9,9 @@ package org.cache2k.config;
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -20,11 +20,10 @@ package org.cache2k.config;
  * #L%
  */
 
-import org.cache2k.annotation.Nullable;
-
 import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import org.cache2k.annotation.Nullable;
 
 /**
  * A data structure to retain all known type information from the key and value types, including
@@ -34,22 +33,21 @@ import java.lang.reflect.Type;
  * <p>While the type descriptor contains implementation classes, interface consumers must not rely
  * on the implementation types.
  *
- * <p><b>About types:</b>
- * If no type information is provided it defaults to the Object class. The provided type information
- * is used inside the cache for optimizations and as well as to select appropriate default
- * transformation schemes for copying objects or marshalling. The correct types are not strictly
- * enforced at all levels by the cache for performance reasons. The cache application guarantees
- * that only the specified types will be used. The cache will check the type compatibility at
- * critical points, e.g. when reconnecting to an external storage. Generic types: An application
- * may provide more detailed type information to the cache, which contains also generic type
- * parameters by providing a {@link CacheTypeCapture} where the cache can extract the type
- * information.
+ * <p><b>About types:</b> If no type information is provided it defaults to the Object class. The
+ * provided type information is used inside the cache for optimizations and as well as to select
+ * appropriate default transformation schemes for copying objects or marshalling. The correct types
+ * are not strictly enforced at all levels by the cache for performance reasons. The cache
+ * application guarantees that only the specified types will be used. The cache will check the type
+ * compatibility at critical points, e.g. when reconnecting to an external storage. Generic types:
+ * An application may provide more detailed type information to the cache, which contains also
+ * generic type parameters by providing a {@link CacheTypeCapture} where the cache can extract the
+ * type information.
  *
  * <p>The cache type is immutable.
  *
  * @see CacheTypeCapture
- * @see <a href="https://github.com/google/guava/wiki/ReflectionExplained">
- *   ReflectionExplained - Google Guava Documentation</a>
+ * @see <a href="https://github.com/google/guava/wiki/ReflectionExplained">ReflectionExplained -
+ *     Google Guava Documentation</a>
  */
 @SuppressWarnings("rawtypes")
 public interface CacheType<T> {
@@ -87,29 +85,31 @@ public interface CacheType<T> {
   }
 
   /** Class type if not an array. */
-  @Nullable Class<T> getType();
+  @Nullable
+  Class<T> getType();
 
   /**
-   * The type has generic type parameters and the concrete types are known.
-   * {@link #getTypeArguments()} returns the arguments.
+   * The type has generic type parameters and the concrete types are known. {@link
+   * #getTypeArguments()} returns the arguments.
    */
   boolean hasTypeArguments();
 
   /**
-   * This type is an array. To analyze a multidimensional array descend to the component,
-   * for example {@code getComponentType().isArray()}.
+   * This type is an array. To analyze a multidimensional array descend to the component, for
+   * example {@code getComponentType().isArray()}.
    *
    * @see #getComponentType()
    */
   boolean isArray();
 
   /** The component type in case of an array */
-  @Nullable CacheType<?> getComponentType();
+  @Nullable
+  CacheType<?> getComponentType();
 
   /** Known type arguments, if the type is a parametrized type. */
-  @Nullable CacheType<?>[] getTypeArguments();
+  @Nullable
+  CacheType<?>[] getTypeArguments();
 
   /** Java language compatible type name */
   String getTypeName();
-
 }

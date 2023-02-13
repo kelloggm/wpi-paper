@@ -9,9 +9,9 @@ package org.cache2k.expiry;
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -33,11 +33,11 @@ import org.cache2k.io.ResiliencePolicy;
 public class Expiry implements ExpiryTimeValues {
 
   /**
-   * Convert the time value to a time representing a sharp expiry.
-   * This essentially negates the time value and is provided for a more speaking coding style.
+   * Convert the time value to a time representing a sharp expiry. This essentially negates the time
+   * value and is provided for a more speaking coding style.
    *
-   * @param millis expiry time since the milliseconds since epoch or {@link #ETERNAL} if no
-   *               expiry is requested.
+   * @param millis expiry time since the milliseconds since epoch or {@link #ETERNAL} if no expiry
+   *     is requested.
    * @throws IllegalArgumentException if the time value is negative
    */
   public static long toSharpTime(long millis) {
@@ -51,10 +51,9 @@ public class Expiry implements ExpiryTimeValues {
   }
 
   /**
-   * Helper to calculate the next expiry out of two expiry times that
-   * may be up next. Return the time value that is closest or equal to
-   * the load time. Time values in the past are ignored. If all times
-   * are in the past, returns {@link #ETERNAL}.
+   * Helper to calculate the next expiry out of two expiry times that may be up next. Return the
+   * time value that is closest or equal to the load time. Time values in the past are ignored. If
+   * all times are in the past, returns {@link #ETERNAL}.
    *
    * @param loadTime the current time in millis since epoch
    * @param candidate1 candidate time for next expiry
@@ -76,26 +75,23 @@ public class Expiry implements ExpiryTimeValues {
   /**
    * Combine a refresh time span and an expiry at a specified point in time.
    *
-   * <p>If the expiry time is far ahead of time the refresh time span takes
-   * precedence. If the point in time is near, this time takes precedence.
-   * If the refresh time is too close to the requested point an earlier refresh
-   * time is used to keep maximum distance to the requested point in time, which is
-   * {@code abs(pointInTime) - refreshAfter}
+   * <p>If the expiry time is far ahead of time the refresh time span takes precedence. If the point
+   * in time is near, this time takes precedence. If the refresh time is too close to the requested
+   * point an earlier refresh time is used to keep maximum distance to the requested point in time,
+   * which is {@code abs(pointInTime) - refreshAfter}
    *
-   * <p>Rationale: Usually the expiry is allowed to lag behind. This is okay
-   * when a normal expiry interval is used. If sharp expiry is requested an
-   * old value may not be visible at and after the expiry time. Refresh ahead
-   * implies lagging expiry, since the refresh is triggered when the value would
-   * usually expire. The two concepts can be combined in the expiry policy, e.g.
-   * using an interval for triggering refresh ahead and requesting a sharp expiry
-   * only when needed. If effective expiry time for the lagging variant and the
-   * for the sharp variant are in proximity, conflicts need to be resolved.
+   * <p>Rationale: Usually the expiry is allowed to lag behind. This is okay when a normal expiry
+   * interval is used. If sharp expiry is requested an old value may not be visible at and after the
+   * expiry time. Refresh ahead implies lagging expiry, since the refresh is triggered when the
+   * value would usually expire. The two concepts can be combined in the expiry policy, e.g. using
+   * an interval for triggering refresh ahead and requesting a sharp expiry only when needed. If
+   * effective expiry time for the lagging variant and the for the sharp variant are in proximity,
+   * conflicts need to be resolved.
    *
    * @param loadTime time when the load was started
    * @param refreshAfter time span in milliseconds when the next refresh should happen
-   * @param pointInTime time in milliseconds since epoch for the next expiry. Can be negative
-   *             if sharp expiry is requested, or {@link #ETERNAL} if no point in time
-   *             expiry is needed.
+   * @param pointInTime time in milliseconds since epoch for the next expiry. Can be negative if
+   *     sharp expiry is requested, or {@link #ETERNAL} if no point in time expiry is needed.
    */
   public static long mixTimeSpanAndPointInTime(long loadTime, long refreshAfter, long pointInTime) {
     long refreshTime = loadTime + refreshAfter;
@@ -115,5 +111,4 @@ public class Expiry implements ExpiryTimeValues {
     long pointInTimeMinusDelta = absPointInTime - refreshAfter;
     return Math.min(pointInTimeMinusDelta, refreshTime);
   }
-
 }

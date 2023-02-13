@@ -9,9 +9,9 @@ package org.cache2k;
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -20,20 +20,19 @@ package org.cache2k;
  * #L%
  */
 
-import org.cache2k.processor.EntryMutator;
-import org.cache2k.annotation.Nullable;
-import org.cache2k.processor.EntryProcessingResult;
-import org.cache2k.processor.EntryProcessor;
-
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentMap;
 import java.util.function.Function;
+import org.cache2k.annotation.Nullable;
+import org.cache2k.processor.EntryMutator;
+import org.cache2k.processor.EntryProcessingResult;
+import org.cache2k.processor.EntryProcessor;
 
 /**
- * Base class for implementations of the cache interface. By default, every method throws
- * {@link UnsupportedOperationException}.
+ * Base class for implementations of the cache interface. By default, every method throws {@link
+ * UnsupportedOperationException}.
  *
  * @author Jens Wilke
  */
@@ -151,7 +150,7 @@ public class AbstractCache<K, V> implements Cache<K, V> {
 
   @Override
   public <@Nullable R> Map<K, EntryProcessingResult<R>> invokeAll(
-    Iterable<? extends K> keys, EntryProcessor<K, V, R> entryProcessor) {
+      Iterable<? extends K> keys, EntryProcessor<K, V, R> entryProcessor) {
     throw new UnsupportedOperationException();
   }
 
@@ -229,5 +228,4 @@ public class AbstractCache<K, V> implements Cache<K, V> {
   public String toString() {
     throw new UnsupportedOperationException();
   }
-
 }

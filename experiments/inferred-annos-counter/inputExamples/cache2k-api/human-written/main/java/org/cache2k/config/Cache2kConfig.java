@@ -9,9 +9,9 @@ package org.cache2k.config;
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -20,77 +20,73 @@ package org.cache2k.config;
  * #L%
  */
 
-import org.cache2k.Cache2kBuilder;
-import org.cache2k.DataAware;
-import org.cache2k.expiry.RefreshAheadPolicy;
-import org.cache2k.operation.Weigher;
-import org.cache2k.operation.Scheduler;
-import org.cache2k.operation.TimeReference;
-import org.cache2k.annotation.NonNull;
-import org.cache2k.annotation.Nullable;
-import org.cache2k.event.CacheEntryOperationListener;
-import org.cache2k.event.CacheLifecycleListener;
-import org.cache2k.expiry.ExpiryPolicy;
-import org.cache2k.expiry.ExpiryTimeValues;
-import org.cache2k.io.AdvancedCacheLoader;
-import org.cache2k.io.AsyncCacheLoader;
-import org.cache2k.io.CacheLoader;
-import org.cache2k.io.CacheWriter;
-import org.cache2k.io.ExceptionPropagator;
-import org.cache2k.io.ResiliencePolicy;
-
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.Executor;
+import org.cache2k.Cache2kBuilder;
+import org.cache2k.DataAware;
+import org.cache2k.annotation.NonNull;
+import org.cache2k.annotation.Nullable;
+import org.cache2k.event.CacheEntryOperationListener;
+import org.cache2k.event.CacheLifecycleListener;
+import org.cache2k.expiry.ExpiryPolicy;
+import org.cache2k.expiry.ExpiryTimeValues;
+import org.cache2k.expiry.RefreshAheadPolicy;
+import org.cache2k.io.AdvancedCacheLoader;
+import org.cache2k.io.AsyncCacheLoader;
+import org.cache2k.io.CacheLoader;
+import org.cache2k.io.CacheWriter;
+import org.cache2k.io.ExceptionPropagator;
+import org.cache2k.io.ResiliencePolicy;
+import org.cache2k.operation.Scheduler;
+import org.cache2k.operation.TimeReference;
+import org.cache2k.operation.Weigher;
 
 /**
  * Configuration for a cache2k cache.
  *
- * <p>To create a cache, the {@link Cache2kBuilder} is used. All configuration properties
- * are present on the builder and are documented in this place. Consequently, all properties
- * refer to the corresponding builder method.
+ * <p>To create a cache, the {@link Cache2kBuilder} is used. All configuration properties are
+ * present on the builder and are documented in this place. Consequently, all properties refer to
+ * the corresponding builder method.
  *
  * <p>The configuration bean is designed to be serializable. This is used for example to copy
- * default configurations. The builder allows object references to customizations to be set.
- * If this happens the configuration is not serializable. Such configuration is only used for
- * immediate creation of one cache via the builder.
+ * default configurations. The builder allows object references to customizations to be set. If this
+ * happens the configuration is not serializable. Such configuration is only used for immediate
+ * creation of one cache via the builder.
  *
- * <p>The configuration may contain additional beans, called configuration sections, that are
- * used to configure extensions.
+ * <p>The configuration may contain additional beans, called configuration sections, that are used
+ * to configure extensions.
  *
- * <p>Within the XML configuration of a cache manager different default configuration
- * values may be specified. To get a configuration bean with the effective defaults of
- * a specific manager do {@code Cache2kBuilder.forUnknownTypes().manager(...).toConfiguration()}
+ * <p>Within the XML configuration of a cache manager different default configuration values may be
+ * specified. To get a configuration bean with the effective defaults of a specific manager do
+ * {@code Cache2kBuilder.forUnknownTypes().manager(...).toConfiguration()}
  *
  * @author Jens Wilke
  */
 @SuppressWarnings({"unused"})
-public class Cache2kConfig<K, V> implements ConfigBean<Cache2kConfig<K, V>, Cache2kBuilder<K, V>>,
-                                            DataAware<K, V>, ConfigWithSections {
+public class Cache2kConfig<K, V>
+    implements ConfigBean<Cache2kConfig<K, V>, Cache2kBuilder<K, V>>,
+        DataAware<K, V>,
+        ConfigWithSections {
 
   /**
-   * A marker duration used in {@link #setExpireAfterWrite(Duration)}, to request
-   * eternal expiry. The maximum duration after the duration is considered as eternal
-   * for our purposes.
+   * A marker duration used in {@link #setExpireAfterWrite(Duration)}, to request eternal expiry.
+   * The maximum duration after the duration is considered as eternal for our purposes.
    */
   public static final Duration EXPIRY_ETERNAL = Duration.ofMillis(ExpiryTimeValues.ETERNAL);
 
   /**
-   * Default entry capacity of a cache. If no capacity is configured the cache uses the default
-   * of 1802.
+   * Default entry capacity of a cache. If no capacity is configured the cache uses the default of
+   * 1802.
    */
   public static final long DEFAULT_ENTRY_CAPACITY = 1802;
 
-  /**
-   * Constant for unset parameter value.
-   */
+  /** Constant for unset parameter value. */
   public static final int UNSET_INT = -1;
-  /**
-   * Constant for unset parameter value.
-   */
+  /** Constant for unset parameter value. */
   public static final long UNSET_LONG = -1;
 
   private boolean storeByReference;
@@ -123,33 +119,33 @@ public class Cache2kConfig<K, V> implements ConfigBean<Cache2kConfig<K, V>, Cach
   private @Nullable CustomizationSupplier<? extends Executor> refreshExecutor;
   private @Nullable CustomizationSupplier<? extends Executor> asyncListenerExecutor;
   private @Nullable CustomizationSupplier<? extends Executor> executor;
-  private @Nullable
-    CustomizationSupplier<? extends ExpiryPolicy<? super K, ? super V>> expiryPolicy;
+  private @Nullable CustomizationSupplier<? extends ExpiryPolicy<? super K, ? super V>>
+      expiryPolicy;
   private @Nullable CustomizationSupplier<? extends TimeReference> timeReference;
   private @Nullable CustomizationSupplier<? extends Scheduler> scheduler;
-  private @Nullable
-    CustomizationSupplier<? extends ResiliencePolicy<? super K, ? super V>> resiliencePolicy;
-  private @Nullable
-    CustomizationSupplier<? extends RefreshAheadPolicy<? super K, ? super V, ?>> refreshAheadPolicy;
+  private @Nullable CustomizationSupplier<? extends ResiliencePolicy<? super K, ? super V>>
+      resiliencePolicy;
+  private @Nullable CustomizationSupplier<? extends RefreshAheadPolicy<? super K, ? super V, ?>>
+      refreshAheadPolicy;
   private @Nullable CustomizationSupplier<? extends CacheWriter<K, V>> writer;
   private @Nullable CustomizationSupplier<? extends CacheLoader<K, V>> loader;
   private @Nullable CustomizationSupplier<? extends AdvancedCacheLoader<K, V>> advancedLoader;
   private @Nullable CustomizationSupplier<? extends AsyncCacheLoader<K, V>> asyncLoader;
-  private @Nullable
-    CustomizationSupplier<? extends ExceptionPropagator<? super K, ? super V>> exceptionPropagator;
+  private @Nullable CustomizationSupplier<? extends ExceptionPropagator<? super K, ? super V>>
+      exceptionPropagator;
   private @Nullable CustomizationSupplier<? extends Weigher<K, V>> weigher;
   private @Nullable Collection<CustomizationSupplier<CacheEntryOperationListener<K, V>>> listeners;
-  private @Nullable
-    Collection<CustomizationSupplier<CacheEntryOperationListener<K, V>>> asyncListeners;
-  private @Nullable Collection<CustomizationSupplier<? extends CacheLifecycleListener>> lifecycleListeners;
+  private @Nullable Collection<CustomizationSupplier<CacheEntryOperationListener<K, V>>>
+      asyncListeners;
+  private @Nullable Collection<CustomizationSupplier<? extends CacheLifecycleListener>>
+      lifecycleListeners;
   private @Nullable Set<Feature> features;
   private @Nullable SectionContainer sections;
   private @Nullable CacheWrapper traceCacheWrapper;
   private @Nullable CacheWrapper cacheWrapper;
 
   /**
-   * Construct a config instance setting the type parameters and returning a
-   * proper generic type.
+   * Construct a config instance setting the type parameters and returning a proper generic type.
    *
    * @see Cache2kBuilder#keyType(Class)
    * @see Cache2kBuilder#valueType(Class)
@@ -162,8 +158,7 @@ public class Cache2kConfig<K, V> implements ConfigBean<Cache2kConfig<K, V>, Cach
   }
 
   /**
-   * Construct a config instance setting the type parameters and returning a
-   * proper generic type.
+   * Construct a config instance setting the type parameters and returning a proper generic type.
    *
    * @see Cache2kBuilder#keyType(CacheType)
    * @see Cache2kBuilder#valueType(CacheType)
@@ -178,19 +173,18 @@ public class Cache2kConfig<K, V> implements ConfigBean<Cache2kConfig<K, V>, Cach
   /**
    * @see Cache2kBuilder#name(String)
    */
-  public @Nullable String getName() { return name; }
+  public @Nullable String getName() {
+    return name;
+  }
 
   /**
-   *
    * @see Cache2kBuilder#name(String)
    */
   public void setName(@Nullable String name) {
     this.name = name;
   }
 
-  /**
-   * True if name is generated and not set by the cache client.
-   */
+  /** True if name is generated and not set by the cache client. */
   public boolean isNameWasGenerated() {
     return nameWasGenerated;
   }
@@ -200,7 +194,6 @@ public class Cache2kConfig<K, V> implements ConfigBean<Cache2kConfig<K, V>, Cach
   }
 
   /**
-   *
    * @see Cache2kBuilder#entryCapacity
    */
   public long getEntryCapacity() {
@@ -268,8 +261,8 @@ public class Cache2kConfig<K, V> implements ConfigBean<Cache2kConfig<K, V>, Cach
   }
 
   /**
-   * Sets expire after write. The value is capped at {@link #EXPIRY_ETERNAL}, meaning
-   * an equal or higher duration is treated as eternal expiry.
+   * Sets expire after write. The value is capped at {@link #EXPIRY_ETERNAL}, meaning an equal or
+   * higher duration is treated as eternal expiry.
    *
    * @see Cache2kBuilder#expireAfterWrite(Duration)
    */
@@ -282,7 +275,7 @@ public class Cache2kConfig<K, V> implements ConfigBean<Cache2kConfig<K, V>, Cach
   }
 
   /**
-   * @see Cache2kBuilder#idleScanTime(Duration) 
+   * @see Cache2kBuilder#idleScanTime(Duration)
    */
   public void setIdleScanTime(@Nullable Duration v) {
     if (v != null && Duration.ZERO.compareTo(v) >= 0) {
@@ -347,9 +340,9 @@ public class Cache2kConfig<K, V> implements ConfigBean<Cache2kConfig<K, V>, Cach
   }
 
   /**
-   * An external configuration for the cache was found and is applied.
-   * This is {@code true} if default values are set via the XML configuration or
-   * if there is a specific section for the cache name.
+   * An external configuration for the cache was found and is applied. This is {@code true} if
+   * default values are set via the XML configuration or if there is a specific section for the
+   * cache name.
    */
   public boolean isExternalConfigurationPresent() {
     return externalConfigurationPresent;
@@ -359,9 +352,7 @@ public class Cache2kConfig<K, V> implements ConfigBean<Cache2kConfig<K, V>, Cach
     externalConfigurationPresent = v;
   }
 
-  /**
-   * Mutable collection of additional configuration sections
-   */
+  /** Mutable collection of additional configuration sections */
   public SectionContainer getSections() {
     if (sections == null) {
       sections = new SectionContainer();
@@ -370,9 +361,9 @@ public class Cache2kConfig<K, V> implements ConfigBean<Cache2kConfig<K, V>, Cach
   }
 
   /**
-   * Adds the collection of sections to the existing list. This method is intended to
-   * improve integration with bean configuration mechanisms that use the set method and
-   * construct a set or list, like Springs' bean XML configuration.
+   * Adds the collection of sections to the existing list. This method is intended to improve
+   * integration with bean configuration mechanisms that use the set method and construct a set or
+   * list, like Springs' bean XML configuration.
    */
   public void setSections(Collection<ConfigSection<?, ?>> c) {
     getSections().addAll(c);
@@ -394,7 +385,7 @@ public class Cache2kConfig<K, V> implements ConfigBean<Cache2kConfig<K, V>, Cach
    * @see Cache2kBuilder#loader(AdvancedCacheLoader)
    */
   public void setAdvancedLoader(
-    @Nullable CustomizationSupplier<? extends AdvancedCacheLoader<K, V>> v) {
+      @Nullable CustomizationSupplier<? extends AdvancedCacheLoader<K, V>> v) {
     advancedLoader = v;
   }
 
@@ -420,13 +411,13 @@ public class Cache2kConfig<K, V> implements ConfigBean<Cache2kConfig<K, V>, Cach
     loaderThreadCount = v;
   }
 
-  public @Nullable
-    CustomizationSupplier<? extends ExpiryPolicy<? super K, ? super V>> getExpiryPolicy() {
+  public @Nullable CustomizationSupplier<? extends ExpiryPolicy<? super K, ? super V>>
+      getExpiryPolicy() {
     return expiryPolicy;
   }
 
   public void setExpiryPolicy(
-    @Nullable CustomizationSupplier<? extends ExpiryPolicy<? super K, ? super V>> v) {
+      @Nullable CustomizationSupplier<? extends ExpiryPolicy<? super K, ? super V>> v) {
     expiryPolicy = v;
   }
 
@@ -453,7 +444,7 @@ public class Cache2kConfig<K, V> implements ConfigBean<Cache2kConfig<K, V>, Cach
   }
 
   public @Nullable CustomizationSupplier<? extends ExceptionPropagator<? super K, ? super V>>
-    getExceptionPropagator() {
+      getExceptionPropagator() {
     return exceptionPropagator;
   }
 
@@ -461,22 +452,21 @@ public class Cache2kConfig<K, V> implements ConfigBean<Cache2kConfig<K, V>, Cach
    * @see Cache2kBuilder#exceptionPropagator(ExceptionPropagator)
    */
   public void setExceptionPropagator(
-    @Nullable CustomizationSupplier<? extends ExceptionPropagator<? super K, ? super V>> v) {
+      @Nullable CustomizationSupplier<? extends ExceptionPropagator<? super K, ? super V>> v) {
     exceptionPropagator = v;
   }
 
   /**
-   * A set of listeners. Listeners added in this collection will be
-   * executed in a synchronous mode, meaning, further processing for
-   * an entry will stall until a registered listener is executed.
+   * A set of listeners. Listeners added in this collection will be executed in a synchronous mode,
+   * meaning, further processing for an entry will stall until a registered listener is executed.
    *
-   * <p>A listener can be added by adding it to the collection.
-   * Duplicate (in terms of equal objects) listeners will be ignored.
+   * <p>A listener can be added by adding it to the collection. Duplicate (in terms of equal
+   * objects) listeners will be ignored.
    *
    * @return Mutable collection of listeners
    */
-  public @NonNull
-  Collection<CustomizationSupplier<CacheEntryOperationListener<K, V>>> getListeners() {
+  public @NonNull Collection<CustomizationSupplier<CacheEntryOperationListener<K, V>>>
+      getListeners() {
     if (listeners == null) {
       listeners = new ArrayList<>();
     }
@@ -491,23 +481,22 @@ public class Cache2kConfig<K, V> implements ConfigBean<Cache2kConfig<K, V>, Cach
   }
 
   /**
-   * Adds the collection of customizations to the existing list. This method is intended to
-   * improve integration with bean configuration mechanisms that use the set method and
-   * construct a set or list, like Springs' bean XML configuration.
+   * Adds the collection of customizations to the existing list. This method is intended to improve
+   * integration with bean configuration mechanisms that use the set method and construct a set or
+   * list, like Springs' bean XML configuration.
    */
-  public void setListeners(
-    Collection<CustomizationSupplier<CacheEntryOperationListener<K, V>>> c) {
+  public void setListeners(Collection<CustomizationSupplier<CacheEntryOperationListener<K, V>>> c) {
     getListeners().addAll(c);
   }
 
   /**
-   * A set of listeners. A listener can be added by adding it to the collection.
-   * Duplicate (in terms of equal objects) listeners will be ignored.
+   * A set of listeners. A listener can be added by adding it to the collection. Duplicate (in terms
+   * of equal objects) listeners will be ignored.
    *
    * @return Mutable collection of listeners
    */
-  public @NonNull
-  Collection<CustomizationSupplier<CacheEntryOperationListener<K, V>>> getAsyncListeners() {
+  public @NonNull Collection<CustomizationSupplier<CacheEntryOperationListener<K, V>>>
+      getAsyncListeners() {
     if (asyncListeners == null) {
       asyncListeners = new ArrayList<>();
     }
@@ -522,23 +511,23 @@ public class Cache2kConfig<K, V> implements ConfigBean<Cache2kConfig<K, V>, Cach
   }
 
   /**
-   * Adds the collection of customizations to the existing list. This method is intended to
-   * improve integration with bean configuration mechanisms that use the set method and
-   * construct a set or list, like Springs' bean XML configuration.
+   * Adds the collection of customizations to the existing list. This method is intended to improve
+   * integration with bean configuration mechanisms that use the set method and construct a set or
+   * list, like Springs' bean XML configuration.
    */
   public void setAsyncListeners(
-    Collection<CustomizationSupplier<CacheEntryOperationListener<K, V>>> c) {
+      Collection<CustomizationSupplier<CacheEntryOperationListener<K, V>>> c) {
     getAsyncListeners().addAll(c);
   }
 
   /**
-   * A set of listeners. A listener can be added by adding it to the collection.
-   * Duplicate (in terms of equal objects) listeners will be ignored.
+   * A set of listeners. A listener can be added by adding it to the collection. Duplicate (in terms
+   * of equal objects) listeners will be ignored.
    *
    * @return Mutable collection of listeners
    */
-  public @NonNull
-  Collection<CustomizationSupplier<? extends CacheLifecycleListener>> getLifecycleListeners() {
+  public @NonNull Collection<CustomizationSupplier<? extends CacheLifecycleListener>>
+      getLifecycleListeners() {
     if (lifecycleListeners == null) {
       lifecycleListeners = new ArrayList<>();
     }
@@ -553,17 +542,16 @@ public class Cache2kConfig<K, V> implements ConfigBean<Cache2kConfig<K, V>, Cach
   }
 
   /**
-   * Adds the collection of customizations to the existing list. This method is intended to
-   * improve integration with bean configuration mechanisms that use the set method and
-   * construct a set or list, like Springs' bean XML configuration.
+   * Adds the collection of customizations to the existing list. This method is intended to improve
+   * integration with bean configuration mechanisms that use the set method and construct a set or
+   * list, like Springs' bean XML configuration.
    */
   public void setLifecycleListeners(
-    @NonNull Collection<CustomizationSupplier<? extends CacheLifecycleListener>> c) {
+      @NonNull Collection<CustomizationSupplier<? extends CacheLifecycleListener>> c) {
     getLifecycleListeners().addAll(c);
   }
 
-  public @NonNull
-  Set<Feature> getFeatures() {
+  public @NonNull Set<Feature> getFeatures() {
     if (features == null) {
       features = new HashSet<>();
     }
@@ -579,7 +567,7 @@ public class Cache2kConfig<K, V> implements ConfigBean<Cache2kConfig<K, V>, Cach
   }
 
   public @Nullable CustomizationSupplier<? extends ResiliencePolicy<? super K, ? super V>>
-    getResiliencePolicy() {
+      getResiliencePolicy() {
     return resiliencePolicy;
   }
 
@@ -587,16 +575,19 @@ public class Cache2kConfig<K, V> implements ConfigBean<Cache2kConfig<K, V>, Cach
    * @see Cache2kBuilder#resiliencePolicy
    */
   public void setResiliencePolicy(
-    @Nullable CustomizationSupplier<? extends ResiliencePolicy<? super K, ? super V>> v) {
+      @Nullable CustomizationSupplier<? extends ResiliencePolicy<? super K, ? super V>> v) {
     resiliencePolicy = v;
   }
 
-  public CustomizationSupplier<? extends RefreshAheadPolicy<? super K, ? super V, ?>> getRefreshAheadPolicy() {
+  public CustomizationSupplier<? extends RefreshAheadPolicy<? super K, ? super V, ?>>
+      getRefreshAheadPolicy() {
     return refreshAheadPolicy;
   }
 
   public void setRefreshAheadPolicy(
-    @Nullable CustomizationSupplier<? extends RefreshAheadPolicy<? super K, ? super V, ?>> refreshAheadPolicy) {
+      @Nullable
+          CustomizationSupplier<? extends RefreshAheadPolicy<? super K, ? super V, ?>>
+              refreshAheadPolicy) {
     this.refreshAheadPolicy = refreshAheadPolicy;
   }
 
@@ -773,11 +764,8 @@ public class Cache2kConfig<K, V> implements ConfigBean<Cache2kConfig<K, V>, Cach
     return v;
   }
 
-  /**
-   * Creates a cache builder from the configuration.
-   */
+  /** Creates a cache builder from the configuration. */
   public Cache2kBuilder<K, V> builder() {
     return Cache2kBuilder.of(this);
   }
-
 }

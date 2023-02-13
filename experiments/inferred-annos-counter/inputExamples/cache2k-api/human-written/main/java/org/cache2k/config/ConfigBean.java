@@ -9,9 +9,9 @@ package org.cache2k.config;
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -23,15 +23,13 @@ package org.cache2k.config;
 /**
  * Marker for cache configuration beans. The marker is not mandatory.
  *
- * <p>Every bean that is used in a cache configuration should adhere to the Java Beans standard.
- * The objects need to be serializable since this is used to copy the default configuration.
+ * <p>Every bean that is used in a cache configuration should adhere to the Java Beans standard. The
+ * objects need to be serializable since this is used to copy the default configuration.
  *
  * @author Jens Wilke
  */
-public interface ConfigBean
-  <SELF extends ConfigBean<SELF, B>, B extends ConfigBuilder<B, SELF>>
-  extends BeanMarker {
+public interface ConfigBean<SELF extends ConfigBean<SELF, B>, B extends ConfigBuilder<B, SELF>>
+    extends BeanMarker {
 
   B builder();
-
 }

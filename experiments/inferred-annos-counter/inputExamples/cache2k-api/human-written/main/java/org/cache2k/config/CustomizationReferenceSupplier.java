@@ -9,9 +9,9 @@ package org.cache2k.config;
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -20,14 +20,13 @@ package org.cache2k.config;
  * #L%
  */
 
+import java.util.Objects;
 import org.cache2k.annotation.NonNull;
 import org.cache2k.annotation.Nullable;
 
-import java.util.Objects;
-
 /**
- * A reference to the customization to be used is set while building the cache.
- * The reference is returned. The class loader is ignored.
+ * A reference to the customization to be used is set while building the cache. The reference is
+ * returned. The class loader is ignored.
  *
  * @author Jens Wilke
  */
@@ -66,5 +65,4 @@ public final class CustomizationReferenceSupplier<@NonNull T> implements Customi
   public int hashCode() {
     return object.hashCode();
   }
-
 }

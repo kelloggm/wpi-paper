@@ -1,10 +1,9 @@
 /**
- * Service provider interface that is used by the cache2k implementation. Not intended for the
- * use of normal cache clients.
+ * Service provider interface that is used by the cache2k implementation. Not intended for the use
+ * of normal cache clients.
  *
  * @author Jens Wilke
  */
-
 @NonNullApi
 package org.cache2k.spi;
 
@@ -17,9 +16,9 @@ package org.cache2k.spi;
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.

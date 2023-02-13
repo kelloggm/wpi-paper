@@ -9,9 +9,9 @@ package org.cache2k.config;
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -20,26 +20,25 @@ package org.cache2k.config;
  * #L%
  */
 
+import java.lang.reflect.ParameterizedType;
+import java.util.Arrays;
 import org.cache2k.Cache2kBuilder;
 import org.cache2k.annotation.Nullable;
 
-import java.lang.reflect.ParameterizedType;
-import java.util.Arrays;
-
 /**
- * Helper class to capture generic types into a type descriptor. This is used to provide
- * the cache with detailed type information of the key and value objects.
+ * Helper class to capture generic types into a type descriptor. This is used to provide the cache
+ * with detailed type information of the key and value objects.
  *
- * Example usage with {@link Cache2kBuilder}:<pre>   {@code
+ * <p>Example usage with {@link Cache2kBuilder}:
  *
- *   CacheBuilder.newCache().valueType(new CacheType<List<String>(){}).build()
+ * <pre>{@code
+ * CacheBuilder.newCache().valueType(new CacheType<List<String>(){}).build()
  * }</pre>
  *
  * This constructs a cache with the known type {@code List<String>} for its value.
  *
- * @see <a href="https://github.com/google/guava/wiki/ReflectionExplained">Google Guava
- * CacheType explaination</a>
- *
+ * @see <a href="https://github.com/google/guava/wiki/ReflectionExplained">Google Guava CacheType
+ *     explaination</a>
  * @author Jens Wilke
  */
 @SuppressWarnings("nullness")
@@ -47,10 +46,12 @@ public class CacheTypeCapture<T> implements CacheType<T> {
 
   @SuppressWarnings("unchecked")
   private final CacheType<T> descriptor =
-    (CacheType<T>) CacheType.of(
-      ((ParameterizedType) this.getClass().getGenericSuperclass()).getActualTypeArguments()[0]);
+      (CacheType<T>)
+          CacheType.of(
+              ((ParameterizedType) this.getClass().getGenericSuperclass())
+                  .getActualTypeArguments()[0]);
 
-  protected CacheTypeCapture() { }
+  protected CacheTypeCapture() {}
 
   @Override
   public @Nullable CacheType<?> getComponentType() {
@@ -106,7 +107,8 @@ public class CacheTypeCapture<T> implements CacheType<T> {
     }
 
     @Override
-    @Nullable public Class<T> getType() {
+    @Nullable
+    public Class<T> getType() {
       return null;
     }
 
@@ -129,12 +131,9 @@ public class CacheTypeCapture<T> implements CacheType<T> {
     public final String toString() {
       return DESCRIPTOR_TO_STRING_PREFIX + getTypeName();
     }
-
   }
 
-  /**
-   * CacheType representing a class.
-   */
+  /** CacheType representing a class. */
   public static class OfClass<T> extends BaseType<T> {
 
     private final Class<T> type;
@@ -180,12 +179,9 @@ public class CacheTypeCapture<T> implements CacheType<T> {
     public int hashCode() {
       return type.hashCode();
     }
-
   }
 
-  /**
-   * CacheType representing an array.
-   */
+  /** CacheType representing an array. */
   @SuppressWarnings("ConstantConditions")
   public static class OfArray extends BaseType<Void> {
 
@@ -240,8 +236,12 @@ public class CacheTypeCapture<T> implements CacheType<T> {
 
     @Override
     public boolean equals(Object o) {
-      if (this == o) { return true; }
-      if (o == null || getClass() != o.getClass()) { return false; }
+      if (this == o) {
+        return true;
+      }
+      if (o == null || getClass() != o.getClass()) {
+        return false;
+      }
       OfArray arrayType = (OfArray) o;
       return componentType.equals(arrayType.componentType);
     }
@@ -252,9 +252,7 @@ public class CacheTypeCapture<T> implements CacheType<T> {
     }
   }
 
-  /**
-   * CacheType representing a generic type.
-   */
+  /** CacheType representing a generic type. */
   public static class OfGeneric<T> extends BaseType<T> {
 
     private final CacheType<?>[] typeArguments;
@@ -282,8 +280,10 @@ public class CacheTypeCapture<T> implements CacheType<T> {
 
     @Override
     public String getTypeName() {
-      return
-        OfClass.shortenName(type.getCanonicalName()) + "<" + arrayToString(typeArguments) + '>';
+      return OfClass.shortenName(type.getCanonicalName())
+          + "<"
+          + arrayToString(typeArguments)
+          + '>';
     }
 
     @Override
@@ -302,7 +302,6 @@ public class CacheTypeCapture<T> implements CacheType<T> {
       result = 31 * result + type.hashCode();
       return result;
     }
-
   }
 
   static String arrayToString(CacheType<?>[] a) {
@@ -313,10 +312,8 @@ public class CacheTypeCapture<T> implements CacheType<T> {
     int l = a.length - 1;
     for (int i = 0; ; i++) {
       sb.append(a[i].getTypeName());
-      if (i == l)
-        return sb.toString();
+      if (i == l) return sb.toString();
       sb.append(',');
     }
   }
-
 }

@@ -9,9 +9,9 @@ package org.cache2k;
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -23,9 +23,9 @@ package org.cache2k;
 import org.cache2k.annotation.Nullable;
 
 /**
- * Reduced interface to return a value selected by a key object. Cache users
- * of a read-through cache may choose this simple interface for requesting data
- * only, rather to use the full-blown cache interface.
+ * Reduced interface to return a value selected by a key object. Cache users of a read-through cache
+ * may choose this simple interface for requesting data only, rather to use the full-blown cache
+ * interface.
  *
  * @author Jens Wilke
  */
@@ -36,6 +36,6 @@ public interface KeyValueSource<K, V> extends DataAware<K, V> {
    *
    * @see Cache#get(Object)
    */
-  @Nullable V get(K key);
-
+  @Nullable
+  V get(K key);
 }
