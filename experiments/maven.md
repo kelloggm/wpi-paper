@@ -9,7 +9,7 @@ that you used to the appropriate branch: `annotation-statistics` if you're using
 technique to count human-written annotations, or `wpi-annotations` if you're counting
 inferred annotations. 
 
-### Alternative 1: -X + javac
+### Alternative 1: `mvn -X`, then `javac`
 
 If this works, it's the easiest way to collect the numbers (but, it doesn't always
 work). Follow these steps (after enabling AnnotationStatistics in the build system as usual):
@@ -18,7 +18,7 @@ work). Follow these steps (after enabling AnnotationStatistics in the build syst
 3. locate the arguments passed to javac in `out`. Maven prints "Command line options:" right before it prints
 this list, so I recommend searching for that. Warning: in multi-project builds, there might be more than one
 of these in the output, so you should check all of them.
-4. copy the options passed to javac into a new shell script and precede them with `javac`. If the project requires $JAVA_HOME set with the project specific version of java, you will need to precede the arguments with `$JAVA_HOME/bin/javac`.
+4. copy the options passed to javac into a new shell script named `count-annotations.sh` and precede them with `javac`. You might need to quote some arguments, such as any containing a parenthesis as in `-AskipDefs=(Test|BaseCase|DataSet|TestCase|PacketWithParser|OtherPacket|DummyGenerator|Accessors)$`.  If the project requires $JAVA_HOME set with the project specific version of java, you will need to precede the arguments with `$JAVA_HOME/bin/javac`.
 5. run this script. You should get output from AnnotationStatistics.
 6. if successful, commit the script.
 
@@ -46,8 +46,12 @@ section lists the relevant annotations for the checker.
    ```
 4. then run something like the following: for anno in `cat annos.txt`; do rg $anno *; done
    * `rg` is [ripgrep](https://github.com/BurntSushi/ripgrep). `grep` is also fine (but much slower).
-5. count the results by hand. You might be tempted to use the `--count-matches` argument to `rg`.
-Be sure to run at least once without it to make sure the output looks correct, though: this is
+5. count the results "by hand"---that is, by using ripgrep to count the annotations, but verifying that everything
+look okay yourself before fully automating it.
+You may need to include the `-w` flag to exact match annotations (if the checker has annotations whose
+names are substrings of each other, as most do). The `--stat` and `--count-matches` flags are also useful
+to give total counts of the matched annotations, once you've verified by hand that the output looks correct.
+But, be sure to run at least once without these flags to make sure the output looks correct: this is
 an error-prone and approximate counting method, and you should expect to have to deal with special
 cases: this isn't fully automatable.
 6. if this works, commit the `annos.txt` file and a script containing the specific `rg` command
