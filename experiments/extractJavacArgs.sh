@@ -3,8 +3,11 @@
 # This script extracts the javac args of a maven project.
 # It may be useful when annotation statistics swallows expected output 
 # and the project has to be run manually as explained in maven.md
-# Make sure you have a $JAVA_HOME variable set.
 
+if [ "${JAVA_HOME}" = "" ]; then
+  echo "Must set the JAVA_HOME environment variable."
+  exit 1
+fi
 
 MVN_COMPILE="mvn -X clean compile"
 ${MVN_COMPILE} > compile-out.txt
