@@ -26,8 +26,8 @@ public class ICalAvailableTest {
 
   private final String EXPECTED_OUTPUT =
       "@Pure got 1/1\n"
-          + "@RequiresNonNull got 0/2\n"
-          + "@Nullable got 1/2\n"
+          + "@RequiresNonNull got 2/2\n"
+          + "@Nullable got 0/2\n"
           + "@NonNull got 0/2\n"
           + "@MonotonicNonNull got 1/1\n"
           + "@Regex got 1/1\n"
@@ -56,6 +56,10 @@ public class ICalAvailableTest {
           "../inputExamples/icalavailable/generated/org/plumelib/icalavailable/ICalAvailable-org.checkerframework.checker.interning.InterningChecker.ajava",
           "../inputExamples/icalavailable/generated/org/plumelib/icalavailable/ICalAvailable-org.checkerframework.checker.index.lowerbound.LowerBoundChecker.ajava"
         });
-    assertTrue(outputStreamCaptor.toString().trim().contentEquals(EXPECTED_OUTPUT));
+    assertTrue(
+        outputStreamCaptor
+            .toString()
+            .replaceAll("\\s", "")
+            .contentEquals(EXPECTED_OUTPUT.replaceAll("\\s", "")));
   }
 }

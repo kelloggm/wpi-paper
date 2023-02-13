@@ -74,8 +74,18 @@ The procedure:
    3. Push the unannotated code:
       `git commit -am "output of RemoveAnnotationsForInference" ; git push origin unannotated`
    4. Verify that, because the annotations have been removed, the program no longer typechecks. You should
-   see an error from one of the Checker Framework checkers you recorded in step 2c when you re-run whatever
-   command you used to run the typechecker before.
+   see an error from one of the Checker Framework checkers you recorded in step B3 when you re-run whatever
+   command you used to run the typechecker before. Note: the `RemoveAnnotationsForInference` program might 
+   remove annotations that it should not (e.g., annotations from non-Checker-Framework projects that are required 
+   for the project to compile). If you see something else (e.g., a `symbol not found` error), follow these steps:
+      1. Run `git diff origin/baseline` to see the removed annotations. Examine each removed annotation and check whether
+      it belongs to the Checker Framework. You can do this by searching for the annotation's name in 
+      the [Checker Framework manual](https://checkerframework.org/manual/).
+      2. For each annotation that does not belong to the Checker Framework, re-add it to the project.
+      3. For each annotation that does not belong to the Checker Framework, add it to the list of "trusted"
+      annotations in the implementation of `RemoveAnnotationsForInference`, which you can find [here](https://github.com/typetools/checker-framework/blob/master/framework/src/main/java/org/checkerframework/framework/stub/RemoveAnnotationsForInference.java).
+      The list of trusted annotations is in the `isTrustedAnnotation(String)` method. Make a PR to the Checker Framework with
+      the new trusted annotations.
 
 ##### D. Collect the number of original annotations in the code:
    1. run `git checkout -b annotation-statistics origin/baseline`
@@ -98,7 +108,8 @@ The procedure:
 	         checker you will need to figure out what its annotations are.).
          TODO: sometimes there are mulitple projects, so there are multiple occurrences of "Found annotations:".  The "Found annotations:" output should indicate in which directory or project the annotations were found, or a script should combine all the tables in the output into a single table.
          TODO: consider writing a script for interpreting the output of AnnotationStatistics by checker?
-   7. run `git commit -m "annotation statistics configuration" ; git push origin annotation-statistics`.
+   7. If the build system is Maven and no AnnotationStatistics output was produced in step 6, you'll need to use an alternative strategy to count the annotations. There are some notes on how to do so in the file `maven.md` in this directory.
+   8. run `git commit -m "annotation statistics configuration" ; git push origin annotation-statistics`.
 
 ##### E. Collect the number of lines of code:
    1. run `git checkout baseline`
@@ -107,11 +118,10 @@ The procedure:
    
 ##### F. Run WPI:
    1. run `git checkout -b wpi-enabled origin/unannotated`
-   2. choose any temporary directory for $WPITEMPDIR
-      TODO: Giving the user choices can be confusing and requires user effort.  Just dictate a temporary directory here, or hardcode it in the commands below.  I'm personally using /scratch/$USER/wpi-output/PROJECTNAME-wpi . (If you're reading this later and are unsure what to chose, this is a good default.)
+   2. run `export WPITEMPDIR=/scratch/$USER/wpi-output/PROJECTNAME-wpi` (change PROJECTNAME, don't use it literally).
    3. modify the build file:
        1. run with `-Ainfer=ajava`, `-Awarns`, and `-Aajava=$WPITEMPDIR`
-          (modifying the latter as appropriate for project structure, Ex: '-Aajava=/path/to/temp/dir/').
+          (the latter should be explicit, not the variable name,, Ex: '-Aajava=/scratch/mernst/wpi-output/Araknemu-wpi').
        2. Remove any `-Werror` argument to javac, because otherwise WPI will fail.
        3. Disable any non-Checker-Framework annotation processors (e.g., user-defined ones)
    4. Copy `wpi-template.sh` to `wpi.sh` in the project directory.
@@ -128,6 +138,8 @@ The procedure:
       https://docs.google.com/spreadsheets/d/1r_NhumolEp5CiOL7CmsvZaa4-FDUxCJXfswyJoKg8uM/ ,
       the number of errors issued by the typecheckers and which 
       typechecker issued the error.
+      This is the output after the last "entering a new iteration" in the output.
+      TODO: Say how to compute this.
    9. Save the output of WPI (i.e., the warnings it produces) to the file `typecheck.out` in the project's top-level directory.
    10. Add `typecheck.out` to git and then commit to the `wpi-enabled` branch: `git add typecheck.out ; git commit -m "results of typechecking" ; git push origin wpi-enabled`
 
@@ -142,6 +154,7 @@ The procedure:
    2. create a copy of the script `compute-annos-inferred.sh` in the target project directory
    3. modify the variables at the beginning of the script as appropriate for the target project
       [[TODO: I think it would be better to take those variables as arguments if possible, to avoid the need to make a new version of the script.  The advantage of having a concrete script is that in the future it would not be necessary to know which arguments to pass.  But the concrete script could also be just an invocation of the master `compute-annos-inferred.sh` in the paper repository.]]
+    7. If the build system is Maven and no AnnotationStatistics output was produce, you'll need to use an alternative strategy to count the 	 annotations. There are some notes on how to do so in the file `maven.md` in this directory.
    4. run the script
    5. transcribe the output after "====== COMBINED RESULTS =======" is printed to the spreadsheet, combining rows that mention the same annotation 
       (this happens when e.g., different @RequiresQualifier annotations are inferred by different checkers)

@@ -82,7 +82,7 @@ def part1():
     '''
     process = subprocess.run("git commit -am \"output of RemoveAnnotationsForInference\" ; git push origin unannotated", shell=True)
     
-    print("\nVerify that, because the annotations have been removed, the program no longer typechecks. You should see an error from one of the Checker Framework checkers you recorded in step 2c when you re-run whatever command you used to run the typechecker before.")
+    print("\nVerify that, because the annotations have been removed, the program no longer typechecks. You should see an error from one of the Checker Framework checkers you recorded in step B3 when you re-run whatever command you used to run the typechecker before.")
     pausePrg()
     
     '''
@@ -116,7 +116,7 @@ def part1():
             i. Clean the program, then compile the program.
     '''
     
-    print("10. Compile the project and save the output in 'Human-written.txt' file\n\n\texample:\n\t./gradlew build >> Human-written.txt\n")
+    print("10. Compile the project and save the output in 'Human-written.txt' file\n\n\texample:\n\t./gradlew build >> Human-written.txt\nIf the build system is Maven and no AnnotationStatistics output was produced, you'll need to use an alternative strategy to count the annotations. There are some notes on how to do so in the file `maven.md`.")
     pausePrg()
 
     '''
