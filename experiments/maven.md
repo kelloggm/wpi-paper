@@ -46,7 +46,9 @@ section lists the relevant annotations for the checker.
    ```
 4. then run something like the following: for anno in `cat annos.txt`; do rg $anno *; done
    * `rg` is [ripgrep](https://github.com/BurntSushi/ripgrep). `grep` is also fine (but much slower).
-5. count the results by hand. You might be tempted to use the `--count-matches` argument to `rg`.
+5. count the results by hand. You might be tempted to use the `--count-matches` argument to `rg`. 
+You may need to include the `-w` flag to exact match annotations. The `--stat` flag is also usefull
+to give a total of the matched annotations. 
 Be sure to run at least once without it to make sure the output looks correct, though: this is
 an error-prone and approximate counting method, and you should expect to have to deal with special
 cases: this isn't fully automatable.
