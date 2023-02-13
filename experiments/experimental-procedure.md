@@ -118,11 +118,10 @@ The procedure:
    
 ##### F. Run WPI:
    1. run `git checkout -b wpi-enabled origin/unannotated`
-   2. choose any temporary directory for $WPITEMPDIR
-      TODO: Giving the user choices can be confusing and requires user effort.  Just dictate a temporary directory here, or hardcode it in the commands below.  I'm personally using /scratch/$USER/wpi-output/PROJECTNAME-wpi . (If you're reading this later and are unsure what to chose, this is a good default.)
+   2. run `export WPITEMPDIR=/scratch/$USER/wpi-output/PROJECTNAME-wpi` (change PROJECTNAME, don't use it literally).
    3. modify the build file:
        1. run with `-Ainfer=ajava`, `-Awarns`, and `-Aajava=$WPITEMPDIR`
-          (modifying the latter as appropriate for project structure, Ex: '-Aajava=/path/to/temp/dir/').
+          (the latter should be explicit, not the variable name,, Ex: '-Aajava=/scratch/mernst/wpi-output/Araknemu-wpi').
        2. Remove any `-Werror` argument to javac, because otherwise WPI will fail.
        3. Disable any non-Checker-Framework annotation processors (e.g., user-defined ones)
    4. Copy `wpi-template.sh` to `wpi.sh` in the project directory.
@@ -139,6 +138,8 @@ The procedure:
       https://docs.google.com/spreadsheets/d/1r_NhumolEp5CiOL7CmsvZaa4-FDUxCJXfswyJoKg8uM/ ,
       the number of errors issued by the typecheckers and which 
       typechecker issued the error.
+      This is the output after the last "entering a new iteration" in the output.
+      TODO: Say how to compute this.
    9. Save the output of WPI (i.e., the warnings it produces) to the file `typecheck.out` in the project's top-level directory.
    10. Add `typecheck.out` to git and then commit to the `wpi-enabled` branch: `git add typecheck.out ; git commit -m "results of typechecking" ; git push origin wpi-enabled`
 
