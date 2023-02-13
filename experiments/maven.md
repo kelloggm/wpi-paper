@@ -13,8 +13,8 @@ inferred annotations.
 
 If this works, it's the easiest way to collect the numbers (but, it doesn't always
 work). Follow these steps (after enabling AnnotationStatistics in the build system as usual):
-The `extractJavacArgs.sh` script may be useful as it completes most of the steps below providing 
-you with `JavacRaw.txt` containing the javac arguments.
+The `extractJavacArgs.sh` script may be useful as it completes steps 1-3, partially completes 
+step 4 (does not quote arguments) producing `JavacRaw.txt` containing the javac arguments.
 1. clean the project (`mvn clean`)
 2. re-run the compilation in debug mode and pipe the output to a file (`mvn -X compile &> out`)
 3. locate the arguments passed to javac in `out`. Maven prints "Command line options:" right before it prints
