@@ -2,7 +2,7 @@
 
 # This script extracts the javac args of a maven project.
 # It may be useful when annotation statistics swallows expected output 
-# and the project has to be run manually as explained in the notes. 
+# and the project has to be run manually as explained in maven.md
 # Make sure you have a $JAVA_HOME variable set.
 
 
