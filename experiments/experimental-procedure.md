@@ -120,7 +120,7 @@ The procedure:
    1. run `git checkout -b wpi-enabled origin/unannotated`
    2. run `export WPITEMPDIR=/scratch/$USER/wpi-output/PROJECTNAME-wpi` (change PROJECTNAME, don't use it literally).
    3. modify the build file:
-       1. run with `-Ainfer=ajava`, `-Awarns`, and `-Aajava=$WPITEMPDIR`
+       1. run with `-Ainfer=ajava`, `-Awarns`, `-AshowPrefixInWarningMessages`, and `-Aajava=$WPITEMPDIR`
           (the latter should be explicit, not the variable name,, Ex: '-Aajava=/scratch/mernst/wpi-output/Araknemu-wpi').
        2. Remove any `-Werror` argument to javac, because otherwise WPI will fail.
        3. Disable any non-Checker-Framework annotation processors (e.g., user-defined ones)
