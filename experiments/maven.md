@@ -13,6 +13,8 @@ inferred annotations.
 
 If this works, it's the easiest way to collect the numbers (but, it doesn't always
 work). Follow these steps (after enabling AnnotationStatistics in the build system as usual):
+The `extractJavacArgs.sh` script may be useful as it completes most of the steps below providing 
+you with `JavacRaw.txt` containing the javac arguments.
 1. clean the project (`mvn clean`)
 2. re-run the compilation in debug mode and pipe the output to a file (`mvn -X compile &> out`)
 3. locate the arguments passed to javac in `out`. Maven prints "Command line options:" right before it prints
@@ -49,7 +51,7 @@ section lists the relevant annotations for the checker.
 5. count the results "by hand"---that is, by using ripgrep to count the annotations, but verifying that everything
 look okay yourself before fully automating it.
 You may need to include the `-w` flag to exact match annotations (if the checker has annotations whose
-names are substrings of each other, as most do). The `--stat` and `--count-matches` flags are also useful
+names are substrings of each other, as most do). The `--stats` and `--count-matches` flags are also useful
 to give total counts of the matched annotations, once you've verified by hand that the output looks correct.
 But, be sure to run at least once without these flags to make sure the output looks correct: this is
 an error-prone and approximate counting method, and you should expect to have to deal with special
