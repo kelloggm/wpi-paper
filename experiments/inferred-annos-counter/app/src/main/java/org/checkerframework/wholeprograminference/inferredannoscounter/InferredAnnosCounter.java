@@ -4,9 +4,12 @@ import com.github.difflib.DiffUtils;
 import com.github.difflib.patch.AbstractDelta;
 import com.github.difflib.patch.DeltaType;
 import com.github.difflib.patch.Patch;
+import com.github.javaparser.StaticJavaParser;
+import com.github.javaparser.ast.CompilationUnit;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -147,7 +150,6 @@ public class InferredAnnosCounter {
       String tempLine = "";
       boolean inProgress = false;
       while ((originalFileLine = br.readLine()) != null) {
-        originalFileLine = ignoreComment(originalFileLine);
         LineStatus status = checkLineStatus(originalFileLine);
         if (inProgress) {
           if (status == LineStatus.CLOSE) {
@@ -393,41 +395,31 @@ public class InferredAnnosCounter {
   /**
    * This method trims out all the comments in a line from the input files
    *
-   * @param line a line from the input files
-   * @return that line without any comment
+   * @param filePath the absolute path of the file to be trimmed out comments
+   * @return the path of a copy of the input file without comments included
    */
-  private static String ignoreComment(String line) {
-    String finalLine = line;
-    int indexOfDashStar = finalLine.indexOf("/*");
-    // this loop is to deal with all possible blocks of comment in the line
-    while (indexOfDashStar != -1) {
-      int indexOfStarDash = finalLine.indexOf("*/", indexOfDashStar + 1);
-      if (indexOfStarDash == -1) {
-        finalLine = finalLine.substring(0, indexOfDashStar);
-        break;
-      } else {
-        String beforeBlock = "";
-        if (indexOfDashStar > 0) {
-          beforeBlock = finalLine.substring(0, indexOfDashStar - 1);
+  private static String ignoreComment(String filePath) {
+    try {
+      StaticJavaParser.getParserConfiguration().setAttributeComments(false);
+      CompilationUnit cu = StaticJavaParser.parse(new File(filePath));
+      try {
+        File tempFile = File.createTempFile(filePath + "temp", ".txt");
+        tempFile.deleteOnExit();
+        try (FileWriter writer = new FileWriter(tempFile, true)) {
+          writer.write(cu.toString());
+          return tempFile.getAbsolutePath();
+        } catch (Exception e) {
+          throw new RuntimeException(
+              "An error occurred while writing to the temporary file: " + e.getMessage());
         }
-        String afterBlock = finalLine.substring(indexOfStarDash + 2, finalLine.length());
-        finalLine = beforeBlock + afterBlock;
+      } catch (IOException e) {
+        throw new RuntimeException(
+            "An error occurred while creating the temporary file: " + e.getMessage());
       }
-      indexOfDashStar = finalLine.indexOf("/*");
+    } catch (Exception e) {
+      throw new RuntimeException(
+          "Could not read file: " + filePath + ". Check that it exists?" + e.getMessage());
     }
-    int indexOfDash = finalLine.indexOf("//");
-    int indexOfStar = finalLine.indexOf("*");
-    if (indexOfDash != -1) {
-      if (notInStringLiteral(indexOfDash, finalLine)) {
-        finalLine = finalLine.substring(0, indexOfDash);
-      }
-    }
-    if (indexOfStar != -1) {
-      if (notInStringLiteral(indexOfStar, finalLine)) {
-        finalLine = finalLine.substring(0, indexOfStar);
-      }
-    }
-    return finalLine;
   }
 
   /**
@@ -573,13 +565,12 @@ public class InferredAnnosCounter {
     Map<String, Integer> annoSimilar = new HashMap<>();
     // the number of lines in the original file
     int originalFileLineCount = 0;
-    List<String> inputFileWithOnlySingleLineAnno = annoMultiToSingle(args[0]);
+    List<String> inputFileWithOnlySingleLineAnno = annoMultiToSingle(ignoreComment(args[0]));
     List<String> inputFileWithEachAnnoOnOneLine =
         eachAnnotationInOneSingleLine(inputFileWithOnlySingleLineAnno);
     int originalFileLineIndex = 0;
     // Read the original file once to determine the annotations that written by the human.
     for (String originalFileLine : inputFileWithEachAnnoOnOneLine) {
-      originalFileLine = ignoreComment(originalFileLine);
       originalFileLine = extractCheckerPackage(originalFileLine);
       // since it's too difficult to keep the length of whitespace at the beginning of each line the
       // same
@@ -607,12 +598,11 @@ public class InferredAnnosCounter {
     // Iterate over the arguments from 1 to the end and diff each with the original,
     // putting the results into diffs.
     for (int i = 1; i < args.length; ++i) {
-      List<String> inputFileWithOnlySingleLineAnno2 = annoMultiToSingle(args[i]);
+      List<String> inputFileWithOnlySingleLineAnno2 = annoMultiToSingle(ignoreComment(args[i]));
       List<String> inputFileWithEachAnnoOnOneLine2 =
           eachAnnotationInOneSingleLine(inputFileWithOnlySingleLineAnno2);
       List<String> newFile = new ArrayList<>();
       for (String ajavaFileLine : inputFileWithEachAnnoOnOneLine2) {
-        ajavaFileLine = ignoreComment(ajavaFileLine);
         // if the condition is true, this line contains only one single annotation and nothing else.
         if (ajavaFileLine.contains("@org")) {
           ajavaFileLine = formatAnnotaionsWithArguments(ajavaFileLine);
