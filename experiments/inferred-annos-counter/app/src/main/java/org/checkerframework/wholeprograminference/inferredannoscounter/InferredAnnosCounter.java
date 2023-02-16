@@ -9,8 +9,6 @@ import com.github.javaparser.ast.CompilationUnit;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -139,57 +137,47 @@ public class InferredAnnosCounter {
    * This method reads the input files, and changes all the multi-line annotations into a single
    * line. This method returns a list, each element of that list is a line of the formatted file.
    *
-   * @param fileName the name of the input file to be formatted
+   * @param fileContent a String containing all lines of the input file
    * @return inputFiles a list containing lines of the formatted file
    */
-  private static List<String> annoMultiToSingle(String fileName) {
+  private static List<String> annoMultiToSingle(String fileContent) {
     List<String> inputFiles = new ArrayList<>();
-    File file = new File(fileName);
-    try (BufferedReader br = new BufferedReader(new FileReader(file))) {
-      String originalFileLine;
-      String tempLine = "";
-      boolean inProgress = false;
-      while ((originalFileLine = br.readLine()) != null) {
-        LineStatus status = checkLineStatus(originalFileLine);
-        if (inProgress) {
-          if (status == LineStatus.CLOSE) {
-            /*
-            There are two cases that an anotation is multi-line, either by Google Java Format or by default.
-            For the first case, it's easy to understand that we don't want any space in the middle of an annotation.
-            For the second case, it will be easier for the Diff Algorithm if there's no space in the bracket.
-             */
-            tempLine = tempLine + originalFileLine.trim();
-            inputFiles.add(tempLine);
-            inProgress = false;
-            tempLine = "";
-          } else {
-            originalFileLine = originalFileLine.trim();
-            tempLine = tempLine + originalFileLine;
-          }
-        } else if (status == LineStatus.COMPLETE || !originalFileLine.contains("@")) {
-          tempLine = tempLine + originalFileLine;
+    String[] fileLines = fileContent.split("\n");
+    String tempLine = "";
+    boolean inProgress = false;
+    for (String originalFileLine : fileLines) {
+      LineStatus status = checkLineStatus(originalFileLine);
+      if (inProgress) {
+        if (status == LineStatus.CLOSE) {
+          /*
+          There are two cases that an anotation is multi-line, either by Google Java Format or by default.
+          For the first case, it's easy to understand that we don't want any space in the middle of an annotation.
+          For the second case, it will be easier for the Diff Algorithm if there's no space in the bracket.
+           */
+          tempLine = tempLine + originalFileLine.trim();
           inputFiles.add(tempLine);
+          inProgress = false;
           tempLine = "";
-        } else if (status == LineStatus.OPEN && originalFileLine.contains("@")) {
-          tempLine = tempLine + originalFileLine;
-          inProgress = true;
-        } else if (status == LineStatus.CLOSE) {
-          // This line is irrelevant: it contains an entire annotation and also
-          // happens to have unbalanced parentheses. This is fine and happens all
-          // the time, but doesn't matter for our purposes.
-          continue;
         } else {
-          throw new RuntimeException(
-              "unexpected line status: " + status + " for line " + originalFileLine);
+          originalFileLine = originalFileLine.trim();
+          tempLine = tempLine + originalFileLine;
         }
+      } else if (status == LineStatus.COMPLETE || !originalFileLine.contains("@")) {
+        tempLine = tempLine + originalFileLine;
+        inputFiles.add(tempLine);
+        tempLine = "";
+      } else if (status == LineStatus.OPEN && originalFileLine.contains("@")) {
+        tempLine = tempLine + originalFileLine;
+        inProgress = true;
+      } else if (status == LineStatus.CLOSE) {
+        // This line is irrelevant: it contains an entire annotation and also
+        // happens to have unbalanced parentheses. This is fine and happens all
+        // the time, but doesn't matter for our purposes.
+        continue;
+      } else {
+        throw new RuntimeException(
+            "unexpected line status: " + status + " for line " + originalFileLine);
       }
-    } catch (IOException e) {
-      throw new RuntimeException(
-          "Could not read file: "
-              + fileName
-              + ". Check that it exists?"
-              + "\nActual exception: "
-              + e);
     }
     return inputFiles;
   }
@@ -402,20 +390,7 @@ public class InferredAnnosCounter {
     try {
       StaticJavaParser.getParserConfiguration().setAttributeComments(false);
       CompilationUnit cu = StaticJavaParser.parse(new File(filePath));
-      try {
-        File tempFile = File.createTempFile(filePath + "temp", ".txt");
-        tempFile.deleteOnExit();
-        try (FileWriter writer = new FileWriter(tempFile, true)) {
-          writer.write(cu.toString());
-          return tempFile.getAbsolutePath();
-        } catch (Exception e) {
-          throw new RuntimeException(
-              "An error occurred while writing to the temporary file: " + e.getMessage());
-        }
-      } catch (IOException e) {
-        throw new RuntimeException(
-            "An error occurred while creating the temporary file: " + e.getMessage());
-      }
+      return cu.toString();
     } catch (Exception e) {
       throw new RuntimeException(
           "Could not read file: " + filePath + ". Check that it exists?" + e.getMessage());
