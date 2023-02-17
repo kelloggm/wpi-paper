@@ -4,10 +4,11 @@ import com.github.difflib.DiffUtils;
 import com.github.difflib.patch.AbstractDelta;
 import com.github.difflib.patch.DeltaType;
 import com.github.difflib.patch.Patch;
+import com.github.javaparser.StaticJavaParser;
+import com.github.javaparser.ast.CompilationUnit;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -136,58 +137,47 @@ public class InferredAnnosCounter {
    * This method reads the input files, and changes all the multi-line annotations into a single
    * line. This method returns a list, each element of that list is a line of the formatted file.
    *
-   * @param fileName the name of the input file to be formatted
+   * @param fileContent a String containing all lines of the input file
    * @return inputFiles a list containing lines of the formatted file
    */
-  private static List<String> annoMultiToSingle(String fileName) {
+  private static List<String> annoMultiToSingle(String fileContent) {
     List<String> inputFiles = new ArrayList<>();
-    File file = new File(fileName);
-    try (BufferedReader br = new BufferedReader(new FileReader(file))) {
-      String originalFileLine;
-      String tempLine = "";
-      boolean inProgress = false;
-      while ((originalFileLine = br.readLine()) != null) {
-        originalFileLine = ignoreComment(originalFileLine);
-        LineStatus status = checkLineStatus(originalFileLine);
-        if (inProgress) {
-          if (status == LineStatus.CLOSE) {
-            /*
-            There are two cases that an anotation is multi-line, either by Google Java Format or by default.
-            For the first case, it's easy to understand that we don't want any space in the middle of an annotation.
-            For the second case, it will be easier for the Diff Algorithm if there's no space in the bracket.
-             */
-            tempLine = tempLine + originalFileLine.trim();
-            inputFiles.add(tempLine);
-            inProgress = false;
-            tempLine = "";
-          } else {
-            originalFileLine = originalFileLine.trim();
-            tempLine = tempLine + originalFileLine;
-          }
-        } else if (status == LineStatus.COMPLETE || !originalFileLine.contains("@")) {
-          tempLine = tempLine + originalFileLine;
+    String[] fileLines = fileContent.split("\n");
+    String tempLine = "";
+    boolean inProgress = false;
+    for (String originalFileLine : fileLines) {
+      LineStatus status = checkLineStatus(originalFileLine);
+      if (inProgress) {
+        if (status == LineStatus.CLOSE) {
+          /*
+          There are two cases that an anotation is multi-line, either by Google Java Format or by default.
+          For the first case, it's easy to understand that we don't want any space in the middle of an annotation.
+          For the second case, it will be easier for the Diff Algorithm if there's no space in the bracket.
+           */
+          tempLine = tempLine + originalFileLine.trim();
           inputFiles.add(tempLine);
+          inProgress = false;
           tempLine = "";
-        } else if (status == LineStatus.OPEN && originalFileLine.contains("@")) {
-          tempLine = tempLine + originalFileLine;
-          inProgress = true;
-        } else if (status == LineStatus.CLOSE) {
-          // This line is irrelevant: it contains an entire annotation and also
-          // happens to have unbalanced parentheses. This is fine and happens all
-          // the time, but doesn't matter for our purposes.
-          continue;
         } else {
-          throw new RuntimeException(
-              "unexpected line status: " + status + " for line " + originalFileLine);
+          originalFileLine = originalFileLine.trim();
+          tempLine = tempLine + originalFileLine;
         }
+      } else if (status == LineStatus.COMPLETE || !originalFileLine.contains("@")) {
+        tempLine = tempLine + originalFileLine;
+        inputFiles.add(tempLine);
+        tempLine = "";
+      } else if (status == LineStatus.OPEN && originalFileLine.contains("@")) {
+        tempLine = tempLine + originalFileLine;
+        inProgress = true;
+      } else if (status == LineStatus.CLOSE) {
+        // This line is irrelevant: it contains an entire annotation and also
+        // happens to have unbalanced parentheses. This is fine and happens all
+        // the time, but doesn't matter for our purposes.
+        continue;
+      } else {
+        throw new RuntimeException(
+            "unexpected line status: " + status + " for line " + originalFileLine);
       }
-    } catch (IOException e) {
-      throw new RuntimeException(
-          "Could not read file: "
-              + fileName
-              + ". Check that it exists?"
-              + "\nActual exception: "
-              + e);
     }
     return inputFiles;
   }
@@ -391,43 +381,20 @@ public class InferredAnnosCounter {
   }
 
   /**
-   * This method trims out all the comments in a line from the input files
+   * This method trims out all the comments in all lines from an input file
    *
-   * @param line a line from the input files
-   * @return that line without any comment
+   * @param filePath the absolute path of the file to be trimmed out comments
+   * @return the content of the file without comments
    */
-  private static String ignoreComment(String line) {
-    String finalLine = line;
-    int indexOfDashStar = finalLine.indexOf("/*");
-    // this loop is to deal with all possible blocks of comment in the line
-    while (indexOfDashStar != -1) {
-      int indexOfStarDash = finalLine.indexOf("*/", indexOfDashStar + 1);
-      if (indexOfStarDash == -1) {
-        finalLine = finalLine.substring(0, indexOfDashStar);
-        break;
-      } else {
-        String beforeBlock = "";
-        if (indexOfDashStar > 0) {
-          beforeBlock = finalLine.substring(0, indexOfDashStar - 1);
-        }
-        String afterBlock = finalLine.substring(indexOfStarDash + 2, finalLine.length());
-        finalLine = beforeBlock + afterBlock;
-      }
-      indexOfDashStar = finalLine.indexOf("/*");
+  private static String ignoreComment(String filePath) {
+    try {
+      StaticJavaParser.getParserConfiguration().setAttributeComments(false);
+      CompilationUnit cu = StaticJavaParser.parse(new File(filePath));
+      return cu.toString();
+    } catch (Exception e) {
+      throw new RuntimeException(
+          "Could not read file: " + filePath + ". Check that it exists?" + e.getMessage());
     }
-    int indexOfDash = finalLine.indexOf("//");
-    int indexOfStar = finalLine.indexOf("*");
-    if (indexOfDash != -1) {
-      if (notInStringLiteral(indexOfDash, finalLine)) {
-        finalLine = finalLine.substring(0, indexOfDash);
-      }
-    }
-    if (indexOfStar != -1) {
-      if (notInStringLiteral(indexOfStar, finalLine)) {
-        finalLine = finalLine.substring(0, indexOfStar);
-      }
-    }
-    return finalLine;
   }
 
   /**
@@ -573,13 +540,12 @@ public class InferredAnnosCounter {
     Map<String, Integer> annoSimilar = new HashMap<>();
     // the number of lines in the original file
     int originalFileLineCount = 0;
-    List<String> inputFileWithOnlySingleLineAnno = annoMultiToSingle(args[0]);
+    List<String> inputFileWithOnlySingleLineAnno = annoMultiToSingle(ignoreComment(args[0]));
     List<String> inputFileWithEachAnnoOnOneLine =
         eachAnnotationInOneSingleLine(inputFileWithOnlySingleLineAnno);
     int originalFileLineIndex = 0;
     // Read the original file once to determine the annotations that written by the human.
     for (String originalFileLine : inputFileWithEachAnnoOnOneLine) {
-      originalFileLine = ignoreComment(originalFileLine);
       originalFileLine = extractCheckerPackage(originalFileLine);
       // since it's too difficult to keep the length of whitespace at the beginning of each line the
       // same
@@ -607,12 +573,11 @@ public class InferredAnnosCounter {
     // Iterate over the arguments from 1 to the end and diff each with the original,
     // putting the results into diffs.
     for (int i = 1; i < args.length; ++i) {
-      List<String> inputFileWithOnlySingleLineAnno2 = annoMultiToSingle(args[i]);
+      List<String> inputFileWithOnlySingleLineAnno2 = annoMultiToSingle(ignoreComment(args[i]));
       List<String> inputFileWithEachAnnoOnOneLine2 =
           eachAnnotationInOneSingleLine(inputFileWithOnlySingleLineAnno2);
       List<String> newFile = new ArrayList<>();
       for (String ajavaFileLine : inputFileWithEachAnnoOnOneLine2) {
-        ajavaFileLine = ignoreComment(ajavaFileLine);
         // if the condition is true, this line contains only one single annotation and nothing else.
         if (ajavaFileLine.contains("@org")) {
           ajavaFileLine = formatAnnotaionsWithArguments(ajavaFileLine);
