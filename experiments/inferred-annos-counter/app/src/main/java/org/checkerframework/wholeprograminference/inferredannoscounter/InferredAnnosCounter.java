@@ -381,10 +381,10 @@ public class InferredAnnosCounter {
   }
 
   /**
-   * This method trims out all the comments in a line from the input files
+   * This method trims out all the comments in all lines from an input file
    *
    * @param filePath the absolute path of the file to be trimmed out comments
-   * @return the path of a copy of the input file without comments included
+   * @return the content of the file without comments
    */
   private static String ignoreComment(String filePath) {
     try {
