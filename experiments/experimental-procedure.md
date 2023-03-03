@@ -83,7 +83,7 @@ The procedure:
       the [Checker Framework manual](https://checkerframework.org/manual/).
       2. For each annotation that does not belong to the Checker Framework, copy it to a file, `keepFile.txt` without the prepending `@`.
       3. Once you have all the annotations, make a new branch `git checkout -b unannotated-KeepAnnos` and remove only Checker Framework annotations by running.
-         `java -cp "$CHECKERFRAMEWORK/checker/dist/checker.jar" org.checkerframework.framework.stub.RemoveAnnotationsForInference -keepFile <myKeepFile>`
+         `java -cp "$CHECKERFRAMEWORK/checker/dist/checker.jar" org.checkerframework.framework.stub.RemoveAnnotationsForInference -keepFile /full/path/to/my/keepFile.txt`
 
 ##### D. Collect the number of original annotations in the code:
    1. run `git checkout -b annotation-statistics origin/baseline`
