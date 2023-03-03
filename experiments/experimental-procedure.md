@@ -81,18 +81,16 @@ The procedure:
       1. Run `git diff origin/baseline` to see the removed annotations. Examine each removed annotation and check whether
       it belongs to the Checker Framework. You can do this by searching for the annotation's name in 
       the [Checker Framework manual](https://checkerframework.org/manual/).
-      2. For each annotation that does not belong to the Checker Framework, re-add it to the project.
-      3. For each annotation that does not belong to the Checker Framework, add it to the list of "trusted"
-      annotations in the implementation of `RemoveAnnotationsForInference`, which you can find [here](https://github.com/typetools/checker-framework/blob/master/framework/src/main/java/org/checkerframework/framework/stub/RemoveAnnotationsForInference.java).
-      The list of trusted annotations is in the `isTrustedAnnotation(String)` method. Make a PR to the Checker Framework with
-      the new trusted annotations.
+      2. For each annotation that does not belong to the Checker Framework, copy it to a file, `keepFile.txt` without the prepending `@`.
+      3. Once you have all the annotations, make a new branch `git checkout -b unannotated-KeepAnnos` and remove only Checker Framework annotations by running.
+         `java -cp "$CHECKERFRAMEWORK/checker/dist/checker.jar" org.checkerframework.framework.stub.RemoveAnnotationsForInference -keepFile <myKeepFile>`
 
 ##### D. Collect the number of original annotations in the code:
    1. run `git checkout -b annotation-statistics origin/baseline`
    2. modify the project's build file so that it
         1. does not run the typecheckers that it was running before, and
         2. does run the processor org.checkerframework.common.util.count.AnnotationStatistics
-        3. add the `-Aannotations` and `-Anolocations` options, and make sure that you remove any `-Werror` argument to javac.
+        3. add the `-Aannotations` and `-Anolocations` options, and make sure that you remove any , `-Alint` and `-Werror` argument to javac.
    3. If the build system is maven, add `<showWarnings>true</showWarnings>` to the maven-compiler-plugin `<configuration>`.
    4. If the project is running a formatter (ex: Spotless), disable it in the build system. 
    5. Stage your changes with `git add` (in case you missed a formatter).
