@@ -161,12 +161,9 @@ The procedure:
    6. commit and push the script: `git add compute-annos-inferred.sh ; git commit -m "inference output summarization script" ; git push origin wpi-annotations`
 
 ##### I. Measure the percentage of hand-written annotations that WPI inferred:
-   1. copy the experiments directory's `format.sh` to `format-mycopy.sh` found in the experiments directory into your project's top level directory. 
-   2. change the variable, `WPI_RESULTS_DIR` to the path of your project's WPI annotations `wpi-annotations`.[[TODO: Why not make this a command-line argument, or computing it from other information that is available?]]
-   3. run the script `./format-mycopy.sh`.
-   4. copy [[TODO: Here and elsewhere, instead of giving an English description of the high-level operation to perform, give a concrete command line that can be cut-and-pasted, reducing errors.]] outputs of this experimental procedure into (`/main/experiments/inferred-annos-counter/inputExamples`). This can be done by creating a directory in (`/inferred-annos-counter/inputExamples`) with the name of your project and two sub folders, `generated` and `human-written`. (This and following steps are optional. Use as input for downstream tools on small projects only).
-   5. copy all of the contents in your `$WPITEMPDIR` directory used in the previous steps into the `generated` subfolder. 
-   6. copy all of the human-written code (the human-annotated, i.e. original, code, but with a formatter run over it) from your project's source folder (e.g., ./src/main/java/ in a Gradle project) into the `human-written` directory that was created
+   1. copy [[TODO: Here and elsewhere, instead of giving an English description of the high-level operation to perform, give a concrete command line that can be cut-and-pasted, reducing errors.]] outputs of this experimental procedure into (`/main/experiments/inferred-annos-counter/inputExamples`). This can be done by creating a directory in (`/inferred-annos-counter/inputExamples`) with the name of your project and two sub folders, `generated` and `human-written`. (This and following steps are optional. Use as input for downstream tools on small projects only).
+   2. copy all of the contents in your `$WPITEMPDIR` directory used in the previous steps into the `generated` subfolder. 
+   3. copy all of the human-written code (the human-annotated, i.e. original, code, but with a formatter run over it) from your project's source folder (e.g., ./src/main/java/ in a Gradle project) into the `human-written` directory that was created
     1. Run the InferredAnnosCounter.
       1. Run the following command, modifying the paths as appropriate: `bash /path/to/run-iac.sh absolute/path/to/java/source/tree/src/main/java /absolute/path/to/generated/ajava/files/wpi-annotations`
       2. Compute summary numbers by adding the results for each annotation (TODO: automate this step in the run-iac.sh script)
