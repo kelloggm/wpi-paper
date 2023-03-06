@@ -209,4 +209,16 @@ public class InferredAnnosCounterTest {
             + outputStreamCaptor,
         outputStreamCaptor.toString().trim().contains(line2));
   }
+
+  @Test
+  public void annotationWithinWarningSuppression() {
+    InferredAnnosCounter.main(
+        new String[] {
+          "testCases/AnnotationWithinWarningSuppression.java",
+          "testCases/AnnotationWithinWarningSuppression.ajava"
+        });
+    assertTrue(
+        "IAC did count an annotation within the bounds of a warning suppression, which should have been ignored",
+        outputStreamCaptor.toString().isBlank());
+  }
 }
