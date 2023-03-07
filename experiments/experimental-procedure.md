@@ -81,12 +81,12 @@ The procedure:
       1. Run `git diff origin/baseline` to see the removed annotations. Examine each removed annotation and check whether
       it belongs to the Checker Framework. You can do this by searching for the annotation's name in 
       the [Checker Framework manual](https://checkerframework.org/manual/).
-      2. For each annotation that does not belong to the Checker Framework, copy it to a file, `keepFile.txt`.
-         Each annotation should be on its own line, include both the simple and fully-qualified names.
+      2. For each annotation that does not belong to the Checker Framework, copy them to a file, `keepFile.txt`.
+         Include both the simple and fully-qualified names with each being on a seperate line.
       3. Reset your unannotated branch to match the baseline branch: `git reset --mixed baseline`;  `git push -f`;
-      4. Stage your keepFile, `git add myKeepfile`
-      5. Once you have all the annotations, make a new branch `git checkout -b unannotated-KeepAnnos` and remove only Checker Framework annotations by running.
-         `java -cp "$CHECKERFRAMEWORK/checker/dist/checker.jar" org.checkerframework.framework.stub.RemoveAnnotationsForInference -keepFile mykeepFile.txt`
+      4. Stage your keepFile, `git add keepFile.txt`
+      5. Once you have all the annotations, remove only Checker Framework annotations by running.
+         `java -cp "$CHECKERFRAMEWORK/checker/dist/checker.jar" org.checkerframework.framework.stub.RemoveAnnotationsForInference -keepFile keepFile.txt`
 
 ##### D. Collect the number of original annotations in the code:
    1. run `git checkout -b annotation-statistics origin/baseline`
