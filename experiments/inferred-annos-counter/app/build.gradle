@@ -17,6 +17,7 @@ dependencies {
     // Handles parsing diff files.
     // https://mvnrepository.com/artifact/io.github.java-diff-utils/java-diff-utils
     implementation "io.github.java-diff-utils:java-diff-utils:4.11"
+    implementation 'com.github.javaparser:javaparser-core:3.25.0'
 }
 
 checkerFramework {

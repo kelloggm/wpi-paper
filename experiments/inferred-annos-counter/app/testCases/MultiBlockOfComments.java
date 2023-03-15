@@ -1,1 +1,6 @@
- String /* I think, therefore */ @NonNull i = "exist";
+ public class MultiBlockOfComments {
+	public static void main() {
+ 		 @NonNull String /* I think, therefore */ i = "exist";
+	}
+}
+

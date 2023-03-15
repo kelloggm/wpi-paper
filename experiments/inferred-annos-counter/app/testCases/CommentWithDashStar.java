@@ -1,5 +1,9 @@
- @Pure
- /* some methods here... */
- /* @NonNull */
- int x;
- @SideEffectFree
+public class CommentWithDashStar {
+	public static void main() {
+ 		@Pure int x;
+ 		//some methods here...//
+ 		/* @NonNull */ int y;
+ 		@SideEffectFree int z;
+	}
+}
+

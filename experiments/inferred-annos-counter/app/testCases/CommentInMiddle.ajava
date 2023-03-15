@@ -1,4 +1,8 @@
- @org.checkerframework.dataflow.qual.Pure
- //some methods here...//
- @org.checkerframework.checker.nullness.qual.NonNull
- @org.checkerframework.dataflow.qual.SideEffectFree
+ public class CommentInMiddle {
+	public static void main() {
+ 		@org.checkerframework.dataflow.qual.Pure int x;
+ 		//some methods here...//
+ 		@org.checkerframework.checker.nullness.qual.NonNull int y;
+	        @org.checkerframework.dataflow.qual.SideEffectFree int z;
+	}
+}

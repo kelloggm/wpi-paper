@@ -1,1 +1,5 @@
- String /* I think, therefore */ /* @org.checkerframework.checker.nullness.qual.NonNull */ i = "exist";
+ public class MultiBlockOfComments {
+	public static void main() {
+ 		/* @org.checkerframework.checker.nullness.qual.NonNull */ String /* I think, therefore @NonNull */ i = "exist";
+	}
+}

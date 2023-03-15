@@ -1,5 +1,10 @@
- @org.checkerframework.dataflow.qual.Pure
- //some methods here...//
- @org.checkerframework.checker.nullness.qual.NonNull
+public class AnnotationInMiddleOfADeclaration {
 
- @org.checkerframework.dataflow.qual.SideEffectFree
+	public static void main() {
+ 		@org.checkerframework.dataflow.qual.Pure int x;
+ 		/* some methods here...*/
+ 		ArrayList<@org.checkerframework.checker.nullness.qual.NonNull CalendarComponent> clist = calendar.getComponents();
+
+ 		@org.checkerframework.dataflow.qual.SideEffectFree String z;
+	}
+}
