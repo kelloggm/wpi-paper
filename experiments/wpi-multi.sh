@@ -2,21 +2,45 @@
 
 # Have list of the project sub names (ie, Project1, Project2, Project3)
 
-PROJECT_NAME="$1"
-mkdir /tmp/WPITEMP-$PROJECT_NAME
-TOP_LEVEL=/tmp/WPITEMP-$PROJECT_NAME
+# Check if project name exists
+if [ -z "$1" ] 
+then 
+    echo "Usage: <Projectname> <ProjectsFile>" 
+    exit
+else 
+    PROJECT_NAME="$1"
+fi
 
-# Loop over each user specified project to confirm it exists and containts java code
-# The list of sub projects should collected by the script, not the user. 
+if [ -z "$2" ] 
+then 
+    echo "Usage: <Projectname> <ProjectsFile>" 
+    exit
+fi
 
+TOP_LEVEL=~/Documents/WPITEMP-${PROJECT_NAME} #This directory should be chosen by the user?
+mkdir -p ${TOP_LEVEL}
+
+# Check if all sub-project directories exist and contain java files 
+while read subProject; do
+    if [ -d ./$subProject ]
+    then
+        echo "$subProject Found"
+        mkdir -p ${TOP_LEVEL}/${subProject}
+    else 
+        echp "$subProject Missing"
+        exit
+    fi
+done <$2
 
 while read subProject; do
-    mkdir $TOP_LEVEL/$subProject
-    WPITEMPDIR=$TOP_LEVEL/$subProject
-    WPITOUTDIR=./$subProject/build/
-    /bin/bash wpi.sh $WPITEMPDIR $WPIOUTDIR
+    WPIOUTDIR="./${subProject}/build/" #This should not assume that the files will be found in build but it is most likely they will
+    #For some reason ".${subproject}/build/ doesn't work when passing to wpi script"
+    WPITEMPDIR=${TOP_LEVEL}/${subProject}
+    echo "Running WPI ON $subProject"
+    echo $WPIOUTDIR
+    ./wpi-multi.sh $WPITEMPDIR $WPIOUTDIR
     wait
-done <subProjects.txt
+done <$2
 
 
 
