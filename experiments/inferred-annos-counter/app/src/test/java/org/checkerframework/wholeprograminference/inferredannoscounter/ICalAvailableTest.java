@@ -56,7 +56,13 @@ public class ICalAvailableTest {
           "../inputExamples/icalavailable/generated/org/plumelib/icalavailable/ICalAvailable-org.checkerframework.checker.interning.InterningChecker.ajava",
           "../inputExamples/icalavailable/generated/org/plumelib/icalavailable/ICalAvailable-org.checkerframework.checker.index.lowerbound.LowerBoundChecker.ajava"
         });
+
     assertTrue(
+        "ICalAvailableTest got wrong output.\n"
+            + "Expected: "
+            + EXPECTED_OUTPUT
+            + "\nActual: "
+            + outputStreamCaptor.toString(),
         outputStreamCaptor
             .toString()
             .replaceAll("\\s", "")
