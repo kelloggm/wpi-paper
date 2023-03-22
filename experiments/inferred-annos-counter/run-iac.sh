@@ -34,6 +34,7 @@ for file in ${JAVA_FILES}; do
     filebasename="${filenodirname%.*}"
     AJAVA_FILES=$(find "${2}" -name "${filebasename}-*.ajava")
     AJAVA_SPACE=$(echo "${AJAVA_FILES}" | tr "\n" " ")
+    if [[ ! ${AJAVA_FILES} == *".ajava"* ]]; then continue; fi
     run_iac "${file}" "${AJAVA_SPACE}"
 done
 
