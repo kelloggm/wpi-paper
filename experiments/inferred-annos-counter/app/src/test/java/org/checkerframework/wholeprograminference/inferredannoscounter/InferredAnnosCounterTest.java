@@ -195,7 +195,7 @@ public class InferredAnnosCounterTest {
   }
 
   @Test
-  public void annotationsSurroundedBySpace() {
+  public void annotationsNotSurroundedBySpace() {
     InferredAnnosCounter.main(
         new String[] {
           "testCases/AnnotationNotSurroundedBySpace.java",
