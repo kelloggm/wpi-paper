@@ -195,6 +195,20 @@ public class InferredAnnosCounterTest {
   }
 
   @Test
+  public void annotationsNotSurroundedBySpace() {
+    InferredAnnosCounter.main(
+        new String[] {
+          "testCases/AnnotationNotSurroundedBySpace.java",
+          "testCases/AnnotationNotSurroundedBySpace.ajava"
+        });
+    String line1 = "@NonNull got 0/3";
+    assertTrue(
+        "Didn't find the correct number of @NonNull annotations; expected 0/3, got: "
+            + outputStreamCaptor,
+        outputStreamCaptor.toString().trim().contains(line1));
+  }
+
+  @Test
   public void gJFMultiLine() {
     InferredAnnosCounter.main(
         new String[] {"testCases/GJFMultiLine.java", "testCases/GJFMultiLine.ajava"});
