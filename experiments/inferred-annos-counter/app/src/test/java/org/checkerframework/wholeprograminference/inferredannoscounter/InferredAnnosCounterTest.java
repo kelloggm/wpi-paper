@@ -30,7 +30,7 @@ public class InferredAnnosCounterTest {
   @Test
   public void throwsRunTimeExceptionForNoInputFiles() {
     exception.expect(RuntimeException.class);
-    exception.expectMessage("Provide at least one .java file and one or more" + ".ajava files.");
+    exception.expectMessage("Provide at least one .java file");
     InferredAnnosCounter.main(new String[] {});
   }
 
@@ -40,6 +40,17 @@ public class InferredAnnosCounterTest {
     exception.expectMessage(
         "Could not read file: " + "meaningless.java" + ". Check that it exists?");
     InferredAnnosCounter.main(new String[] {"meaningless.java", "testbca.ajava"});
+  }
+
+  @Test
+  public void onlyOneJavaFile() {
+    InferredAnnosCounter.main(new String[] {"testCases/OnlyOneJavaFile.java"});
+    String line1 = "@Pure got 0/1";
+    String line2 = "@NonNull got 0/1";
+    String line3 = "@SideEffectFree got 0/1";
+    assertTrue(outputStreamCaptor.toString().trim().contains(line1));
+    assertTrue(outputStreamCaptor.toString().trim().contains(line2));
+    assertTrue(outputStreamCaptor.toString().trim().contains(line3));
   }
 
   @Test
