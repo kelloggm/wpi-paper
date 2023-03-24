@@ -222,14 +222,14 @@ public class InferredAnnosCounterTest {
   @Test
   public void annotationWithinWarningSuppressions() {
     InferredAnnosCounter.main(
-            new String[] {
-                    "testCases/AnnotationWithinWarningSuppression.java",
-                    "testCases/AnnotationWithinWarningSuppression.ajava"
-            });
+        new String[] {
+          "testCases/AnnotationWithinWarningSuppression.java",
+          "testCases/AnnotationWithinWarningSuppression.ajava"
+        });
     assertTrue(
-            "IAC should not count an annotation that is within a scopr of SuppressWarnings "
-                    + outputStreamCaptor,
-            outputStreamCaptor.toString().trim().isEmpty());
+        "IAC should not count an annotation that is within a scopr of SuppressWarnings "
+            + outputStreamCaptor,
+        outputStreamCaptor.toString().trim().isEmpty());
   }
 
   @Test
