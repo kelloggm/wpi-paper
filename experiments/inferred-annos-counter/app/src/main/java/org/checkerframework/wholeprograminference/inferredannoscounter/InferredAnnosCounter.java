@@ -546,8 +546,11 @@ public class InferredAnnosCounter {
    * file. The reason we do this is that RemoveAnnotationsForInference requires the file to be in a
    * directory with the exact structure as the package line declares. To achieve that is too
    * difficult, so we simply remove that line to make the file looks like it belongs to no package.
+   * For InferredAnnosCounter, we only take one Java file into consideration at a time, so this
+   * method will not make the program go wrong because of two Java files with the same name but in
+   * two different package
    *
-   * @param filePath
+   * @param filePath the path of the file to remove possible package line
    */
   public static void removePossiblePackage(String filePath) {
     // Instantiating the Scanner class to read the file
