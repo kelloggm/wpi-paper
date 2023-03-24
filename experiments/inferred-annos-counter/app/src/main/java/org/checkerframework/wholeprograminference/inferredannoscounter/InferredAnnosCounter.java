@@ -520,9 +520,8 @@ public class InferredAnnosCounter {
       throw new RuntimeException("Could not read type-qualifiers.txt, check if it exists?");
     }
 
-    if (args.length <= 1) {
-      throw new RuntimeException(
-          "Provide at least one .java file and one or more" + ".ajava files.");
+    if (args.length < 1) {
+      throw new RuntimeException("Provide at least one .java file");
     }
 
     // These variables are maintained throughout:
