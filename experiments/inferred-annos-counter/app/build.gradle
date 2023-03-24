@@ -18,12 +18,7 @@ dependencies {
     // https://mvnrepository.com/artifact/io.github.java-diff-utils/java-diff-utils
     implementation "io.github.java-diff-utils:java-diff-utils:4.11"
     implementation 'com.github.javaparser:javaparser-core:3.25.0'
-    implementation 'com.google.guava:guava:31.0.1-jre'
-    implementation 'org.plumelib:plume-util:1.6.5'
-    implementation "org.plumelib:reflection-util:1.0.6"
     implementation 'org.checkerframework:checker-qual:3.32.0'
-    implementation 'org.checkerframework:checker-util:3.32.0'
-    implementation 'org.checkerframework:javacutil:3.32.0'
     implementation 'org.checkerframework:checker:3.32.0'
 }
 
