@@ -509,36 +509,36 @@ public class InferredAnnosCounter {
    *     annotation in the file as value
    */
   public static Map<String, Integer> returnListOfAnnosToIgnore(String filePath) {
+    String tempDirectoryFile = "";
+    Map<String, Integer> listOfAnnoToIgnore = new HashMap<>();
     try {
       Path file = Paths.get(filePath);
       Path tempDir = Files.createTempDirectory("mytemp");
       Path tempFile = tempDir.resolve(file.getFileName());
       Files.copy(file, tempFile);
       removePossiblePackage(tempFile.toString());
-      Map<String, Integer> listOfAnnoToIgnore = new HashMap<>();
       RemoveAnnotationsForInference.main(new String[] {tempDir.toString()});
-      List<String> tempFileWithOnlySingleLineAnno =
-          annoMultiToSingle(ignoreComment(tempFile.toString()));
-      List<String> tempFileWithEachAnnotationOnASingleLine =
-          eachAnnotationInOneSingleLine(tempFileWithOnlySingleLineAnno);
-      for (String tempFileLine : tempFileWithEachAnnotationOnASingleLine) {
-        tempFileLine = extractCheckerPackage(tempFileLine);
-        // since it's too difficult to keep the length of whitespace at the beginning of each line
-        // the
-        // same
-        tempFileLine = tempFileLine.trim();
-        String specialAnno = trimParen(tempFileLine);
-        // the fact that this if statement's condition is true means that this line contains exactly
-        // one CF annotation and nothing else.
-        if (tempFileLine.indexOf('@') == 0) {
-          int numberOfAnno = listOfAnnoToIgnore.getOrDefault(specialAnno, 0);
-          listOfAnnoToIgnore.put(specialAnno, numberOfAnno + 1);
-        }
-      }
-      return listOfAnnoToIgnore;
+      tempDirectoryFile = tempFile.toString();
     } catch (IOException e) {
       throw new RuntimeException("Could not read file: " + filePath + ". Check that it exists?");
     }
+    List<String> tempFileWithOnlySingleLineAnno =
+        annoMultiToSingle(ignoreComment(tempDirectoryFile));
+    List<String> tempFileWithEachAnnotationOnASingleLine =
+        eachAnnotationInOneSingleLine(tempFileWithOnlySingleLineAnno);
+    for (String tempFileLine : tempFileWithEachAnnotationOnASingleLine) {
+      tempFileLine = extractCheckerPackage(tempFileLine);
+      // this line is an annotation. So we need to clear all preceding and succeeding space.
+      tempFileLine = tempFileLine.trim();
+      String specialAnno = trimParen(tempFileLine);
+      // the fact that this if statement's condition is true means that this line contains exactly
+      // one CF annotation and nothing else.
+      if (tempFileLine.indexOf('@') == 0) {
+        int numberOfAnno = listOfAnnoToIgnore.getOrDefault(specialAnno, 0);
+        listOfAnnoToIgnore.put(specialAnno, numberOfAnno + 1);
+      }
+    }
+    return listOfAnnoToIgnore;
   }
 
   /**
