@@ -18,7 +18,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Scanner;
 import org.checkerframework.checker.index.qual.IndexFor;
 import org.checkerframework.framework.stub.RemoveAnnotationsForInference;
 
@@ -553,24 +552,14 @@ public class InferredAnnosCounter {
    * @param filePath the path of the file to remove possible package line
    */
   public static void removePossiblePackage(String filePath) {
-    // Instantiating the Scanner class to read the file
-    String fileContents = "";
-    try (Scanner sc = new Scanner(new File(filePath))) {
-      // instantiating the StringBuffer class
-      StringBuffer buffer = new StringBuffer();
-      // Reading lines of the file and appending them to StringBuffer
-      String firstLine = sc.nextLine();
-      if (!firstLine.contains("package")) {
-        return;
-      }
-      while (sc.hasNextLine()) {
-        buffer.append(sc.nextLine() + System.lineSeparator());
-      }
-      fileContents = buffer.toString();
-      sc.close();
-    } catch (IOException e) {
-      throw new RuntimeException("Could not read file: " + filePath + ". Check that it exists?");
+    // fileContents will have no comments or blank space at the beginning
+    String fileContents = ignoreComment(filePath);
+    String[] fileLines = fileContents.split("\n");
+    String firstLine = fileLines[0];
+    if (!firstLine.contains("package")) {
+      return;
     }
+    fileContents = fileContents.replace(firstLine, "");
     try (FileWriter writer = new FileWriter(filePath)) {
       writer.append(fileContents);
       writer.flush();
