@@ -67,25 +67,38 @@ The procedure:
     6. commit the result to the `baseline` branch: `git commit -am "run with modern Checker Framework" ; git push origin baseline`
 
 
-##### C. Create a new branch called "unannotated" from the new `baseline` commit, with annotations removed:
+##### C. Create a new branch called "unannotated-check" from the new `baseline` commit, with annotations removed:
    1. `git checkout -b unannotated`
    2. Run the `RemoveAnnotationsForInference` program on the source; no ouput means it ran successfully:
       `java -cp "$CHECKERFRAMEWORK/checker/dist/checker.jar" org.checkerframework.framework.stub.RemoveAnnotationsForInference .`
    3. Push the unannotated code:
       `git commit -am "output of RemoveAnnotationsForInference" ; git push origin unannotated`
    4. Verify that, because the annotations have been removed, the program no longer typechecks. You should
-   see an error from one of the Checker Framework checkers you recorded in step B3 when you re-run whatever
-   command you used to run the typechecker before. Note: the `RemoveAnnotationsForInference` program might 
-   remove annotations that it should not (e.g., annotations from non-Checker-Framework projects that are required 
-   for the project to compile). If you see something else (e.g., a `symbol not found` error), follow these steps:
-      1. Run `git diff origin/baseline` to see the removed annotations. Examine each removed annotation and check whether
-      it belongs to the Checker Framework. You can do this by searching for the annotation's name in 
-      the [Checker Framework manual](https://checkerframework.org/manual/).
-      2. For each annotation that does not belong to the Checker Framework, re-add it to the project.
-      3. For each annotation that does not belong to the Checker Framework, add it to the list of "trusted"
-      annotations in the implementation of `RemoveAnnotationsForInference`, which you can find [here](https://github.com/typetools/checker-framework/blob/master/framework/src/main/java/org/checkerframework/framework/stub/RemoveAnnotationsForInference.java).
-      The list of trusted annotations is in the `isTrustedAnnotation(String)` method. Make a PR to the Checker Framework with
-      the new trusted annotations.
+      see an error from one of the Checker Framework checkers you recorded in step B3 when you re-run whatever
+      command you used to run the typechecker before. 
+   5. Save all the errors to a file `typecheck-noAnnos.out` and then commit them to the `unannotated` branch. 
+      `git add typecheck.out ; git commit -m "results of typechecking" ; git push origin wpi-enabled`.
+         Note: the `RemoveAnnotationsForInference` program might remove annotations that it should not (e.g., annotations from non-Checker-Framework projects that are required for the project to compile). 
+         If you see only warnings, check to see if there is an `Awarns` argument and remove it. 
+         If you see something else (e.g., a `symbol not found` error), follow these steps:
+         1. Run `git diff origin/baseline` to see the removed annotations. Examine each removed annotation and check whether it belongs to the Checker Framework. You can do this by searching for the annotation's name in 
+         the [Checker Framework manual](https://checkerframework.org/manual/).
+         2. Copy each annotation that does not belong to Checker Framework into a text file (outside of the project directory) named `keepFile.txt`. Include both the simple and fully-qualified names on there own lines without the prepending '@'. ie:
+         `Annotation`
+         `Fully.Qualified.Name.Annotation`
+         3. Reset the branch back to the previous commit that has the annotations.
+         `git restore --source=<baseline>`
+         4. Copy the keepFile back into the project directory. Remove only Checker Framework annotations by running 
+            `java -cp "$CHECKERFRAMEWORK/checker/dist/checker.jar" org.checkerframework.framework.stub.RemoveAnnotationsForInference -keepFile keepFile.txt .`
+         5. 
+            `git add keepFile.txt ; git commit -m "Adding Keep Annotations"; git push origin unannotated`
+         6. Push the unannotated code with the new 
+         `git commit -am "output of RemoveAnnotationsForInference" ; git push origin unannotated`
+         7. Save all the errors by running the codto a file `typecheck-noAnnos.out` and then commit them to the `unannotated` branch. 
+         `git add typecheck.out ; git commit -m "results of typechecking" ; git push origin wpi-enabled`.
+
+      
+      `git add keepFile.txt ; git commit -m "Adding Keep Annotations"; git push origin unannotated-check`
 
 ##### D. Collect the number of original annotations in the code:
    1. run `git checkout -b annotation-statistics origin/baseline`
