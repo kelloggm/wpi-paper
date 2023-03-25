@@ -87,20 +87,18 @@ The procedure:
             `Annotation`
             `Fully.Qualified.Name.Annotation`
          3. Go back to the baseline branch, deleted the `unannotated` branch.
-            Delete the remote branch `git push origin --delete unannotated`
-            Delete the local branch `git branch -D unannotated`
-         4. 
-         4. Copy the keepFile back into the project directory. Remove only Checker Framework annotations by running 
+               Delete the remote branch `git push origin --delete unannotated`
+               Delete the local branch `git branch -D unannotated`
+         4. Run the `RemoveAnnotationsForInference` program on the source;
             `java -cp "$CHECKERFRAMEWORK/checker/dist/checker.jar" org.checkerframework.framework.stub.RemoveAnnotationsForInference -keepFile keepFile.txt .`
-         5. Recreate the branch from baseline: `git checkout -b unannotated`
+         5. Recreate the branch from baseline:
+            `git checkout -b unannotated`
+         6. Add, commit and push the keepFile.
             `git add keepFile.txt ; git commit -m "Adding Keep Annotations"; git push origin unannotated`
-         6. Push the unannotated code with the kept annotations and removed Checker Framework annotations. 
+         7. Push the unannotated code with the kept annotations and removed Checker Framework annotations. 
             `git commit -am "output of RemoveAnnotationsForInference" ; git push origin unannotated`
-         7. Save all the errors by running the codto a file `typecheck-noAnnos.out` and then commit them to the        `unannotated` branch. 
-            `git add typecheck.out ; git commit -m "results of typechecking" ; git push origin wpi-enabled`.
-
-      
-      `git add keepFile.txt ; git commit -m "Adding Keep Annotations"; git push origin unannotated-check`
+         8. Save the typecheck errors to a file `typecheck-noAnnos.txt`; 
+            `git add and commit the file ; git commit -m "All typecheck warnings" ; git push origin unannotated`.
 
 ##### D. Collect the number of original annotations in the code:
    1. run `git checkout -b annotation-statistics origin/baseline`
