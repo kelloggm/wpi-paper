@@ -9,11 +9,17 @@ import com.github.javaparser.ast.CompilationUnit;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.checkerframework.checker.index.qual.IndexFor;
+import org.checkerframework.framework.stub.RemoveAnnotationsForInference;
 
 /**
  * The entry point for the inferred annos counter. Run this by passing arguments, with the first
@@ -493,6 +499,76 @@ public class InferredAnnosCounter {
   }
 
   /**
+   * Given an input file, this method returns a Map of annotations that should be ignored in that
+   * file and their corresponding quantity. The main reason we ignore some annotations is that they
+   * are within a scope of SuprressWarnings.
+   *
+   * @param filePath the path of the input file
+   * @return a Map with the name of the annotation to ignore as key and the number of that
+   *     annotation in the file as value
+   */
+  public static Map<String, Integer> returnListOfAnnosToIgnore(String filePath) {
+    String tempDirectoryFile = "";
+    Map<String, Integer> listOfAnnoToIgnore = new HashMap<>();
+    try {
+      Path file = Paths.get(filePath);
+      Path tempDir = Files.createTempDirectory("mytemp");
+      Path tempFile = tempDir.resolve(file.getFileName());
+      Files.copy(file, tempFile);
+      removePossiblePackage(tempFile.toString());
+      RemoveAnnotationsForInference.main(new String[] {tempDir.toString()});
+      tempDirectoryFile = tempFile.toString();
+    } catch (IOException e) {
+      throw new RuntimeException("Could not read file: " + filePath + ". Check that it exists?");
+    }
+    List<String> tempFileWithOnlySingleLineAnno =
+        annoMultiToSingle(ignoreComment(tempDirectoryFile));
+    List<String> tempFileWithEachAnnotationOnASingleLine =
+        eachAnnotationInOneSingleLine(tempFileWithOnlySingleLineAnno);
+    for (String tempFileLine : tempFileWithEachAnnotationOnASingleLine) {
+      tempFileLine = extractCheckerPackage(tempFileLine);
+      // this line is an annotation. So we need to clear all preceding and succeeding space.
+      tempFileLine = tempFileLine.trim();
+      String specialAnno = trimParen(tempFileLine);
+      // the fact that this if statement's condition is true means that this line contains exactly
+      // one CF annotation and nothing else.
+      if (tempFileLine.indexOf('@') == 0) {
+        int numberOfAnno = listOfAnnoToIgnore.getOrDefault(specialAnno, 0);
+        listOfAnnoToIgnore.put(specialAnno, numberOfAnno + 1);
+      }
+    }
+    return listOfAnnoToIgnore;
+  }
+
+  /**
+   * This method removes the first line of a Java file if that line declares the package of the
+   * file. The reason we do this is that RemoveAnnotationsForInference requires the file to be in a
+   * directory with the exact structure as the package line declares. To achieve that is too
+   * difficult, so we simply remove that line to make the file looks like it belongs to no package.
+   * For InferredAnnosCounter, we only take one Java file into consideration at a time, so this
+   * method will not make the program go wrong because of two Java files with the same name but in
+   * two different package
+   *
+   * @param filePath the path of the file to remove possible package line
+   */
+  public static void removePossiblePackage(String filePath) {
+    // fileContents will have no comments or blank space at the beginning
+    String fileContents = ignoreComment(filePath);
+    String[] fileLines = fileContents.split("\n");
+    String firstLine = fileLines[0];
+    if (!firstLine.contains("package")) {
+      return;
+    }
+    fileContents = fileContents.replace(firstLine, "");
+    try (FileWriter writer = new FileWriter(filePath)) {
+      writer.append(fileContents);
+      writer.flush();
+    } catch (IOException e) {
+      throw new RuntimeException();
+    }
+  }
+
+  /**
    * The main entry point. Running this outputs the percentage of annotations in some source file
    * that were inferred by WPI.
    *
@@ -537,6 +613,7 @@ public class InferredAnnosCounter {
     /* the name of the types of annotations and their "correct" numbers (meaning the number of annotations of that
     type not missed by computer-written files) */
     Map<String, Integer> annoSimilar = new HashMap<>();
+    Map<String, Integer> listOfAnnoToIgnore = returnListOfAnnosToIgnore(args[0]);
     // the number of lines in the original file
     int originalFileLineCount = 0;
     List<String> inputFileWithOnlySingleLineAnno = annoMultiToSingle(ignoreComment(args[0]));
@@ -650,8 +727,15 @@ public class InferredAnnosCounter {
     for (Map.Entry<String, Integer> e : annoCount.entrySet()) {
       int totalCount = e.getValue();
       String value = e.getKey();
+      if (listOfAnnoToIgnore.containsKey(value)) {
+        totalCount = totalCount - listOfAnnoToIgnore.get(value);
+      }
       int correctCount = annoSimilar.get(value);
-      System.out.println(value + " got " + correctCount + "/" + totalCount);
+      // totalCount being equal to 0 meaning that all of the annotations with this type are within
+      // the bound of some SuppressWarnings
+      if (totalCount != 0) {
+        System.out.println(value + " got " + correctCount + "/" + totalCount);
+      }
     }
   }
 }

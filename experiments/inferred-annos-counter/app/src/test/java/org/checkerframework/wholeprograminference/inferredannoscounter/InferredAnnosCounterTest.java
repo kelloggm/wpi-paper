@@ -220,6 +220,41 @@ public class InferredAnnosCounterTest {
   }
 
   @Test
+  public void annotationWithinWarningSuppressions() {
+    InferredAnnosCounter.main(
+        new String[] {
+          "testCases/AnnotationWithinWarningSuppression.java",
+          "testCases/AnnotationWithinWarningSuppression.ajava"
+        });
+    assertTrue(
+        "IAC should not count an annotation that is within a scope of SuppressWarnings "
+            + outputStreamCaptor,
+        outputStreamCaptor.toString().trim().isEmpty());
+  }
+
+  @Test
+  public void blankSpaceBeforePackage() {
+    InferredAnnosCounter.main(new String[] {"testCases/BlankSpaceBeforePackage.java"});
+    // To ensure that the blank space before the package line has been removed, we can verify if the
+    // annotation within the scope of SuppressWarnings is being correctly ignored.
+    assertTrue(
+        "InferredAnnosCounter is not working properly with Java files having blank space before the package line "
+            + outputStreamCaptor,
+        outputStreamCaptor.toString().trim().isEmpty());
+  }
+
+  @Test
+  public void commentsBeforePackage() {
+    InferredAnnosCounter.main(new String[] {"testCases/CommentsBeforePackage.java"});
+    // To ensure that the comments before the package line have been removed, we can verify if the
+    // annotation within the scope of  SuppressWarnings is being correctly ignored.
+    assertTrue(
+        "InferredAnnosCounter is not working properly with Java files having comments before the package line "
+            + outputStreamCaptor,
+        outputStreamCaptor.toString().trim().isEmpty());
+  }
+
+  @Test
   public void gJFMultiLine() {
     InferredAnnosCounter.main(
         new String[] {"testCases/GJFMultiLine.java", "testCases/GJFMultiLine.ajava"});

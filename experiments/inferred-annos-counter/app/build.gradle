@@ -18,6 +18,8 @@ dependencies {
     // https://mvnrepository.com/artifact/io.github.java-diff-utils/java-diff-utils
     implementation "io.github.java-diff-utils:java-diff-utils:4.11"
     implementation 'com.github.javaparser:javaparser-core:3.25.0'
+    implementation 'org.checkerframework:checker-qual:3.32.0'
+    implementation 'org.checkerframework:checker:3.32.0'
 }
 
 checkerFramework {
