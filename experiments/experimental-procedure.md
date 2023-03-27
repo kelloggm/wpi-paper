@@ -73,11 +73,11 @@ The procedure:
       `java -cp "$CHECKERFRAMEWORK/checker/dist/checker.jar" org.checkerframework.framework.stub.RemoveAnnotationsForInference .`
    3. Push the unannotated code:
       `git commit -am "output of RemoveAnnotationsForInference" ; git push origin unannotated`
-   4. Verify that, because the annotations have been removed, the program no longer typechecks. You should
-      see an error from one of the Checker Framework checkers you recorded in step B3 when you re-run whatever
-      command you used to run the typechecker before. 
+   4. Verify that, because the annotations have been removed, the program no longer typechecks 
+ 	You should see an error from one of the Checker Framework checkers you recorded in step B3 when you re-run whatever
+      	command you used to run the typechecker before (If you only see warnings, check if `-Awarns` is being used, remove it and compile to confirm
+	the project typechecks, add it back afterwards).
          Note: the `RemoveAnnotationsForInference` program might remove annotations that it should not (e.g., annotations from non-Checker-Framework projects that are required for the project to compile). 
-         If you see only warnings, check to see if there is an `Awarns` argument and remove it. 
          If you see something else (e.g., a `symbol not found` error), follow these steps:
          1. Run `git diff origin/baseline` to see the removed annotations. Examine each removed annotation and check whether it belongs to the Checker Framework. You can do this by searching for the annotation's name in 
          the [Checker Framework manual](https://checkerframework.org/manual/).
@@ -95,7 +95,8 @@ The procedure:
             `java -cp "$CHECKERFRAMEWORK/checker/dist/checker.jar" org.checkerframework.framework.stub.RemoveAnnotationsForInference -keepFile keepFile.txt .`
          7. Push the unannotated code with by running.
             `git commit -am "output of RemoveAnnotationsForInference" ; git push origin unannotated`
-   5. Save all the type check errors to a file `typecheck-noAnnos.out` and then commit them to the `unannotated` branch. 
+   5. Comment out any `-Werror` and `-Alint`, add '-Awarns', compile and save all the type check warnings to a file `typecheck-noAnnos.out`. 
+   6. Add, commit the `typecheck-noAnnos.out` to the `unannotated` branch. 
    `git add typecheck-noAnnos.out ; git commit -m "All typecheck warnings" ; git push origin unannotated`.
 
 ##### D. Collect the number of original annotations in the code:
