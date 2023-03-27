@@ -67,7 +67,7 @@ The procedure:
     6. commit the result to the `baseline` branch: `git commit -am "run with modern Checker Framework" ; git push origin baseline`
 
 
-##### C. Create a new branch called "unannotated-check" from the new `baseline` commit, with annotations removed:
+##### C. Create a new branch called "unannotated" from the new `baseline` commit, with annotations removed:
    1. `git checkout -b unannotated`
    2. Run the `RemoveAnnotationsForInference` program on the source; no ouput means it ran successfully:
       `java -cp "$CHECKERFRAMEWORK/checker/dist/checker.jar" org.checkerframework.framework.stub.RemoveAnnotationsForInference .`
