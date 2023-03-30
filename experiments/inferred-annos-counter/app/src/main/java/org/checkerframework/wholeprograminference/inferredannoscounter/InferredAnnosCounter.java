@@ -22,17 +22,16 @@ import org.checkerframework.checker.index.qual.IndexFor;
 import org.checkerframework.framework.stub.RemoveAnnotationsForInference;
 
 /**
- * The entry point for the inferred annos counter. Run this by passing arguments, with the first
- * being the path of the human-written file, and other arguments being the path of the .ajava files
- * produced by the WPI. The path here should be relative to "experiments\inferred-annos-counter."
- * The program assumes that a formatter has been applied, so it is important to run the script
- * format.sh in the directory "experiments" beforehand. InferredAnnosCounter only takes one
+ * The entry point for the inferred annos counter. To run the program, you need to pass arguments.
+ * The first argument should be the path to the human-written Java file. Optionally, you can provide
+ * one or more paths to the corresponding computer-generated .ajava files. The path here should be
+ * relative to "experiments\inferred-annos-counter." InferredAnnosCounter only takes one
  * human-written source file at a time. So in case it is needed to run multiple human-written files
  * with corresponding computer-generated files, InferredAnnosCounter needs to be invoked multiple
  * times. The way to run InferredAnnosCounter is like this: cd experiments\inferred-annos-counter
  * (going to the working directory) and then gradle run --args = "(a path to the human-written file)
- * (one or more paths to the computer-generated files)". The result will not be in alphabetical
- * order.
+ * (optionally one or more paths to the computer-generated files)". The result will not be in
+ * alphabetical order.
  */
 public class InferredAnnosCounter {
 
