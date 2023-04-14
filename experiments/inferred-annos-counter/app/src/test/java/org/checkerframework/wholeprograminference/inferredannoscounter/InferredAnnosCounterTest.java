@@ -68,6 +68,17 @@ public class InferredAnnosCounterTest {
   }
 
   @Test
+  public void smallTestForCollectionUtils() {
+    InferredAnnosCounter.main(
+        new String[] {
+          "../inputExamples/RxNorm-explorer/human-written/main/java/gov/fda/nctr/util/CollectionUtils.java",
+          "../inputExamples/RxNorm-explorer/generated/gov/fda/nctr/util/CollectionUtils-org.checkerframework.checker.nullness.NullnessChecker.ajava"
+        });
+    String line1 = "@NonNull got 0/10";
+    assertTrue(outputStreamCaptor.toString().trim().contains(line1));
+  }
+
+  @Test
   public void commentInMiddle() {
     InferredAnnosCounter.main(
         new String[] {"testCases/CommentInMiddle.java", "testCases/CommentInMiddle.ajava"});
