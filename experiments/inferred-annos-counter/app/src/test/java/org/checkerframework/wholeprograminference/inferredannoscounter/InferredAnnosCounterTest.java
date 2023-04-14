@@ -147,6 +147,16 @@ public class InferredAnnosCounterTest {
   }
 
   @Test
+  public void annotationMismatch() {
+    InferredAnnosCounter.main(
+        new String[] {"testCases/AnnotationMismatch.java", "testCases/AnnotationMismatch.ajava"});
+    String line = "@NonNull got 0/1";
+    String line2 = "@Nullable got 1/1";
+    assertTrue("Annotation is mismatched", outputStreamCaptor.toString().trim().contains(line));
+    assertTrue("Annotation is miscounted", outputStreamCaptor.toString().trim().contains(line2));
+  }
+
+  @Test
   public void commentWithDashStar() {
     InferredAnnosCounter.main(
         new String[] {"testCases/CommentWithDashStar.java", "testCases/CommentWithDashStar.ajava"});
