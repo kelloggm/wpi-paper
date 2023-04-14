@@ -71,8 +71,8 @@ public class InferredAnnosCounterTest {
   public void smallTestForCollectionUtils() {
     InferredAnnosCounter.main(
         new String[] {
-          "../inputExamples/RxNorm-explorer/human-written/main/java/gov/fda/nctr/util/CollectionUtils.java",
-          "../inputExamples/RxNorm-explorer/generated/gov/fda/nctr/util/CollectionUtils-org.checkerframework.checker.nullness.NullnessChecker.ajava"
+          "../inputExamples/RxNorm-explorer/human-written/src/java/gov/fda/nctr/util/CollectionUtils.java",
+          "../inputExamples/RxNorm-explorer/generated/src/gov/fda/nctr/util/CollectionUtils-org.checkerframework.checker.nullness.NullnessChecker.ajava"
         });
     String line1 = "@NonNull got 0/10";
     assertTrue(outputStreamCaptor.toString().trim().contains(line1));
