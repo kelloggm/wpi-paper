@@ -2,6 +2,7 @@ package org.checkerframework.wholeprograminference.inferredannoscounter;
 
 import com.github.difflib.DiffUtils;
 import com.github.difflib.patch.AbstractDelta;
+import com.github.difflib.patch.DeltaType;
 import com.github.difflib.patch.Patch;
 import com.github.javaparser.StaticJavaParser;
 import com.github.javaparser.ast.CompilationUnit;
@@ -270,32 +271,6 @@ public class InferredAnnosCounter {
         }
       }
       if (line.charAt(i) == '@' && checkinString) {
-        count++;
-      }
-    }
-    return count;
-  }
-
-  /**
-   * This method counts the number of a specific symbol in a line. Note that this method will ignore
-   * symbols in string literals.
-   *
-   * @param line a line
-   * @param target the symbol to be counted
-   * @return the number of symbol in the input line
-   */
-  private static int countSymbol(String line, char target) {
-    int count = 0;
-    boolean checkinString = true;
-    for (int i = 0; i < line.length(); i++) {
-      if (line.charAt(i) == '\"') {
-        if (checkinString) {
-          checkinString = false;
-        } else {
-          checkinString = true;
-        }
-      }
-      if (line.charAt(i) == target && checkinString) {
         count++;
       }
     }
@@ -593,38 +568,43 @@ public class InferredAnnosCounter {
   }
 
   /**
-   * Given two deltas returned by the Diff algorithm, this method will return true if those two
-   * deltas are originally one single line. As IAC has a special formatting method to put each
-   * annotation in a single line, if an annotation is in the middle of a line, that line will be
-   * break into at least three separate lines.
+   * Return true if there is a mismatched annotation between the pair of input deltas. The way we
+   * check is that, if at least one of the deltas has the CHANGE type and none of them contains only
+   * annotations, we claim that there is a mismatched annotation between them. Note that the two
+   * deltas are consecutive.
    *
-   * @param firstDelta
-   * @param secondDelta
-   * @return true if the two deltas are orignially one single line
+   * @param thisDelta the first delta
+   * @param nextDelta the second delta
+   * @return true if there is a mismatch between them
    */
-  public static boolean belongToOneSingleLine(List<String> firstDelta, List<String> secondDelta) {
-    String firstPart = "";
-    String secondPart = "";
-    for (String part : firstDelta) {
-      firstPart = firstPart + part;
+  public static boolean hasMismatchAnnotationInTheMiddle(
+      AbstractDelta<String> thisDelta, AbstractDelta<String> nextDelta) {
+    if (thisDelta.getType() != DeltaType.CHANGE && nextDelta.getType() != DeltaType.CHANGE) {
+      return false;
     }
-    for (String part : secondDelta) {
-      secondPart = secondPart + part;
+    if (containsOnlyAnnotations(thisDelta) || containsOnlyAnnotations(nextDelta)) {
+      return false;
     }
-    int firstPartOpenParen = countSymbol(firstPart, '(');
-    int firstPartCloseParen = countSymbol(firstPart, ')');
-    int firstPartGreaterSymbol = countSymbol(firstPart, '<');
-    int firstPartLessSymbol = countSymbol(firstPart, '>');
-    int secondPartOpenParen = countSymbol(secondPart, '(');
-    int secondPartCloseParen = countSymbol(secondPart, ')');
-    int secondPartGreaterSymbol = countSymbol(secondPart, '<');
-    int secondPartLessSymbol = countSymbol(secondPart, '>');
-    boolean firstIsBeginning =
-        (firstPartOpenParen > firstPartCloseParen) || firstPartGreaterSymbol > firstPartLessSymbol;
-    boolean secondIsEnding =
-        secondPartOpenParen < secondPartCloseParen
-            || secondPartGreaterSymbol < secondPartLessSymbol;
-    return firstIsBeginning && secondIsEnding;
+    return true;
+  }
+
+  /**
+   * This method checks if a delta contains nothing but annotations
+   *
+   * @param delta
+   * @return true if the delta contains only annotations
+   */
+  public static boolean containsOnlyAnnotations(AbstractDelta<String> delta) {
+    List<String> currentSourceLines = delta.getSource().getLines();
+    for (String line : currentSourceLines) {
+      if (line.length() == 0) {
+        return false;
+      }
+      if (line.charAt(0) != '@') {
+        return false;
+      }
+    }
+    return true;
   }
 
   /**
@@ -727,29 +707,28 @@ public class InferredAnnosCounter {
     }
     // Iterate over the list of diffs and process each. There must be args.length - 1 diffs, since
     // there is one diff between args[0] and each other element of args.
-    List<String> listOfMismatchedAnnotation = new ArrayList<>();
     for (int i = 0; i < args.length - 1; i++) {
       Patch<String> patch = diffs.get(i);
       List<AbstractDelta<String>> listOfDelta = patch.getDeltas();
       for (int currPointer = 0; currPointer < listOfDelta.size(); currPointer++) {
         AbstractDelta<String> delta = listOfDelta.get(currPointer);
+        List<String> sourceLines = delta.getSource().getLines();
         int nextPointer = currPointer + 1;
         // if there are two consecutive deltas that are originally one single line before the
         // eachAnnotationInOneSingleLine is applied, then the annotation between those two lines is
         // mismatched
         if (nextPointer < listOfDelta.size()) {
           AbstractDelta<String> nextDelta = listOfDelta.get(nextPointer);
-          List<String> currentSourceLines = delta.getSource().getLines();
-          List<String> nextSourceLines = nextDelta.getSource().getLines();
-          if (belongToOneSingleLine(currentSourceLines, nextSourceLines)) {
-            int indexOfMismatched = delta.getSource().getPosition() + currentSourceLines.size();
+          if (hasMismatchAnnotationInTheMiddle(delta, nextDelta)) {
+            int indexOfMismatched = delta.getSource().getPosition() + sourceLines.size();
             String mismatchName = originalFile.get(indexOfMismatched);
-            String mismatchFullForm = mismatchName + "_" + indexOfMismatched;
-            int value = annoLocate.get(mismatchFullForm);
-            annoLocate.put(mismatchFullForm, value + 1);
+            if (mismatchName.indexOf("@") == 0) {
+              String mismatchFullForm = mismatchName + "_" + indexOfMismatched;
+              int value = annoLocate.get(mismatchFullForm);
+              annoLocate.put(mismatchFullForm, value + 1);
+            }
           }
         }
-        List<String> sourceLines = delta.getSource().getLines();
         // get the position of the first line entry in the delta
         int position = delta.getSource().getPosition();
         String result = "";
