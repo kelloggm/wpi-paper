@@ -571,7 +571,7 @@ public class InferredAnnosCounter {
    * Return true if there is a mismatched annotation between the pair of input deltas. The way we
    * check is that, if at least one of the deltas has the CHANGE type and none of them contains only
    * annotations, we claim that there is a mismatched annotation between them. Note that the two
-   * deltas are consecutive.
+   * deltas must be consecutive.
    *
    * @param thisDelta the first delta
    * @param nextDelta the second delta
