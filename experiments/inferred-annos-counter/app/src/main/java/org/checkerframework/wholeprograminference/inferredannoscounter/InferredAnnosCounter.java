@@ -568,6 +568,46 @@ public class InferredAnnosCounter {
   }
 
   /**
+   * Return true if there is a mismatched annotation between the pair of input deltas. The way we
+   * check is that, if at least one of the deltas has the CHANGE type and none of them contains only
+   * annotations, we claim that there is a mismatched annotation between them. Note that the two
+   * deltas must be consecutive.
+   *
+   * @param thisDelta the first delta
+   * @param nextDelta the second delta
+   * @return true if there is a mismatch between them
+   */
+  public static boolean hasMismatchAnnotationInTheMiddle(
+      AbstractDelta<String> thisDelta, AbstractDelta<String> nextDelta) {
+    if (thisDelta.getType() != DeltaType.CHANGE && nextDelta.getType() != DeltaType.CHANGE) {
+      return false;
+    }
+    if (containsOnlyAnnotations(thisDelta) || containsOnlyAnnotations(nextDelta)) {
+      return false;
+    }
+    return true;
+  }
+
+  /**
+   * This method checks if a delta contains nothing but annotations
+   *
+   * @param delta
+   * @return true if the delta contains only annotations
+   */
+  public static boolean containsOnlyAnnotations(AbstractDelta<String> delta) {
+    List<String> currentSourceLines = delta.getSource().getLines();
+    for (String line : currentSourceLines) {
+      if (line.length() == 0) {
+        return false;
+      }
+      if (line.charAt(0) != '@') {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  /**
    * The main entry point. Running this outputs the percentage of annotations in some source file
    * that were inferred by WPI.
    *
@@ -669,32 +709,43 @@ public class InferredAnnosCounter {
     // there is one diff between args[0] and each other element of args.
     for (int i = 0; i < args.length - 1; i++) {
       Patch<String> patch = diffs.get(i);
-      for (AbstractDelta<String> delta : patch.getDeltas()) {
-        // get the delta in string format
-        String deltaInString = delta.toString();
-        // just take the delta with annotations into consideration
-        // INSERT type indicates that the annotations only appear in the computer-generated files.
-        // So we don't take it into consideration.
-        if (deltaInString.contains("@") && delta.getType() != DeltaType.INSERT) {
-          List<String> sourceLines = delta.getSource().getLines();
-          // get the position of the first line entry in the delta
-          int position = delta.getSource().getPosition();
-          String result = "";
-          for (int j = 0; j < sourceLines.size(); j++) {
-            String element = sourceLines.get(j);
-            if (element.contains("@")) {
-              // in case there are other components in the string element other than the
-              // annotation itself
-              List<String> annoList = extractString(element);
-              for (String anno : annoList) {
-                // this is the position of the current line entry
-                int localPosition = position + j;
-                result = "@" + anno + "_" + localPosition;
-                // update the data of AnnoLocate
-                if (annoLocate.containsKey(result)) {
-                  int value = annoLocate.get(result);
-                  annoLocate.put(result, value + 1);
-                }
+      List<AbstractDelta<String>> listOfDelta = patch.getDeltas();
+      for (int currPointer = 0; currPointer < listOfDelta.size(); currPointer++) {
+        AbstractDelta<String> delta = listOfDelta.get(currPointer);
+        List<String> sourceLines = delta.getSource().getLines();
+        int nextPointer = currPointer + 1;
+        // if there are two consecutive deltas that are originally one single line before the
+        // eachAnnotationInOneSingleLine is applied, then the annotation between those two lines is
+        // mismatched
+        if (nextPointer < listOfDelta.size()) {
+          AbstractDelta<String> nextDelta = listOfDelta.get(nextPointer);
+          if (hasMismatchAnnotationInTheMiddle(delta, nextDelta)) {
+            int indexOfMismatched = delta.getSource().getPosition() + sourceLines.size();
+            String mismatchName = originalFile.get(indexOfMismatched);
+            if (mismatchName.indexOf("@") == 0) {
+              String mismatchFullForm = mismatchName + "_" + indexOfMismatched;
+              int value = annoLocate.get(mismatchFullForm);
+              annoLocate.put(mismatchFullForm, value + 1);
+            }
+          }
+        }
+        // get the position of the first line entry in the delta
+        int position = delta.getSource().getPosition();
+        String result = "";
+        for (int j = 0; j < sourceLines.size(); j++) {
+          String element = sourceLines.get(j);
+          if (element.contains("@")) {
+            // in case there are other components in the string element other than the
+            // annotation itself
+            List<String> annoList = extractString(element);
+            for (String anno : annoList) {
+              // this is the position of the current line entry
+              int localPosition = position + j;
+              result = "@" + anno + "_" + localPosition;
+              // update the data of AnnoLocate
+              if (annoLocate.containsKey(result)) {
+                int value = annoLocate.get(result);
+                annoLocate.put(result, value + 1);
               }
             }
           }

@@ -68,6 +68,17 @@ public class InferredAnnosCounterTest {
   }
 
   @Test
+  public void smallTestForCollectionUtils() {
+    InferredAnnosCounter.main(
+        new String[] {
+          "../inputExamples/RxNorm-explorer/human-written/src/java/gov/fda/nctr/util/CollectionUtils.java",
+          "../inputExamples/RxNorm-explorer/generated/src/gov/fda/nctr/util/CollectionUtils-org.checkerframework.checker.nullness.NullnessChecker.ajava"
+        });
+    String line1 = "@NonNull got 0/10";
+    assertTrue(outputStreamCaptor.toString().trim().contains(line1));
+  }
+
+  @Test
   public void commentInMiddle() {
     InferredAnnosCounter.main(
         new String[] {"testCases/CommentInMiddle.java", "testCases/CommentInMiddle.ajava"});
@@ -144,6 +155,16 @@ public class InferredAnnosCounterTest {
         "Didn't find the correct number of @EnsuresCalledMethods annotations; expected 1/1, got: "
             + outputStreamCaptor,
         outputStreamCaptor.toString().trim().contains(line));
+  }
+
+  @Test
+  public void annotationMismatch() {
+    InferredAnnosCounter.main(
+        new String[] {"testCases/AnnotationMismatch.java", "testCases/AnnotationMismatch.ajava"});
+    String line = "@NonNull got 0/1";
+    String line2 = "@Nullable got 1/1";
+    assertTrue("Annotation is mismatched", outputStreamCaptor.toString().trim().contains(line));
+    assertTrue("Annotation is miscounted", outputStreamCaptor.toString().trim().contains(line2));
   }
 
   @Test
