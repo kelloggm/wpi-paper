@@ -203,7 +203,12 @@ public class InferredAnnosCounter {
       boolean inProgress = false;
       for (String element : temp) {
         int indexOfAnno = element.indexOf('@');
-        if (indexOfAnno != -1 && !inProgress) {
+        int indexOfElement = line.indexOf(element);
+        if (indexOfAnno != -1
+            && !inProgress
+            && indexOfElement != -1
+            && indexOfElement < line.length()
+            && notInStringLiteral(indexOfElement, line)) {
           if (resultLine.length() > 0) {
             // sometimes the annotation can be in the middle of a declaration
             formatted.add(resultLine + element.substring(0, indexOfAnno));
