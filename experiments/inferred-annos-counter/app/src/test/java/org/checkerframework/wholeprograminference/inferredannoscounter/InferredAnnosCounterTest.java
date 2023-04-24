@@ -146,6 +146,18 @@ public class InferredAnnosCounterTest {
         outputStreamCaptor.toString().trim().contains(line));
   }
 
+  /**
+   * This test is for annotations in string literals. As long as it does not throw out any
+   * exception, this will be a passing test. Otherwise, if a NullPointerException is thrown, then
+   * most likely we have forgotten to ignore annotations in string literals in
+   * eachAnnotationInASingleLine
+   */
+  @Test
+  public void TestValueExtractor() {
+    InferredAnnosCounter.main(
+        new String[] {"testCases/TestValueExtractor.java", "testCases/TestValueExtractor.ajava"});
+  }
+
   @Test
   public void dotInParathense() {
     InferredAnnosCounter.main(
