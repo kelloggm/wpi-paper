@@ -3,7 +3,9 @@
 # This script should be used on projects that contain multiple sub projects
 # that have multiple directories. This script requires that you execute it
 # using the `source` command and have -Ajava=${env.WPITEMPDIR} in the pom.xml
-# build file. This script was intended to be used only on Maven projects.
+# build file. This script was intended to be used only on Maven projects. The 
+# only changes you will have to make is to add the names of directories that
+# are subprojects for your project in the array below.
 
 # The names of the subfolders in your project that are considered subprojects.
 SUBPROJECTS=(
