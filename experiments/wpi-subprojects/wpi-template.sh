@@ -5,16 +5,18 @@
 # script with values that make sense for your project; the values there
 # now are examples.
 
+if [ -z $1 ]; then echo "Missing Args, Usage: <TEMPDIR> <OUTDIR>"; exit; fi;
+if [ -z $2 ]; then echo "Missing Args, Usage: <TEMPDIR> <OUTDIR>"; exit; fi;
 
 # The compile and clean commands for the project's build system.
-BUILD_CMD="./gradlew compileJava"
-CLEAN_CMD="./gradlew clean"
+BUILD_CMD="mvn compile"
+CLEAN_CMD="mvn clean"
 ${BUILD_CMD} # Compile the program so that WPIOUTDIR is created.
 
 # Where should the output be placed at the end? This directory is also
 # used to store intermediate WPI results. The directory does not need to
 # exist. If it does exist when this script starts, it will be deleted.
-WPITEMPDIR=tmp
+WPITEMPDIR="$1"
 # Where is WPI's output placed by the Checker Framework? This is some
 # directory ending in build/whole-program-inference. For most projects,
 # this directory is just ./build/whole-program-inference .
@@ -29,7 +31,7 @@ WPITEMPDIR=tmp
 # same build system (e.g., because of a project's settings.gradle file).
 
 # Program needs to compiled before running script so WPI creates this directory.
-WPIOUTDIR=~/.gradle/workers/build/whole-program-inference 
+WPIOUTDIR="$2"
 
 # Whether to run in debug mode. In debug mode, output is printed to the terminal
 # at the beginning of each iteration, and the diff between each pair of iterations is
