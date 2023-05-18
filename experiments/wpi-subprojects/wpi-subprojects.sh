@@ -7,11 +7,12 @@
 
 # The names of the subfolders in your project that are considered subprojects.
 SUBPROJECTS=(
+
 )
 
 # Full path to the source project/repo on the system.
 PROJECT_SPACE=$(realpath)
-PROJECT_NAME=$(basename $PROJECT_SPACE)
+PROJECT_NAME=$(basename "${PROJECT_SPACE}")
 # The root directory where all the subprojects WPITEMP directories will be stored, change tmp/ as needed.
 TOP_LEVEL=tmp/$PROJECT_NAME
 mkdir $TOP_LEVEL
