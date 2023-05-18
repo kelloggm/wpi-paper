@@ -16,19 +16,19 @@ SUBPROJECTS=(
 PROJECT_SPACE=$(realpath)
 PROJECT_NAME=$(basename "${PROJECT_SPACE}")
 # The root directory where all the subprojects WPITEMP directories will be stored, change tmp/ as needed.
-TOP_LEVEL=tmp/$PROJECT_NAME
-mkdir $TOP_LEVEL
+TOP_LEVEL=/tmp/"${PROJECT_NAME}"
+mkdir "${TOP_LEVEL}"
 
 for subProject in "${SUBPROJECTS[@]}"
 do
-    if [ -d $PROJECT_SPACE/$subProject ]
+    if [ -d "${PROJECT_SPACE}"/"${subProject}" ]
     then
         echo "$subProject Found"
-        mkdir -p ${TOP_LEVEL}/${subProject}
-        WPITEMPDIR=${TOP_LEVEL}/${subProject}
+        mkdir -p "${TOP_LEVEL}"/"${subProject}"
+        WPITEMPDIR="${TOP_LEVEL}"/"${subProject}"
         WPIOUTDIR="$PROJECT_SPACE/$subProject/build/"
         echo "Running WPI ON $subProject"
-        ./wpi.sh $WPITEMPDIR $WPIOUTDIR    
+        ./wpi.sh "${WPITEMPDIR}" "${$WPIOUTDIR}"   
     else 
         echo "$subProject Missing"
     fi
