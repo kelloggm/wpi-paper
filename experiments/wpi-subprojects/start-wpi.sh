@@ -7,11 +7,6 @@
 
 # The names of the subfolders in your project that are considered subprojects.
 SUBPROJECTS=(
-    "core"                                                    
-    "validators"                                              
-    "plugin-base"                                              
-    "maven-plugin"
-    "cli"
 )
 
 # Full path to the source project/repo on the system.
