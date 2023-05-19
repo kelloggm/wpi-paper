@@ -1,15 +1,17 @@
 #!/bin/bash
 
-# This script should be used on projects that contain multiple sub projects
-# that have multiple directories. This script requires that you execute it
-# using the `source` command and have -Ajava=${env.WPITEMPDIR} in the pom.xml
-# build file. This script was intended to be used only on Maven projects. The 
-# only changes you will have to make is to add the names of directories that
-# are subprojects for your project in the array below.
+# This script runs wpi.sh on projects that contain multiple  
+# sub projects under their respective directories within your project.
 
-# The names of the subfolders in your project that are considered subprojects.
+# The changes you will have to make include:
+# 1. Add the name of each subproject directory to the `SUBPROJECTS` array. 
+# 2. Change WPITEMPDIR to "$1" and WPIOUTDIR to "$2" in your copy 
+# of the wpi-template.sh script.
+# 3. Set -Ajava=${env.WPITEMPDIR} in the pom.xml.
+# 4. Run the script using the `source` command.
+
 SUBPROJECTS=(
-
+# Add the subdirectory names here.
 )
 
 # Full path to the source project/repo on the system.
@@ -28,6 +30,7 @@ do
         WPITEMPDIR="${TOP_LEVEL}"/"${subProject}"
         WPIOUTDIR="$PROJECT_SPACE/$subProject/build/"
         echo "Running WPI ON $subProject"
+        # Change the name of your wpi.sh script if needed.
         ./wpi.sh "${WPITEMPDIR}" "${$WPIOUTDIR}"   
     else 
         echo "$subProject Missing"

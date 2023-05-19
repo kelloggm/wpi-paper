@@ -14,6 +14,7 @@ ${BUILD_CMD} # Compile the program so that WPIOUTDIR is created.
 # Where should the output be placed at the end? This directory is also
 # used to store intermediate WPI results. The directory does not need to
 # exist. If it does exist when this script starts, it will be deleted.
+# If you are using the subprojects script, set WPITEMPDIR to "$1"
 WPITEMPDIR=tmp
 # Where is WPI's output placed by the Checker Framework? This is some
 # directory ending in build/whole-program-inference. For most projects,
@@ -29,6 +30,7 @@ WPITEMPDIR=tmp
 # same build system (e.g., because of a project's settings.gradle file).
 
 # Program needs to compiled before running script so WPI creates this directory.
+# If you are using the subprojects script, set WPIOUTDIR to "$2"
 WPIOUTDIR=~/.gradle/workers/build/whole-program-inference 
 
 # Whether to run in debug mode. In debug mode, output is printed to the terminal
