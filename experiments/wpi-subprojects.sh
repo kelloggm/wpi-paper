@@ -8,7 +8,7 @@
 # 2. Change WPITEMPDIR to "$1" and WPIOUTDIR to "$2" in your copy 
 #    of the wpi-template.sh script.
 # 3. Set -Ajava=${env.WPITEMPDIR} in the pom.xml.
-# 4. Run the script using the `source` command.
+# 4. Run this script using the `source` command.
 
 # Other changes (to this script, the wpi.sh script, the project's 
 # build system, or any combination of the former) may also 
@@ -17,32 +17,26 @@
 
 # This variable is where the WPI Project root directory will be made and will store the entire project output (PROJECT_TEMP_ROOT).
 TOP_LEVEL=/tmp
+WPI_SCRIPT_NAME="wpi.sh"
 
+SUBPROJECTS=(
+# Add the subdirectory names here.
+)
 
-# Full path to the source project/repo on the system.
+# No changes needed below this point
 PROJECT_SPACE=$(realpath)
 PROJECT_NAME=$(basename "${PROJECT_SPACE}")
 PROJECT_TEMP_ROOT="${TOP_LEVEL}"/"${PROJECT_NAME}"
 
 mkdir "${PROJECT_TEMP_ROOT}"
 
-SUBPROJECTS=(
-# Add the subdirectory names here.
-)
-
-NO_MISSING_PROJECTS=true
 for subProject in "${SUBPROJECTS[@]}"
 do
     if [ -d "${PROJECT_SPACE}"/"${subProject}" ]
     then
-        echo "$subProject found"
+        continue
     else 
-        echo "$subProject not found"
-        NO_MISSING_PROJECTS=false
-    fi 
-
-    if [ "${NO_MISSING_PROJECTS}" = false ] ; then 
-        echo "Subprojects not found, check your array list.";
+        echo "$subProject not found, check your array list.";
         return
     fi 
 done 
@@ -53,5 +47,5 @@ do
     WPITEMPDIR="${PROJECT_TEMP_ROOT}"/"${subProject}"
     WPIOUTDIR="$PROJECT_SPACE/$subProject/build/"
     echo "Running WPI ON $subProject"
-    ./wpi.sh $WPITEMPDIR $WPIOUTDIR
+    ./$WPI_SCRIPT_NAME $WPITEMPDIR $WPIOUTDIR
 done
