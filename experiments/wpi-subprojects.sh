@@ -32,10 +32,8 @@ mkdir "${PROJECT_TEMP_ROOT}"
 
 for subProject in "${SUBPROJECTS[@]}"
 do
-    if [ -d "${PROJECT_SPACE}"/"${subProject}" ]
-    then
-        continue
-    else 
+    if [ ! -d "${PROJECT_SPACE}"/"${subProject}" ]
+    then 
         echo "$subProject not found, check your array list.";
         return
     fi 
@@ -46,6 +44,5 @@ do
     mkdir -p "${PROJECT_TEMP_ROOT}"/"${subProject}"
     WPITEMPDIR="${PROJECT_TEMP_ROOT}"/"${subProject}"
     WPIOUTDIR="$PROJECT_SPACE/$subProject/build/"
-    echo "Running WPI ON $subProject"
     ./$WPI_SCRIPT_NAME $WPITEMPDIR $WPIOUTDIR
 done
