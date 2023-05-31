@@ -9,7 +9,7 @@ repositories=(
   "https://github.com/dd482IT/dmn-check-wpi.git"
   "https://github.com/kelloggm/icalavailable" 
   "https://github.com/dd482IT/require-javadoc-WPI"
-  #"https://github.com/dd482IT/randoop-wpi.git"
+  "https://github.com/dd482IT/randoop-wpi.git"
   "https://github.com/dd482IT/table-wrapper-csv-impl-wpi.git"
   "https://github.com/dd482IT/table-wrapper-api-WPI.git"
   "https://github.com/dd482IT/RxNorm-explorer-wpi.git"
