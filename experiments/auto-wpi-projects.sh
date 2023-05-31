@@ -26,9 +26,9 @@ if [ ! -d $PROJECT_DIR ]; then mkdir $PROJECT_DIR; fi
 pushd "$PROJECT_DIR"
 
 # Java home should be set to the path for JAVA 11 as some projects only run under Java 11.
-if [ -z "$JAVA_HOME" ]; then echo "JAVA_HOME is empty"; exit; fi; 
+if [ -z "$JAVA_HOME" ]; then echo "JAVA_HOME enviornment variable is empty"; exit; fi; 
 # This path will only be used by gradle projects running them with the -PcfLocal argument.
-if [ -z "$CHECKERFRAMEWORK" ]; then echo "An error has occured with the checkerframework path"; exit; fi; 
+if [ -z "$CHECKERFRAMEWORK" ]; then echo "checkerframework enviornment variable is empty"; exit; fi; 
 for repository in "${repositories[@]}"
 do
   # Default
